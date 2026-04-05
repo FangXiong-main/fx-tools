@@ -15,14 +15,14 @@ import java.util.function.Function;
 
 import static com.fangxiong.redis.SystemConstants.*;
 
-public class RedisUtil {
+public class RedisUtils {
     private final StringRedisTemplate stringRedisTemplate;
 
     /**
      * 构造方法
      * @param stringRedisTemplate redis模板
      */
-    public RedisUtil(StringRedisTemplate stringRedisTemplate) {
+    public RedisUtils(StringRedisTemplate stringRedisTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
     }
 

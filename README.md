@@ -1,10 +1,26 @@
 # fx-tools 通用工具包
 
-基于 SpringBoot 开发的 Redis 增强工具库，提供缓存穿透、缓存击穿、逻辑过期等高并发解决方案。
+基于 SpringBoot 开发的 Redis等的增强工具库
 
-## 项目介绍
+## 核心功能
 
-通用工具包，简化 Redis 操作，封装企业级缓存方案，开箱即用。
+### 基础缓存操作
+
+- `setStringValue`：存储字符串数据
+- `getStringValue`：获取字符串数据
+
+### 高并发缓存解决方案
+
+- 缓存穿透（缓存空值）
+- 缓存击穿（互斥锁）
+- 逻辑过期（异步更新）
+
+### 全局随机ID生成器
+
+## 版本更新日志
+### v1.0.0 完成基于缓存穿透、缓存击穿、逻辑过期等高并发查询的开发。
+### v1.0.1 完成基于Redis自增的全局随机Id生成器的开发
+
 
 ## 快速开始
 
@@ -58,18 +74,10 @@
 
     redisUtil.queryWithLogicalExpire(key, id, User.class, 30L, TimeUnit.MINUTES, executorService, userMapper::selectById);
 
-## 核心功能
+#### 全局随机ID生成器
+    
+    redisUtil.uniqueIdGenerator(String keyPrefix,LocalDateTime startTime,int timeStampDigits,int machineCodeDigits,int sequenceDigits,long machineCode)
 
-### 基础缓存操作
-
-- `setStringValue`：存储字符串数据
-- `getStringValue`：获取字符串数据
-
-### 高并发缓存解决方案
-
-- 缓存穿透（缓存空值）
-- 缓存击穿（互斥锁）
-- 逻辑过期（异步更新）
 
 ## 环境依赖
 
