@@ -24,12 +24,17 @@
 
 ## 快速开始
 
+### Maven项目导入Jar包
+在项目主目录下新建lib文件夹,并将jar文件放入
+
 ### 引入 Maven 依赖
 
     <dependency>
-        <groupId>com.fangxiong</groupId>
-        <artifactId>fx-tools</artifactId>
-        <version>1.0-SNAPSHOT</version>
+            <groupId>com.fangxiong</groupId>
+            <artifactId>fx-tools</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/jar包文件名称.jar(例:fx-tools-1.0)</systemPath>
     </dependency>
 
 ### 配置 Redis 连接
