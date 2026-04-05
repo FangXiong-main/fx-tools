@@ -34,7 +34,7 @@
             <artifactId>fx-tools</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/jar包文件名称.jar(例:fx-tools-1.0)</systemPath>
+            <systemPath>${project.basedir}/lib/jar包文件名称.jar(例:fx-tools-1.0.jar)</systemPath>
     </dependency>
 
 ### 配置 Redis 连接
