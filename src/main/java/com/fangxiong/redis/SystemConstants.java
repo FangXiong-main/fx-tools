@@ -2,4 +2,6 @@ package com.fangxiong.redis;
 
 public class SystemConstants {
     public static final String TEMP_LOCK_KEY = "temp:lock:";
+    public static final String INCREASE_PREFIX_KEY = "icr:";
+    public static final int MAX_DIGITS_OF_ID = 63;
 }

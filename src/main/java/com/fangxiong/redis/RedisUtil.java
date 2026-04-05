@@ -7,11 +7,13 @@ import cn.hutool.json.JSONUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-import static com.fangxiong.redis.SystemConstants.TEMP_LOCK_KEY;
+import static com.fangxiong.redis.SystemConstants.*;
 
 public class RedisUtil {
     private final StringRedisTemplate stringRedisTemplate;
@@ -172,6 +174,40 @@ public class RedisUtil {
             }
         });
         return r;
+    }
+
+    /**
+     * 基于Redis自增的全局唯一Id生成器 格式：自定义时间戳位数，机器码位数，序列号位数(时间戳+机器码+序列号)
+     * @param keyPrefix Key值前缀 redis自增Key值格式：（icr：keyPrefix：startTime）
+     * @param startTime 初始时间 时间戳格式：now - startTime
+     * @param timeStampDigits Id中时间戳所占的位数
+     * @param machineCodeDigits Id中机器码所占的位数
+     * @param sequenceDigits Id中序列号所占的位数
+     * @param machineCode 机器码
+    */
+    public long uniqueIdGenerator(String keyPrefix,LocalDateTime startTime,int timeStampDigits,int machineCodeDigits,int sequenceDigits,long machineCode) {
+        if(timeStampDigits+machineCodeDigits+sequenceDigits>MAX_DIGITS_OF_ID || timeStampDigits+machineCodeDigits+sequenceDigits<=0){
+            throw new RuntimeException("设定的Id位数超出最大63位的限制！且最少为1位，The digits of the Id digits must be less than or equal to 63 and greater than or equal to 1");
+        }
+        long id = 0;long digitsCount = 0;
+        LocalDateTime now = LocalDateTime.now();
+        String timeKey = now.format(DateTimeFormatter.ofPattern("yyyy:MM:dd"));
+        long timeStampKey = now.toEpochSecond(ZoneOffset.UTC) - startTime.toEpochSecond(ZoneOffset.UTC);
+        Long sequenceNum = stringRedisTemplate.opsForValue().increment(INCREASE_PREFIX_KEY + keyPrefix + ":" + timeKey);
+        if(timeStampDigits!=0){
+            id = timeStampKey<<(MAX_DIGITS_OF_ID-timeStampDigits);
+            digitsCount+=timeStampDigits;
+        }
+        if(machineCodeDigits!=0){
+            long temp = machineCode << MAX_DIGITS_OF_ID - machineCodeDigits - digitsCount;
+            digitsCount+=machineCodeDigits;
+            id = id | temp;
+        }
+        if(sequenceDigits!=0){
+            long temp = sequenceNum << MAX_DIGITS_OF_ID - sequenceDigits - digitsCount ;
+            id = id | temp;
+        }
+        return id;
     }
 
     /**
