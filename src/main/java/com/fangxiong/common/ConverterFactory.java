@@ -3,6 +3,8 @@ package com.fangxiong.common;
 import com.fangxiong.annotations.TimeType;
 import com.fangxiong.common.converters.LocalDateTimeConverter;
 
+import java.lang.reflect.Field;
+import java.sql.Time;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -10,22 +12,18 @@ import java.util.Map;
 
 public class ConverterFactory {
     private static final Map<Class<?>,Converter> converterMap = new HashMap<>();
-    private static TimeType timeType;
+
     static {
-        converterMap.put(LocalDateTimeConverter.class,jsonString -> LocalDateTime.parse(jsonString, DateTimeFormatter.ofPattern(timeType.value())));
+        converterMap.put(LocalDateTime.class,new LocalDateTimeConverter());
+        converterMap.put(Integer.class,Integer::valueOf);
+        converterMap.put(Long.class,Long::valueOf);
+        converterMap.put(String.class,jsonString -> jsonString);
+        converterMap.put(int.class, Integer::parseInt);
+        converterMap.put(long.class,Long::parseLong);
     }
 
-    private static <A> A getAnnotation(Class<?> clazz){
-        A a=null;
-        return a;
-    }
-
-    public static <T> Converter getConverter(Class<T> clazzType){
-        T annotation = getAnnotation(clazzType);
-        TimeType timeTypeStringValue = clazzType.getAnnotation(TimeType.class);
-        if (timeTypeStringValue!=null){
-            timeType=timeTypeStringValue;
-        }
+    public static Converter getConverter(Class<?> clazzType){
         return converterMap.get(clazzType);
     }
+
 }

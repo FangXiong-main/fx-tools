@@ -7,7 +7,7 @@ public class TestEntity {
     private String name;
     private int age;
     private String gender;
-    @TimeType("yyyy-MM-dd")
+    @TimeType("yyyy-MM-dd HH:mm:ss")
     private LocalDateTime date;
 
     public TestEntity() {
@@ -59,5 +59,16 @@ public class TestEntity {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    @Override
+    public String toString() {
+        return "TestEntity{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                ", gender='" + gender + '\'' +
+                ", date=" + date +
+                '}';
     }
 }

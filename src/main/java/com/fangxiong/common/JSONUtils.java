@@ -3,6 +3,7 @@ package com.fangxiong.common;
 import com.fangxiong.annotations.TimeType;
 import org.springframework.boot.json.JacksonJsonParser;
 
+import java.lang.invoke.CallSite;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -46,24 +47,25 @@ public class JSONUtils {
     }
     public static <T> T jsonToBean(String jsonString, Class<T> clazz) {
         T t;
+        Object converted = null;String valueString;
         Field[] df = clazz.getDeclaredFields();
         try {
             Constructor<T> dc = clazz.getDeclaredConstructor();
             t = dc.newInstance();
             for (Field f : df){
-                Class<?> fieldType = f.getType();
-                System.out.println(f.getName());
                 Pattern pattern = Pattern.compile("\"" + f.getName() + "\"\\s*:\\s*\"(.*?)\"");
                 Matcher matcher = pattern.matcher(jsonString);
-                Object fieldValue = null;
                 if (matcher.find()) {
-                    fieldValue = matcher.group(1);
-
-                    System.out.println(fieldValue);
+                    valueString = matcher.group(1);
+                   if (f.getType()!=LocalDateTime.class){
+                       converted = ConverterFactory.getConverter(f.getType()).convert(valueString);
+                   }else{
+                       converted = LocalDateTime.parse(valueString,DateTimeFormatter.ofPattern(f.getAnnotation(TimeType.class).value()));
+                   }
                 }
                 f.setAccessible(true);
-                if(fieldValue!=null){
-                    f.set(t,fieldValue);
+                if(converted!=null){
+                    f.set(t,converted);
                 }
             }
         } catch (Exception e) {
