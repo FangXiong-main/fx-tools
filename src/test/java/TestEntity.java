@@ -1,14 +1,32 @@
+import com.fangxiong.annotations.TimeType;
+
+import java.time.LocalDateTime;
+
 public class TestEntity {
     private int id;
     private String name;
     private int age;
     private String gender;
+    @TimeType("yyyy-MM-dd")
+    private LocalDateTime date;
 
-    public TestEntity(int id, String name, int age, String gender) {
+    public TestEntity() {
+    }
+
+    public TestEntity(int id, String name, int age, String gender, LocalDateTime date) {
         this.id = id;
         this.name = name;
         this.age = age;
         this.gender = gender;
+        this.date = date;
+    }
+
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDateTime date) {
+        this.date = date;
     }
 
     public int getId() {
