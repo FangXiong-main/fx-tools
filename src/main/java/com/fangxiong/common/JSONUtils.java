@@ -24,14 +24,8 @@ public class JSONUtils {
             sb.append("{").append("\n");
             for (Field f : df) {
                 f.setAccessible(true);
-                TimeType annotation = f.getAnnotation(TimeType.class);
                 sb.append("  ").append("\"").append(f.getName()).append("\" : ").append("\"");
-                if (annotation!=null){
-                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(annotation.value());
-                    sb.append(dateTimeFormatter.format((LocalDateTime)f.get(o)));
-                }else{
-                    sb.append(f.get(o).toString());
-                }
+                sb.append(ParserFactory.getParser(f.getType()).parse(f.get(o), f));
                 sb.append("\"");
                 tempCounter++;
                 if (df.length > 1 && tempCounter!=df.length) {
@@ -47,21 +41,16 @@ public class JSONUtils {
     }
     public static <T> T jsonToBean(String jsonString, Class<T> clazz) {
         T t;
-        Object converted = null;String valueString;
+        Object converted = null;
         Field[] df = clazz.getDeclaredFields();
         try {
             Constructor<T> dc = clazz.getDeclaredConstructor();
             t = dc.newInstance();
             for (Field f : df){
-                Pattern pattern = Pattern.compile("\"" + f.getName() + "\"\\s*:\\s*\"(.*?)\"");
+                Pattern pattern = Pattern.compile("\"" + f.getName() + "\"\\s*:\\s*\"(.*)\"");
                 Matcher matcher = pattern.matcher(jsonString);
                 if (matcher.find()) {
-                    valueString = matcher.group(1);
-                   if (f.getType()!=LocalDateTime.class){
-                       converted = ConverterFactory.getConverter(f.getType()).convert(valueString);
-                   }else{
-                       converted = LocalDateTime.parse(valueString,DateTimeFormatter.ofPattern(f.getAnnotation(TimeType.class).value()));
-                   }
+                    converted = ConverterFactory.getConverter(f.getType()).convert(matcher.group(1), f);
                 }
                 f.setAccessible(true);
                 if(converted!=null){

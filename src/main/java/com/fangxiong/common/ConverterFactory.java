@@ -15,11 +15,11 @@ public class ConverterFactory {
 
     static {
         converterMap.put(LocalDateTime.class,new LocalDateTimeConverter());
-        converterMap.put(Integer.class,Integer::valueOf);
-        converterMap.put(Long.class,Long::valueOf);
-        converterMap.put(String.class,jsonString -> jsonString);
-        converterMap.put(int.class, Integer::parseInt);
-        converterMap.put(long.class,Long::parseLong);
+        converterMap.put(Integer.class,(s,f)-> Integer.parseInt(s));
+        converterMap.put(Long.class,(s,f)-> Long.parseLong(s));
+        converterMap.put(String.class,(s,f)-> s);
+        converterMap.put(int.class, (s,f)-> Integer.parseInt(s));
+        converterMap.put(long.class,(s,f)-> Long.parseLong(s));
     }
 
     public static Converter getConverter(Class<?> clazzType){

@@ -7,7 +7,7 @@ public class TestEntity {
     private String name;
     private int age;
     private String gender;
-    @TimeType("yyyy-MM-dd HH:mm:ss")
+    @TimeType("yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime date;
 
     public TestEntity() {

@@ -10,24 +10,9 @@ import java.time.format.DateTimeFormatter;
 
 public class LocalDateTimeConverter implements Converter {
 
-
     @Override
-    public Object convert(String s) {
-        return null;
-    }
-
-    public Object convertWithAnnotation(String s,Class<?> clazz){
-        Field[] dc = clazz.getDeclaredFields();
-        TimeType timeType = null;
-        for (Field f : dc){
-            timeType = f.getDeclaredAnnotation(TimeType.class);
-            if(timeType!=null) {
-                break;
-            }
-        }
-        if (timeType != null){
-            return LocalDateTime.parse(s, DateTimeFormatter.ofPattern(timeType.value()));
-        }
-        return LocalDateTime.parse(s);
+    public Object convert(String s, Field field) {
+        TimeType timeType = field.getAnnotation(TimeType.class);
+        return LocalDateTime.parse(s,DateTimeFormatter.ofPattern(timeType.value()));
     }
 }
