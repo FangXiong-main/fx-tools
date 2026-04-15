@@ -1,5 +1,7 @@
 package com.fangxiong.common;
 
+import com.fangxiong.common.parsers.ObjectParser;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.regex.Matcher;
@@ -10,7 +12,9 @@ public class JSONUtils {
         Class<?> c = o.getClass();
         StringBuilder sb = new StringBuilder();
         if(CustomizeClazzDetector.isCustomizeClazz(c)){
-            sb.append(ParserFactory.getParser(o.getClass()).parse(o, null));
+            sb.append(ParserFactory.getParser(c).parse(o, null));
+        }else if(CustomizeClazzDetector.isDigitalClazz(c)){
+            sb.append("{\n").append("  \"").append(ParserFactory.getParser(c).parse(o,null)).append("\"\n}");
         }else{
             sb.append(ParserFactory.getParser(c).parse(o, null));
         }

@@ -183,7 +183,15 @@ public class FunctionTest {
     @Test
     public void testJSONUtils2() {
         TestEntity testEntity = new TestEntity(1,"FX",20,"male",LocalDateTime.now());
-        TestEntity2 testEntity2 = new TestEntity2(1,20,"Su",testEntity);
+        Map<String,TestEntity> map = new HashMap<>();
+        map.put("Test1",new TestEntity(20,"fx",20,"male",LocalDateTime.now()));
+        ArrayList<Object> list = new ArrayList<>();
+        list.add("测试");
+        list.add(100);
+        list.add(99.9);
+        list.add(true);
+        list.add(null);
+        TestEntity2 testEntity2 = new TestEntity2(10,"Su",22,testEntity,map,list);
         String jsonString = JSONUtils.toJSONStr(testEntity2);
         System.out.println(jsonString);
     }

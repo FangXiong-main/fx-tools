@@ -1,9 +1,11 @@
 package com.fangxiong.common.parsers;
 
+import com.fangxiong.common.CustomizeClazzDetector;
 import com.fangxiong.common.JSONParser;
 import com.fangxiong.common.ParserFactory;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -14,16 +16,30 @@ public class ObjectParser implements JSONParser {
     @Override
     public String parse(Object o, Field f) {
         StringBuilder sb = new StringBuilder();
-        Field[] df = o.getClass().getDeclaredFields();
+        Class<?> clazz = o.getClass();
+        Field[] df = clazz.getDeclaredFields();
+        int totalCount = df.length;
+        int tempCount = 0;
         sb.append("{\n");
         try {
             for(Field fd : df){
-                fd.setAccessible(true);
-                ParserFactory.getParser(fd.getType()).parse(fd.get(o), fd);
+                Method dm = clazz.getDeclaredMethod("get" + Character.toUpperCase(fd.getName().charAt(0)) + fd.getName().substring(1));
+                sb.append("  \"").append(fd.getName()).append("\"  :  ");
+                String parsed = ParserFactory.getParser(fd.getType()).parse(dm.invoke(o), fd);
+                sb.append(parsed);
+                tempCount++;
+                if(tempCount<totalCount){
+                    sb.append(",");
+                    sb.append("\n");
+                }
             }
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return "";
+        sb.append("\n");
+        sb.append("}");
+        return sb.toString();
     }
+
+
 }

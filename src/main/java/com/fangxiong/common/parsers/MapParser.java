@@ -17,9 +17,7 @@ public class MapParser implements JSONParser {
         int totalCount = map.size();
         int tempCount = 0;
         Set<?> keySet = map.keySet();
-        if (f!=null){
-            sb.append("  \"").append(f.getName()).append("\"  :  ");
-        }
+        Field tempField;
         sb.append("{");
         if (totalCount>0){
             sb.append("\n");

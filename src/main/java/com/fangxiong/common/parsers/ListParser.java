@@ -8,15 +8,14 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 public class ListParser implements JSONParser {
+
+
     @Override
     public String parse(Object o, Field f) {
         StringBuilder sb = new StringBuilder();
         List<?> l = (List<?>) o;
         int totalCount = l.size();
         int tempCount = 0;
-        if(f!=null){
-            sb.append("\"").append(f.getName()).append("\"  :  ");
-        }
         sb.append("[");
         if(totalCount>0){
             sb.append("\n");
