@@ -1,41 +1,18 @@
 package com.fangxiong.common;
 
-import com.fangxiong.annotations.TimeType;
-import org.springframework.boot.json.JacksonJsonParser;
-
-import java.lang.invoke.CallSite;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Type;
-import java.text.DateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class JSONUtils {
-    public static String toJSONString(Object o) {
+    public static String toJSONStr(Object o) {
         Class<?> c = o.getClass();
-        Field[] df = c.getDeclaredFields();
         StringBuilder sb = new StringBuilder();
-        int tempCounter = 0;
-        try {
-            sb.append("{").append("\n");
-            for (Field f : df) {
-                f.setAccessible(true);
-                sb.append("  ").append("\"").append(f.getName()).append("\" : ").append("\"");
-                sb.append(ParserFactory.getParser(f.getType()).parse(f.get(o), f));
-                sb.append("\"");
-                tempCounter++;
-                if (df.length > 1 && tempCounter!=df.length) {
-                    sb.append(",");
-                }
-                sb.append("\n");
-            }
-            sb.append("}");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        if(CustomizeClazzDetector.isCustomizeClazz(c)){
+            sb.append(ParserFactory.getParser(o.getClass()).parse(o, null));
+        }else{
+            sb.append(ParserFactory.getParser(c).parse(o, null));
         }
         return sb.toString();
     }
