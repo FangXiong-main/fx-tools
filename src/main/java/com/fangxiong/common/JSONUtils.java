@@ -10,15 +10,7 @@ import java.util.regex.Pattern;
 public class JSONUtils {
     public static String toJSONStr(Object o) {
         Class<?> c = o.getClass();
-        StringBuilder sb = new StringBuilder();
-        if(CustomizeClazzDetector.isCustomizeClazz(c)){
-            sb.append(ParserFactory.getParser(c).parse(o, null));
-        }else if(CustomizeClazzDetector.isDigitalOrBooleanClazz(c)){
-            sb.append(ParserFactory.getParser(c).parse(o,null));
-        }else{
-            sb.append(ParserFactory.getParser(c).parse(o, null));
-        }
-        return decorateJSONStr(sb.toString());
+        return decorateJSONStr(ParserFactory.getParser(c).parse(o, null));
     }
     public static <T> T jsonToBean(String jsonString, Class<T> clazz) {
         T t;

@@ -14,23 +14,7 @@ import java.util.Set;
 
 public class CustomizeClazzDetector {
     private static final ArrayList<Class<?>> clazzList = new ArrayList<>();
-    private static final ArrayList<Class<?>> digitalOrBooleanClazzList = new ArrayList<>();
     static {
-        //DigitalOrBooleanClazz
-        digitalOrBooleanClazzList.add(Integer.class);
-        digitalOrBooleanClazzList.add(Long.class);
-        digitalOrBooleanClazzList.add(Short.class);
-        digitalOrBooleanClazzList.add(Double.class);
-        digitalOrBooleanClazzList.add(Float.class);
-        digitalOrBooleanClazzList.add(int.class);
-        digitalOrBooleanClazzList.add(long.class);
-        digitalOrBooleanClazzList.add(short.class);
-        digitalOrBooleanClazzList.add(double.class);
-        digitalOrBooleanClazzList.add(float.class);
-        digitalOrBooleanClazzList.add(Boolean.class);
-        digitalOrBooleanClazzList.add(boolean.class);
-
-
         clazzList.add(Integer.class);
         clazzList.add(Long.class);
         clazzList.add(Short.class);
@@ -72,7 +56,4 @@ public class CustomizeClazzDetector {
         return !clazzList.contains(clazz);
     }
 
-    public static Boolean isDigitalOrBooleanClazz(Class<?> clazz){
-        return digitalOrBooleanClazzList.contains(clazz);
-    }
 }

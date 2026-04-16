@@ -4,12 +4,16 @@ import com.fangxiong.common.StrUtils;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FunctionTest {
+    //TODO add Parser for Set and more tye;
+    @Test
+    public void errorTest(){
+        Set<String> set = new HashSet<>();
+        set.add("FX");
+        JSONUtils.toJSONStr(set);
+    }
 
     @Test
     public void beanToJSONFinalTest(){
