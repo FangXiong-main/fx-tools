@@ -15,7 +15,10 @@ public class ParserFactory {
     private static final Map<Class<?>, JSONParser> parserMap = new HashMap<>();
 
     static{
-        parserMap.put(String.class,(o,f)->o==null ? null : "\""+ o +"\"");
+        parserMap.put(String.class,(o,f)->{
+            if(o==null) return null;
+            return "\""+JSONUtils.convertEscapeCharacterToStr(o.toString())+"\"";
+        });
         parserMap.put(int.class,(o,f)->o==null ? null : o.toString());
         parserMap.put(long.class,(o,f)->o==null ? null : o.toString());
         parserMap.put(Integer.class,(o,f)->o==null ? null : o.toString());

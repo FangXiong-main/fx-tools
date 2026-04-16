@@ -14,19 +14,21 @@ import java.util.Set;
 
 public class CustomizeClazzDetector {
     private static final ArrayList<Class<?>> clazzList = new ArrayList<>();
-    private static final ArrayList<Class<?>> digitalClazzList = new ArrayList<>();
+    private static final ArrayList<Class<?>> digitalOrBooleanClazzList = new ArrayList<>();
     static {
-        //DigitalClazz
-        digitalClazzList.add(Integer.class);
-        digitalClazzList.add(Long.class);
-        digitalClazzList.add(Short.class);
-        digitalClazzList.add(Double.class);
-        digitalClazzList.add(Float.class);
-        digitalClazzList.add(int.class);
-        digitalClazzList.add(long.class);
-        digitalClazzList.add(short.class);
-        digitalClazzList.add(double.class);
-        digitalClazzList.add(float.class);
+        //DigitalOrBooleanClazz
+        digitalOrBooleanClazzList.add(Integer.class);
+        digitalOrBooleanClazzList.add(Long.class);
+        digitalOrBooleanClazzList.add(Short.class);
+        digitalOrBooleanClazzList.add(Double.class);
+        digitalOrBooleanClazzList.add(Float.class);
+        digitalOrBooleanClazzList.add(int.class);
+        digitalOrBooleanClazzList.add(long.class);
+        digitalOrBooleanClazzList.add(short.class);
+        digitalOrBooleanClazzList.add(double.class);
+        digitalOrBooleanClazzList.add(float.class);
+        digitalOrBooleanClazzList.add(Boolean.class);
+        digitalOrBooleanClazzList.add(boolean.class);
 
 
         clazzList.add(Integer.class);
@@ -70,7 +72,7 @@ public class CustomizeClazzDetector {
         return !clazzList.contains(clazz);
     }
 
-    public static Boolean isDigitalClazz(Class<?> clazz){
-        return digitalClazzList.contains(clazz);
+    public static Boolean isDigitalOrBooleanClazz(Class<?> clazz){
+        return digitalOrBooleanClazzList.contains(clazz);
     }
 }

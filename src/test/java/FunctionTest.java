@@ -12,6 +12,67 @@ import java.util.Map;
 public class FunctionTest {
 
     @Test
+    public void beanToJSONFinalTest(){
+        // 1. 基础实体 TestEntity
+        TestEntity testEntity = new TestEntity(1, "hello\"Java\\Json\n测试\t制表符'单引号'", 20, "男", LocalDateTime.now());
+        System.out.println(JSONUtils.toJSONStr(testEntity));
+
+        // 2. 复杂嵌套实体 TestEntity2
+        TestEntity header = new TestEntity(2, "子对象\n内容", 18, "女", LocalDateTime.now());
+
+        Map<String, TestEntity> map = new HashMap<>();
+        map.put("user1", new TestEntity(3, "Map内部实体", 25, "未知", LocalDateTime.now()));
+
+        List<Object> list = new ArrayList<>();
+        list.add(999);
+        list.add("列表字符串\"转义测试\"");
+        list.add(3.14);
+        list.add(Boolean.TRUE);
+        list.add(new TestEntity(4, "List里的实体", 30, "男", LocalDateTime.now()));
+
+        TestEntity2 testEntity2 = new TestEntity2(1001, "嵌套测试<>&\"特殊字符'", 22, header, map, list);
+        System.out.println(JSONUtils.toJSONStr(testEntity2));
+
+        // 3. ArrayList 混合类型（无 null，安全版）
+        List<Object> arrayList = new ArrayList<>();
+        arrayList.add(10);
+        arrayList.add(20.5);
+        arrayList.add("换行\n测试\\反斜杠");
+        arrayList.add(Integer.MAX_VALUE);
+        System.out.println(JSONUtils.toJSONStr(arrayList));
+
+        // 4. Map 混合类型
+        Map<String, Object> testMap = new HashMap<>();
+        testMap.put("title", "标题\"双引号测试\"");
+        testMap.put("data", new TestEntity(5, "map-value实体", 28, "女", LocalDateTime.now()));
+        testMap.put("num", 666);
+        System.out.println(JSONUtils.toJSONStr(testMap));
+
+        // 5. 字符串高强度转义测试
+        String testStr = "\"首尾双引号\\中间反斜杠\n换行\r回车\t制表\b退格\u0001隐藏符测试";
+        System.out.println(JSONUtils.toJSONStr(testStr));
+
+        // 6. 普通数字
+        Integer num = 9527;
+        System.out.println(JSONUtils.toJSONStr(num));
+
+        // 7. 普通布尔
+        Boolean flag = true;
+        System.out.println(JSONUtils.toJSONStr(flag));
+    }
+
+    @Test
+    public void testEscapedCharactersConvertor(){
+        String testStr = """
+                hello"Java\\Json
+                测试换行
+                \t我是制表符'单引号'
+                \b冷门退格符\u0007""";
+        String s = JSONUtils.convertEscapeCharacterToStr(testStr);
+        System.out.println(s);
+    }
+
+    @Test
     public void testListToJSON() {
         // 1. List<String>
         ArrayList<String> list1 = new ArrayList<>();

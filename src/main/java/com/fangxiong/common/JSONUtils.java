@@ -13,12 +13,12 @@ public class JSONUtils {
         StringBuilder sb = new StringBuilder();
         if(CustomizeClazzDetector.isCustomizeClazz(c)){
             sb.append(ParserFactory.getParser(c).parse(o, null));
-        }else if(CustomizeClazzDetector.isDigitalClazz(c)){
-            sb.append("{\n").append("  \"").append(ParserFactory.getParser(c).parse(o,null)).append("\"\n}");
+        }else if(CustomizeClazzDetector.isDigitalOrBooleanClazz(c)){
+            sb.append(ParserFactory.getParser(c).parse(o,null));
         }else{
             sb.append(ParserFactory.getParser(c).parse(o, null));
         }
-        return sb.toString();
+        return decorateJSONStr(sb.toString());
     }
     public static <T> T jsonToBean(String jsonString, Class<T> clazz) {
         T t;
@@ -42,5 +42,56 @@ public class JSONUtils {
             throw new RuntimeException(e);
         }
         return t;
+    }
+
+    public static String convertEscapeCharacterToStr(String str){
+        StringBuilder sb = new StringBuilder();
+        char[] charArray = str.toCharArray();
+        for(char c : charArray){
+            if(c == '"'){
+                sb.append("\\\"");
+            } else if (c == '\\') {
+                sb.append("\\\\");
+            } else if (c == '\b') {
+                sb.append("\\").append("b");
+            } else if (c == '\f') {
+                sb.append("\\").append("f");
+            } else if (c == '\n') {
+                sb.append("\\").append("n");
+            } else if (c == 'r') {
+                sb.append("\\").append("r");
+            } else if (c == '\t') {
+                sb.append("\\").append("t");
+            } else if (c <= 31) {
+                sb.append(String.format("\\u%04X",(int)c));
+            }else {
+                sb.append(c);
+            }
+        }
+        return  sb.toString();
+    }
+
+    public static String decorateJSONStr(String jsonStr){
+        StringBuilder sb = new StringBuilder();
+        int tempCount=0;
+        char[] jsonStrCharArray = jsonStr.toCharArray();
+        char previousChar = ' ';
+        for(char c : jsonStrCharArray){
+            if(c=='{' || c=='['){
+                tempCount+=2;
+                sb.append(c).append("\n").append(" ".repeat(tempCount));
+            } else if (c == ':' && previousChar == '\"') {
+                sb.append(c).append(" ");
+            } else if (c == ',') {
+                sb.append(c).append("\n").append(" ".repeat(tempCount));
+            } else if (c == '}' || c==']') {
+                tempCount-=2;
+                sb.append("\n").append(" ".repeat(tempCount)).append(c);
+            }else {
+                sb.append(c);
+            }
+            previousChar = c;
+        }
+        return sb.toString();
     }
 }

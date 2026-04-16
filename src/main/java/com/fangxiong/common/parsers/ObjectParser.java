@@ -20,23 +20,21 @@ public class ObjectParser implements JSONParser {
         Field[] df = clazz.getDeclaredFields();
         int totalCount = df.length;
         int tempCount = 0;
-        sb.append("{\n");
+        sb.append("{");
         try {
             for(Field fd : df){
                 Method dm = clazz.getDeclaredMethod("get" + Character.toUpperCase(fd.getName().charAt(0)) + fd.getName().substring(1));
-                sb.append("  \"").append(fd.getName()).append("\"  :  ");
+                sb.append("\"").append(fd.getName()).append("\":");
                 String parsed = ParserFactory.getParser(fd.getType()).parse(dm.invoke(o), fd);
                 sb.append(parsed);
                 tempCount++;
                 if(tempCount<totalCount){
                     sb.append(",");
-                    sb.append("\n");
                 }
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        sb.append("\n");
         sb.append("}");
         return sb.toString();
     }

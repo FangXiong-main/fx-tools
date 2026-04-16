@@ -17,11 +17,7 @@ public class ListParser implements JSONParser {
         int totalCount = l.size();
         int tempCount = 0;
         sb.append("[");
-        if(totalCount>0){
-            sb.append("\n");
-        }
         for(Object obj : l){
-            sb.append("  ");
             if(obj == null){
                 sb.append("null");
             }else{
@@ -32,7 +28,6 @@ public class ListParser implements JSONParser {
             if(tempCount<totalCount){
                 sb.append(",");
             }
-            sb.append("\n");
         }
         sb.append("]");
         return sb.toString();

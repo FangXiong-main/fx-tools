@@ -17,14 +17,10 @@ public class MapParser implements JSONParser {
         int totalCount = map.size();
         int tempCount = 0;
         Set<?> keySet = map.keySet();
-        Field tempField;
         sb.append("{");
-        if (totalCount>0){
-            sb.append("\n");
-        }
         for (Object key : keySet) {
-            sb.append("  \"");
-            sb.append(key.toString()).append("\"  :  ");
+            sb.append("\"");
+            sb.append(key.toString()).append("\":");
             Object o1 = map.get(key);
             if (o1==null){
                 sb.append("null");
@@ -36,7 +32,6 @@ public class MapParser implements JSONParser {
             if(tempCount<totalCount){
                 sb.append(",");
             }
-            sb.append("\n");
         }
         sb.append("}");
         return sb.toString();
