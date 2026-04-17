@@ -10,8 +10,14 @@ import java.time.format.DateTimeFormatter;
 public class LocalDateTimeJSONConverter implements JSONConverter {
 
     @Override
-    public Object convert(String s, Field field) {
-        TimeType timeType = field.getAnnotation(TimeType.class);
-        return LocalDateTime.parse(s,DateTimeFormatter.ofPattern(timeType.value()));
+    public Object convert(String s, Class<?> clazz) {
+        Field[] declaredFields = clazz.getDeclaredFields();
+        for (Field f:declaredFields){
+            if(f.getAnnotation(TimeType.class)!=null){
+                TimeType timeType = f.getAnnotation(TimeType.class);
+                return LocalDateTime.parse(s,DateTimeFormatter.ofPattern(timeType.value()));
+            }
+        }
+        return LocalDateTime.parse(s);
     }
 }

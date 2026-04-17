@@ -17,7 +17,7 @@ public class ParserFactory {
     static{
         parserMap.put(String.class,(o,f)->{
             if(o==null) return null;
-            return "\""+JSONUtils.convertEscapeCharacterToStr(o.toString())+"\"";
+            return "\""+ParserFactory.convertEscapeCharacterToStr(o.toString())+"\"";
         });
         parserMap.put(int.class,(o,f)->o==null ? null : o.toString());
         parserMap.put(long.class,(o,f)->o==null ? null : o.toString());
@@ -45,4 +45,56 @@ public class ParserFactory {
         }
         return jsonParser;
     }
+
+    public static String convertEscapeCharacterToStr(String str){
+        StringBuilder sb = new StringBuilder();
+        char[] charArray = str.toCharArray();
+        for(char c : charArray){
+            if(c == '"'){
+                sb.append("\\\"");
+            } else if (c == '\\') {
+                sb.append("\\\\");
+            } else if (c == '\b') {
+                sb.append("\\").append("b");
+            } else if (c == '\f') {
+                sb.append("\\").append("f");
+            } else if (c == '\n') {
+                sb.append("\\").append("n");
+            } else if (c == 'r') {
+                sb.append("\\").append("r");
+            } else if (c == '\t') {
+                sb.append("\\").append("t");
+            } else if (c <= 31) {
+                sb.append(String.format("\\u%04X",(int)c));
+            }else {
+                sb.append(c);
+            }
+        }
+        return  sb.toString();
+    }
+
+    public static String decorateJSONStr(String jsonStr){
+        StringBuilder sb = new StringBuilder();
+        int tempCount=0;
+        char[] jsonStrCharArray = jsonStr.toCharArray();
+        char previousChar = ' ';
+        for(char c : jsonStrCharArray){
+            if(c=='{' || c=='['){
+                tempCount+=2;
+                sb.append(c).append("\n").append(" ".repeat(tempCount));
+            } else if (c == ':' && previousChar == '\"') {
+                sb.append(c).append(" ");
+            } else if (c == ',') {
+                sb.append(c).append("\n").append(" ".repeat(tempCount));
+            } else if (c == '}' || c==']') {
+                tempCount-=2;
+                sb.append("\n").append(" ".repeat(tempCount)).append(c);
+            }else {
+                sb.append(c);
+            }
+            previousChar = c;
+        }
+        return sb.toString();
+    }
+
 }

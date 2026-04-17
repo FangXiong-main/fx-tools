@@ -4,5 +4,5 @@ import java.lang.reflect.Field;
 
 @FunctionalInterface
 public interface JSONConverter {
-    Object convert(String s, Field field);
+    Object convert(String s, Class<?> clazz);
 }

@@ -1,6 +1,4 @@
-import com.fangxiong.common.CustomizeClazzDetector;
-import com.fangxiong.common.JSONUtils;
-import com.fangxiong.common.StrUtils;
+import com.fangxiong.common.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.time.LocalDateTime;
@@ -13,6 +11,49 @@ public class FunctionTest {
         Set<String> set = new HashSet<>();
         set.add("FX");
         JSONUtils.toJSONStr(set);
+    }
+
+    @Test
+    public void testSplitJSON(){
+        String json ="{\"id\":10,\"name\":\"Su\",\"age\":22,\"Header\":{\"id\":1,\"name\":\"FX\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"},\"map\":{\"Test1\":{\"id\":20,\"name\":\"fx\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"}},\"list\":[\"测试\",100,99.9,true,null]}\n";
+        StringBuilder sb = new StringBuilder();
+        Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(sb, json);
+        System.out.println(sb);
+        System.out.println(splitMainEntityAndFieldEntity);
+    }
+
+    @Test
+    public void testRemoveEmptyFromJSON(){
+        String test = """
+                {
+                  "id": 10,
+                  "name": "Su",
+                  "age": 22,
+                  "Header": {
+                    "id": 1,
+                    "name": "FX",
+                    "age": 20,
+                    "gender": "male",
+                    "date": "2026-04-17T20:51:06"
+                  },
+                  "map": {
+                    "Test1": {
+                      "id": 20,
+                      "name": "fx",
+                      "age": 20,
+                      "gender": "male",
+                      "date": "2026-04-17T20:51:06"
+                    }
+                  },
+                  "list": [
+                    "测试",
+                    100,
+                    99.9,
+                    true,
+                    null
+                  ]
+                }""";
+        System.out.println(ConverterFactory.getUndecoratedJSONStr(test));
     }
 
     @Test
@@ -72,7 +113,7 @@ public class FunctionTest {
                 测试换行
                 \t我是制表符'单引号'
                 \b冷门退格符\u0007""";
-        String s = JSONUtils.convertEscapeCharacterToStr(testStr);
+        String s = ParserFactory.convertEscapeCharacterToStr(testStr);
         System.out.println(s);
     }
 
