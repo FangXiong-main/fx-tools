@@ -14,6 +14,10 @@ public class MapParser implements JSONParser {
     public String parse(Object o, Field f) {
         StringBuilder sb = new StringBuilder();
         Map<?,?> map = (Map<?,?>) o;
+        if(map==null){
+            sb.append("null");
+            return sb.toString();
+        }
         int totalCount = map.size();
         int tempCount = 0;
         Set<?> keySet = map.keySet();

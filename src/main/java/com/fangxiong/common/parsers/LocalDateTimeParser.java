@@ -11,7 +11,7 @@ public class LocalDateTimeParser implements JSONParser {
     @Override
     public String parse(Object o, Field f) {
         if(f!=null){
-            TimeType timeType = f.getAnnotation(TimeType.class);
+            TimeType timeType = f.getDeclaredAnnotation(TimeType.class);
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(timeType.value());
             return "\""+dateTimeFormatter.format((LocalDateTime)o)+"\"";
         }

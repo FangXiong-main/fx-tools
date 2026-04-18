@@ -14,6 +14,10 @@ public class ListParser implements JSONParser {
     public String parse(Object o, Field f) {
         StringBuilder sb = new StringBuilder();
         List<?> l = (List<?>) o;
+        if(l==null){
+            sb.append("null");
+            return sb.toString();
+        }
         int totalCount = l.size();
         int tempCount = 0;
         sb.append("[");

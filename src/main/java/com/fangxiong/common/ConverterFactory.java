@@ -1,6 +1,7 @@
 package com.fangxiong.common;
 
 import com.fangxiong.common.converters.LocalDateTimeJSONConverter;
+import com.fangxiong.common.converters.MapConverter;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.regex.Pattern;
 
 public class ConverterFactory {
     private static final Map<Class<?>, JSONConverter> converterMap = new HashMap<>();
+    private static final Pattern pattern = Pattern.compile("\"" + "\"\\s*:\\s*\"(.*)\"");
 
     static {
         converterMap.put(LocalDateTime.class,new LocalDateTimeJSONConverter());
@@ -18,6 +20,7 @@ public class ConverterFactory {
         converterMap.put(String.class,(s,f)-> s);
         converterMap.put(int.class, (s,f)-> Integer.parseInt(s));
         converterMap.put(long.class,(s,f)-> Long.parseLong(s));
+        converterMap.put(Map.class,new MapConverter());
     }
 
     public static JSONConverter getConverter(Class<?> clazzType){
@@ -25,7 +28,6 @@ public class ConverterFactory {
     }
 
     public static String getValueStrFromJSON(String json,String fieldName){
-        Pattern pattern = Pattern.compile("\"" + "\"\\s*:\\s*\"(.*)\"");
         Matcher matcher = pattern.matcher(json);
         if (matcher.find()) {
              //return ConverterFactory.getConverter(f.getType()).convert(matcher.group(1), f);
@@ -40,8 +42,8 @@ public class ConverterFactory {
     public static Map<String,String> getSplitMainEntityAndFieldEntity(StringBuilder sbMain,String json){
         Map<String,String> tempPartMap = new HashMap<>();
         char[] ca = json.toCharArray();
-        int tempPointer=0;int tempLeftPointer=0;int tempPartLeftPointer=0;boolean isNotFirst=false;
-        int firstCharCounter=0;boolean isReadPart =false;
+        int tempPointer=1;int tempLeftPointer=0;int tempPartLeftPointer=0;boolean isNotFirst=false;
+        int firstCharCounter=0;int noFieldNameInt=1;boolean isReadPart =false;
         StringBuilder sbPart = new StringBuilder();String tempFiledName = "";
         for(int i=0;i<ca.length;i++){
             if(isReadPart){
@@ -52,10 +54,14 @@ public class ConverterFactory {
                     firstCharCounter++;
                 } else if (firstCharCounter==1) {
                     tempFiledName = sbPart.substring(0,sbPart.length()-2); //"2":{
+                    sbPart.setLength(0);
+                    sbPart.append(ca[i-1]);
                     firstCharCounter++;
                 } else if(tempPartLeftPointer!=0 && (ca[i] == '}' || ca[i] == ']') ){
                     tempPartLeftPointer--;
                 }else if(isNotFirst && tempPartLeftPointer==0){
+                    tempFiledName = firstCharCounter==0 ? ""+noFieldNameInt : tempFiledName;
+                    noFieldNameInt++;
                     sbMain.append(ca[i-1]);
                     tempPartMap.put(tempFiledName,sbPart.toString());
                     sbPart.setLength(0);
@@ -72,7 +78,7 @@ public class ConverterFactory {
                 if(ca[i] == ','){
                     tempPointer=i+1;
                     sbMain.append(ca[i]);
-                } else if (ca[i] == '{' || ca[i] == '[') {
+                } else if (tempLeftPointer!=2 &&(ca[i] == '{' || ca[i] == '[')) {
                     tempLeftPointer ++;
                     sbMain.append(ca[i]);
                 } else if (ca[i] == '}' || ca[i] == ']') {

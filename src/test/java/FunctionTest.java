@@ -1,6 +1,10 @@
+import com.fangxiong.annotations.GenericType;
 import com.fangxiong.common.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -20,6 +24,60 @@ public class FunctionTest {
         Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(sb, json);
         System.out.println(sb);
         System.out.println(splitMainEntityAndFieldEntity);
+        System.out.println(splitMainEntityAndFieldEntity.get("\"map\""));
+    }
+
+    @Test
+    public void testSplitJSON2(){
+        String json ="{\"Test1\":{\"id\":20,\"name\":\"fx\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"}}";
+        StringBuilder sb = new StringBuilder();
+        Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(sb, json);
+        System.out.println(json);
+        System.out.println(sb);
+        System.out.println(splitMainEntityAndFieldEntity);
+    }
+
+    @Test
+    public void testSplitJSON3(){
+        String json = "{\"id\":20,\"name\":\"fx\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"}";
+        StringBuilder sb = new StringBuilder();
+        Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(sb, json);
+        System.out.println(json);
+        System.out.println(sb);
+        System.out.println(splitMainEntityAndFieldEntity);
+    }
+
+    @Test
+    public void testSplitJSON4(){
+        String json = """
+                [
+                  {"k1":"v1","k2":"v2"},
+                  {"k3":"v3","k4":"v4"}
+                ]""";
+        StringBuilder sb = new StringBuilder();
+        String undecoratedJSONStr = ConverterFactory.getUndecoratedJSONStr(json);
+        System.out.println(undecoratedJSONStr);
+        System.out.println(ConverterFactory.getSplitMainEntityAndFieldEntity(sb, undecoratedJSONStr));
+        System.out.println(sb);
+    }
+
+    @Test
+    public void testSplitJSON5(){
+        String json = """
+                [
+                    [
+                        ["a", "b"],
+                        ["c", "d"]
+                    ],
+                    [
+                        ["e", "f"]
+                    ]
+                ]""";
+        StringBuilder sb = new StringBuilder();
+        String undecoratedJSONStr = ConverterFactory.getUndecoratedJSONStr(json);
+        System.out.println(undecoratedJSONStr);
+        System.out.println(ConverterFactory.getSplitMainEntityAndFieldEntity(sb, undecoratedJSONStr));
+        System.out.println(sb);
     }
 
     @Test
@@ -54,6 +112,16 @@ public class FunctionTest {
                   ]
                 }""";
         System.out.println(ConverterFactory.getUndecoratedJSONStr(test));
+    }
+
+    @Test
+    public void beanToJSONFinalTest2(){
+        TestEntity testEntity = new TestEntity(1,"FX",20,"male",LocalDateTime.now());
+        Map<String,TestEntity> map = new HashMap<>();
+        map.put("Test1",new TestEntity(20,"fx",20,"male",LocalDateTime.now()));
+        TestEntity2 testEntity2 = new TestEntity2(10,"Su",22,testEntity,map,null);
+        String json = JSONUtils.toJSONStr(testEntity2);
+        System.out.println(json);
     }
 
     @Test
