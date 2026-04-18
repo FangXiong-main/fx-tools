@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 
 public class ConverterFactory {
     private static final Map<Class<?>, JSONConverter> converterMap = new HashMap<>();
-    private static final Pattern pattern = Pattern.compile("\"" + "\"\\s*:\\s*\"(.*)\"");
 
     static {
         converterMap.put(LocalDateTime.class,new LocalDateTimeJSONConverter());
@@ -25,14 +24,6 @@ public class ConverterFactory {
 
     public static JSONConverter getConverter(Class<?> clazzType){
         return converterMap.get(clazzType);
-    }
-
-    public static String getValueStrFromJSON(String json,String fieldName){
-        Matcher matcher = pattern.matcher(json);
-        if (matcher.find()) {
-             //return ConverterFactory.getConverter(f.getType()).convert(matcher.group(1), f);
-        }
-        return null;
     }
 
     public static String getUndecoratedJSONStr(String json){
@@ -50,10 +41,10 @@ public class ConverterFactory {
                 if(ca[i] == '{' || ca[i] == '['){
                     tempPartLeftPointer++;
                     isNotFirst = true;
-                }else if(firstCharCounter==0 && ca[i] == ':' ){
+                }else if(tempPartLeftPointer==0 && firstCharCounter==0 && ca[i] == ':' ){
                     firstCharCounter++;
                 } else if (firstCharCounter==1) {
-                    tempFiledName = sbPart.substring(0,sbPart.length()-2); //"2":{
+                    tempFiledName = sbPart.substring(0,sbPart.length()-2);
                     sbPart.setLength(0);
                     sbPart.append(ca[i-1]);
                     firstCharCounter++;

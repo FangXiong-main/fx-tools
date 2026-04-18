@@ -14,42 +14,59 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.fangxiong.redis.SystemConstants.SET;
 
 public class ObjectConverter implements JSONConverter {
-    private static final Deque<Map<Class<?>,Class<?>[]>> convertRawTypesDeque = new ArrayDeque<>();
-    private static final ArrayList<Class<?>> convertActualTypes = new ArrayList<Class<?>>();
-    private static final Map<Class<?>,Class<?>[]> tempTypeMap = new HashMap<>();
+    private static final Deque<Type> convertRawTypesDeque = new ArrayDeque<>();
+    private static final Deque<Type[]> convertActualTypesDeque = new ArrayDeque<>();
 
     @Override
     public Object convert(String s, Class<?> clazz) {
         StringBuilder sbMain = new StringBuilder();
         Map<String,String> tempPartMap = ConverterFactory.getSplitMainEntityAndFieldEntity(sbMain,s);
-        Field[] df = clazz.getDeclaredFields();
+        Field[] df = clazz.getDeclaredFields();Class<?> rawType;
         try {
             Object convertedObj = clazz.getDeclaredConstructor().newInstance();
             for (Field f : df) {
                 Method setMd = clazz.getDeclaredMethod(SET + f.getName(), f.getType());
                 if(f.getGenericType() instanceof ParameterizedType pt){
-                    Type tempType = null;
+                    rawType = (Class<?>) pt.getRawType();
                     while(true){
-                        tempType = pt.getRawType();
-                        if(pt.getActualTypeArguments().length==2&&(pt.getActualTypeArguments()[1] instanceof ParameterizedType tempPt)){
-                            //tempTypeMap.put(tempType,)
-                            pt = (ParameterizedType) tempPt.getActualTypeArguments()[1];
-                        }else if(pt.getActualTypeArguments().length==1&&(pt.getActualTypeArguments()[0] instanceof ParameterizedType tempPt)){
-                            pt = (ParameterizedType) tempPt.getActualTypeArguments()[0];
-                        }else if(pt.getActualTypeArguments().length==2){
-                            Class<?>[] tempClazz = {(Class<?>) pt.getActualTypeArguments()[1]};
-                            tempTypeMap.put((Class<?>) pt.getRawType(),tempClazz);
-                            convertRawTypesDeque.push(tempTypeMap);
-                            tempTypeMap.clear();
+                        Type[] actualTypeArguments = pt.getActualTypeArguments();
+                        if(actualTypeArguments.length==2){
+                            convertRawTypesDeque.add(pt.getRawType());
+                            convertActualTypesDeque.add(pt.getActualTypeArguments());
+                            if(!(actualTypeArguments[1] instanceof ParameterizedType)){
+                                break;
+                            }else {
+                                pt = (ParameterizedType) pt.getActualTypeArguments()[1];
+                            }
+                        }else{
+                            convertRawTypesDeque.add(pt.getRawType());
+                            convertActualTypesDeque.add(pt.getActualTypeArguments());
+                            if(!(actualTypeArguments[0] instanceof ParameterizedType)){
+                                break;
+                            }else {
+                                pt = (ParameterizedType) pt.getActualTypeArguments()[0];
+                            }
                         }
                     }
+                    ConverterFactory.getConverter(rawType).convert(tempPartMap.get("\""+f.getName()+"\""),null);
                 }else{
                     setMd.invoke(convertedObj,ConverterFactory.getConverter(f.getType()).convert(tempPartMap.get(f.getName()),f.getType()));
                 }
+                convertRawTypesDeque.clear();
+                convertActualTypesDeque.clear();
             }
             return convertedObj;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
+    public static Type pollConvertRawTypesDeque(){
+        return convertRawTypesDeque.poll();
+    }
+
+    public static Type[] pollConvertActualTypesDeque(){
+        return convertActualTypesDeque.poll();
+    }
+
 }

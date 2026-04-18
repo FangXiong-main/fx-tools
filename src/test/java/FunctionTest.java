@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -15,6 +17,61 @@ public class FunctionTest {
         Set<String> set = new HashSet<>();
         set.add("FX");
         JSONUtils.toJSONStr(set);
+    }
+
+    @Test
+    public void testJsonTOOneMap(){
+        String json = """
+                {
+                    "name": "张三",
+                    "gender": "男",
+                    "major": "计算机科学",
+                    "country": "美国",
+                    "plan": "托福+GRE申CS硕士"
+                }""";
+        StringBuilder sb = new StringBuilder();
+        String undecoratedJSONStr = ConverterFactory.getUndecoratedJSONStr(json);
+        System.out.println(ConverterFactory.getSplitMainEntityAndFieldEntity(sb,undecoratedJSONStr));
+        System.out.println(sb);
+        Map map = JSONUtils.jsonToBean(json, Map.class);
+        System.out.println(map);
+    }
+
+    @Test
+    public void testGetGenericType(){
+        Deque<Type> convertRawTypesDeque = new ArrayDeque<>();
+        Deque<Type[]> convertActualTypesDeque = new ArrayDeque<>();
+        try {
+            Field test = TestGetGenericTypeEntity.class.getDeclaredField("test");
+            if(test.getGenericType() instanceof ParameterizedType pt){
+                while(true){
+                    Type[] actualTypeArguments = pt.getActualTypeArguments();
+                    if(actualTypeArguments.length==2){
+                        convertRawTypesDeque.add(pt.getRawType());
+                        convertActualTypesDeque.add(pt.getActualTypeArguments());
+                        if(!(actualTypeArguments[1] instanceof ParameterizedType)){
+                            break;
+                        }else {
+                            pt = (ParameterizedType) pt.getActualTypeArguments()[1];
+                        }
+                    }else{
+                        convertRawTypesDeque.add(pt.getRawType());
+                        convertActualTypesDeque.add(pt.getActualTypeArguments());
+                        if(!(actualTypeArguments[0] instanceof ParameterizedType)){
+                            break;
+                        }else {
+                            pt = (ParameterizedType) pt.getActualTypeArguments()[0];
+                        }
+                    }
+                }
+            }
+            for(int i=0;i<convertRawTypesDeque.size();i++){
+                System.out.println(convertRawTypesDeque.poll());
+                System.out.println(Arrays.toString(convertActualTypesDeque.poll()));
+            }
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -58,6 +115,7 @@ public class FunctionTest {
         String undecoratedJSONStr = ConverterFactory.getUndecoratedJSONStr(json);
         System.out.println(undecoratedJSONStr);
         System.out.println(ConverterFactory.getSplitMainEntityAndFieldEntity(sb, undecoratedJSONStr));
+        System.out.println();
         System.out.println(sb);
     }
 
