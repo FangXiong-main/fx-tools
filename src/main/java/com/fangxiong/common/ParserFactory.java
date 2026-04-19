@@ -39,11 +39,10 @@ public class ParserFactory {
     }
 
     public static JSONParser getParser(Class<?> clazz){
-        JSONParser jsonParser = parserMap.get(clazz);
-        if(jsonParser==null){
-            jsonParser = addParser(clazz);
+        if (!parserMap.containsKey(clazz)){
+            return addParser(clazz);
         }
-        return jsonParser;
+        return parserMap.get(clazz);
     }
 
     public static String convertEscapeCharacterToStr(String str){

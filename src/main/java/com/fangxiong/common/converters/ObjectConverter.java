@@ -14,8 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.fangxiong.redis.SystemConstants.SET;
 
 public class ObjectConverter implements JSONConverter {
-    private static final Deque<Type> convertRawTypesDeque = new ArrayDeque<>();
-    private static final Deque<Type[]> convertActualTypesDeque = new ArrayDeque<>();
+    private static final ThreadLocal<Deque<Type>> convertRawTypesDeque = ThreadLocal.withInitial(ArrayDeque::new);
+    private static final ThreadLocal<Deque<Type[]>> convertActualTypesDeque = ThreadLocal.withInitial(ArrayDeque::new);
 
     @Override
     public Object convert(String s, Class<?> clazz) {
@@ -25,22 +25,22 @@ public class ObjectConverter implements JSONConverter {
         try {
             Object convertedObj = clazz.getDeclaredConstructor().newInstance();
             for (Field f : df) {
-                Method setMd = clazz.getDeclaredMethod(SET + f.getName(), f.getType());
+                Method setMd = clazz.getDeclaredMethod(SET + Character.toUpperCase(f.getName().charAt(0))+f.getName().substring(1), f.getType());
                 if(f.getGenericType() instanceof ParameterizedType pt){
                     rawType = (Class<?>) pt.getRawType();
                     while(true){
                         Type[] actualTypeArguments = pt.getActualTypeArguments();
                         if(actualTypeArguments.length==2){
-                            convertRawTypesDeque.add(pt.getRawType());
-                            convertActualTypesDeque.add(pt.getActualTypeArguments());
+                            convertRawTypesDeque.get().add(pt.getRawType());
+                            convertActualTypesDeque.get().add(pt.getActualTypeArguments());
                             if(!(actualTypeArguments[1] instanceof ParameterizedType)){
                                 break;
                             }else {
                                 pt = (ParameterizedType) pt.getActualTypeArguments()[1];
                             }
                         }else{
-                            convertRawTypesDeque.add(pt.getRawType());
-                            convertActualTypesDeque.add(pt.getActualTypeArguments());
+                            convertRawTypesDeque.get().add(pt.getRawType());
+                            convertActualTypesDeque.get().add(pt.getActualTypeArguments());
                             if(!(actualTypeArguments[0] instanceof ParameterizedType)){
                                 break;
                             }else {
@@ -48,13 +48,14 @@ public class ObjectConverter implements JSONConverter {
                             }
                         }
                     }
-                    ConverterFactory.getConverter(rawType).convert(tempPartMap.get("\""+f.getName()+"\""),null);
+                    setMd.invoke(convertedObj,ConverterFactory.getConverter(rawType).convert(tempPartMap.get("\"" + f.getName() + "\""), null));
                 }else{
                     setMd.invoke(convertedObj,ConverterFactory.getConverter(f.getType()).convert(tempPartMap.get(f.getName()),f.getType()));
                 }
-                convertRawTypesDeque.clear();
-                convertActualTypesDeque.clear();
             }
+            convertRawTypesDeque.remove();
+            convertActualTypesDeque.remove();
+            MapConverter.removeMapConverterLocalThreadCache();
             return convertedObj;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -62,11 +63,11 @@ public class ObjectConverter implements JSONConverter {
     }
 
     public static Type pollConvertRawTypesDeque(){
-        return convertRawTypesDeque.poll();
+        return convertRawTypesDeque.get().poll();
     }
 
     public static Type[] pollConvertActualTypesDeque(){
-        return convertActualTypesDeque.poll();
+        return convertActualTypesDeque.get().poll();
     }
 
 }

@@ -2,9 +2,11 @@ package com.fangxiong.common;
 
 import com.fangxiong.common.converters.LocalDateTimeJSONConverter;
 import com.fangxiong.common.converters.MapConverter;
+import com.fangxiong.common.converters.ObjectConverter;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,14 +18,22 @@ public class ConverterFactory {
         converterMap.put(LocalDateTime.class,new LocalDateTimeJSONConverter());
         converterMap.put(Integer.class,(s,f)-> Integer.parseInt(s));
         converterMap.put(Long.class,(s,f)-> Long.parseLong(s));
-        converterMap.put(String.class,(s,f)-> s);
+        converterMap.put(String.class,(s,f)-> "\""+s+"\"");
         converterMap.put(int.class, (s,f)-> Integer.parseInt(s));
         converterMap.put(long.class,(s,f)-> Long.parseLong(s));
         converterMap.put(Map.class,new MapConverter());
     }
 
-    public static JSONConverter getConverter(Class<?> clazzType){
-        return converterMap.get(clazzType);
+    public static JSONConverter addConverter(Class<?> clazz) {
+        converterMap.put(clazz,new ObjectConverter());
+        return converterMap.get(clazz);
+    }
+
+    public static JSONConverter getConverter(Class<?> clazz){
+        if(!converterMap.containsKey(clazz)){
+            return addConverter(clazz);
+        }
+        return converterMap.get(clazz);
     }
 
     public static String getUndecoratedJSONStr(String json){
@@ -31,7 +41,7 @@ public class ConverterFactory {
     }
 
     public static Map<String,String> getSplitMainEntityAndFieldEntity(StringBuilder sbMain,String json){
-        Map<String,String> tempPartMap = new HashMap<>();
+        Map<String,String> tempPartMap = new LinkedHashMap<>();
         char[] ca = json.toCharArray();
         int tempPointer=1;int tempLeftPointer=0;int tempPartLeftPointer=0;boolean isNotFirst=false;
         int firstCharCounter=0;int noFieldNameInt=1;boolean isReadPart =false;

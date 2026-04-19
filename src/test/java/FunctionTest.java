@@ -22,19 +22,33 @@ public class FunctionTest {
     @Test
     public void testJsonTOOneMap(){
         String json = """
-                {
-                    "name": "张三",
-                    "gender": "男",
-                    "major": "计算机科学",
-                    "country": "美国",
-                    "plan": "托福+GRE申CS硕士"
-                }""";
+                {"This":null}""";
         StringBuilder sb = new StringBuilder();
         String undecoratedJSONStr = ConverterFactory.getUndecoratedJSONStr(json);
         System.out.println(ConverterFactory.getSplitMainEntityAndFieldEntity(sb,undecoratedJSONStr));
         System.out.println(sb);
-        Map map = JSONUtils.jsonToBean(json, Map.class);
+        Map<String,String> map = (Map<String,String>) JSONUtils.jsonToBean(json, Map.class);
         System.out.println(map);
+    }
+
+    @Test
+    public void testJsonToOneMap2(){
+        String json = """
+                {
+                  "test": {
+                    "group1": {
+                      "name": "校园二手平台",
+                      "type": "全栈项目"
+                    },
+                    "group2": {
+                      "author": "软件工程",
+                      "school": "青海民族大学"
+                    }
+                  }
+                }""";
+        TestGetGenericTypeEntity test = new TestGetGenericTypeEntity();
+        TestGetGenericTypeEntity testGetGenericTypeEntity = JSONUtils.jsonToBean(json,TestGetGenericTypeEntity.class);
+        System.out.println(testGetGenericTypeEntity);
     }
 
     @Test
