@@ -52,6 +52,34 @@ public class FunctionTest {
     }
 
     @Test
+    public void testJsonToOneMap3(){
+        String json = """
+                {
+                  "test": {
+                    "level1Key1": {
+                      "level2Key1": {
+                        "name": "张三",
+                        "age": "22",
+                        "school": "青海民族大学"
+                      },
+                      "level2Key2": {
+                        "goods": "二手电脑",
+                        "price": "3000"
+                      }
+                    },
+                    "level1Key2": {
+                      "level2KeyA": {
+                        "type": "电子产品",
+                        "status": "在售"
+                      }
+                    }
+                  }
+                }""";
+        TestGetGenericTypeEntity testGetGenericTypeEntity = JSONUtils.jsonToBean(json, TestGetGenericTypeEntity.class);
+        System.out.println(testGetGenericTypeEntity);
+    }
+
+    @Test
     public void testGetGenericType(){
         Deque<Type> convertRawTypesDeque = new ArrayDeque<>();
         Deque<Type[]> convertActualTypesDeque = new ArrayDeque<>();

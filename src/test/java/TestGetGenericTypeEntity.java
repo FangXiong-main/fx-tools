@@ -8,7 +8,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TestGetGenericTypeEntity {
-    public Map<String,Map<String,String>> test;
+    public Map<String,Map<String,Map<String,String>>> test;
 
 
     @Override

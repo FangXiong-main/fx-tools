@@ -13,10 +13,10 @@ public class MapConverter implements JSONConverter {
 
     private static final Pattern isIntegerPattern = Pattern.compile("-?(\\d+)");
     private static final Pattern isDicimalPattern = Pattern.compile("-?(\\d+\\.\\d+)");
-    private static final ThreadLocal<Type[]> convertingType = ThreadLocal.withInitial(() -> null);
-    private static final ThreadLocal<Integer> isConverting = ThreadLocal.withInitial(() -> 0);
     private static final ThreadLocal<Type> convertingRawTypeCache = ThreadLocal.withInitial(() -> null);
     private static final ThreadLocal<Type[]> convertingActualTypeCache = ThreadLocal.withInitial(() -> null);
+    private static final ThreadLocal<Boolean> isFirst = ThreadLocal.withInitial(() -> true);
+    private static final ThreadLocal<Boolean> isConverting = ThreadLocal.withInitial(() -> false);
 
     @Override
     public Object convert(String s, Class<?> clazz) {
@@ -24,26 +24,23 @@ public class MapConverter implements JSONConverter {
         Map<String,String> mapKeysAndValues = getJSONKeysAndValues(s);
         StringBuilder sbMain = new StringBuilder();
         if(clazz==null){
-            convertingRawTypeCache.set(ObjectConverter.pollConvertRawTypesDeque());
-            Type convertingRawType = convertingRawTypeCache.get();
-            Type[] convertingActualType;
-            if(isConverting.get()==0){
+            if(isFirst.get()){
+                convertingRawTypeCache.set(ObjectConverter.pollConvertRawTypesDeque());
                 convertingActualTypeCache.set(ObjectConverter.pollConvertActualTypesDeque());
-                convertingActualType = convertingActualTypeCache.get();
-            }else{
-                convertingActualType = convertingType.get();
+                isFirst.set(false);
             }
-
-            if(convertingActualType[1] instanceof ParameterizedType pt){
+            if(convertingActualTypeCache.get()!=null && convertingActualTypeCache.get()[1] instanceof ParameterizedType pt){
                 Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(sbMain, s);
                 splitMainEntityAndFieldEntity =  splitMainEntityAndFieldEntity.isEmpty() ? getJSONKeysAndValues(sbMain.toString()) : splitMainEntityAndFieldEntity ;
-                convertingType.set(convertingActualType);
+                convertingRawTypeCache.set(ObjectConverter.pollConvertRawTypesDeque());
+                convertingActualTypeCache.set(ObjectConverter.pollConvertActualTypesDeque());
                 for (String key : splitMainEntityAndFieldEntity.keySet()) {
-                    isConverting.set(isConverting.get() + 1);
+                    isConverting.set(true);
                     map.put(key,ConverterFactory.getConverter((Class<?>) pt.getRawType()).convert(splitMainEntityAndFieldEntity.get(key),null));
                 }
+                isConverting.set(false);
             }else{
-                return ConverterFactory.getConverter((Class<?>) convertingRawType).convert(s, (Class<?>) convertingType.get()[1]);
+                return ConverterFactory.getConverter((Class<?>) convertingRawTypeCache.get()).convert(s, (Class<?>) convertingActualTypeCache.get()[1]);
             }
         }else if (clazz == Map.class){
             getJSONKeysAndValues(s);
@@ -57,7 +54,6 @@ public class MapConverter implements JSONConverter {
                 map.put(key,ConverterFactory.getConverter(clazz).convert(mapKeysAndValues.get(key),clazz));
             }
         }
-        isConverting.set(isConverting.get()-1);
         return map;
     }
 
@@ -121,8 +117,6 @@ public class MapConverter implements JSONConverter {
     }
 
     public static void removeMapConverterLocalThreadCache() {
-        isConverting.remove();
-        convertingType.remove();
         convertingRawTypeCache.remove();
         convertingActualTypeCache.remove();
     }
