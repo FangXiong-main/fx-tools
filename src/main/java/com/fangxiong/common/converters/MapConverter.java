@@ -15,30 +15,19 @@ public class MapConverter implements JSONConverter {
     private static final Pattern isDicimalPattern = Pattern.compile("-?(\\d+\\.\\d+)");
     private static final ThreadLocal<Type> convertingRawTypeCache = ThreadLocal.withInitial(() -> null);
     private static final ThreadLocal<Type[]> convertingActualTypeCache = ThreadLocal.withInitial(() -> null);
-    private static final ThreadLocal<Boolean> isFirst = ThreadLocal.withInitial(() -> true);
-    private static final ThreadLocal<Boolean> isConverting = ThreadLocal.withInitial(() -> false);
 
     @Override
     public Object convert(String s, Class<?> clazz) {
         Map<String,Object> map = new LinkedHashMap<>();
         Map<String,String> mapKeysAndValues = getJSONKeysAndValues(s);
-        StringBuilder sbMain = new StringBuilder();
         if(clazz==null){
-            if(isFirst.get()){
-                convertingRawTypeCache.set(ObjectConverter.pollConvertRawTypesDeque());
-                convertingActualTypeCache.set(ObjectConverter.pollConvertActualTypesDeque());
-                isFirst.set(false);
-            }
+            convertingRawTypeCache.set(ObjectConverter.pollConvertRawTypesDeque());
+            convertingActualTypeCache.set(ObjectConverter.pollConvertActualTypesDeque());
             if(convertingActualTypeCache.get()!=null && convertingActualTypeCache.get()[1] instanceof ParameterizedType pt){
-                Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(sbMain, s);
-                splitMainEntityAndFieldEntity =  splitMainEntityAndFieldEntity.isEmpty() ? getJSONKeysAndValues(sbMain.toString()) : splitMainEntityAndFieldEntity ;
-                convertingRawTypeCache.set(ObjectConverter.pollConvertRawTypesDeque());
-                convertingActualTypeCache.set(ObjectConverter.pollConvertActualTypesDeque());
+                Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(s);
                 for (String key : splitMainEntityAndFieldEntity.keySet()) {
-                    isConverting.set(true);
                     map.put(key,ConverterFactory.getConverter((Class<?>) pt.getRawType()).convert(splitMainEntityAndFieldEntity.get(key),null));
                 }
-                isConverting.set(false);
             }else{
                 return ConverterFactory.getConverter((Class<?>) convertingRawTypeCache.get()).convert(s, (Class<?>) convertingActualTypeCache.get()[1]);
             }

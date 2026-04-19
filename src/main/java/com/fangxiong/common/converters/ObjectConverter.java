@@ -19,9 +19,9 @@ public class ObjectConverter implements JSONConverter {
 
     @Override
     public Object convert(String s, Class<?> clazz) {
-        StringBuilder sbMain = new StringBuilder();
-        Map<String,String> tempPartMap = ConverterFactory.getSplitMainEntityAndFieldEntity(sbMain,s);
+        Map<String,String> tempPartMap = ConverterFactory.getSplitMainEntityAndFieldEntity(s);
         Field[] df = clazz.getDeclaredFields();Class<?> rawType;
+
         try {
             Object convertedObj = clazz.getDeclaredConstructor().newInstance();
             for (Field f : df) {

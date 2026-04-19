@@ -5,6 +5,7 @@ import com.fangxiong.common.converters.MapConverter;
 import com.fangxiong.common.converters.ObjectConverter;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class ConverterFactory {
         return json.replaceAll("\\s+","");
     }
 
-    public static Map<String,String> getSplitMainEntityAndFieldEntity(StringBuilder sbMain,String json){
+    public static Map<String,String> getSplitMainEntityAndFieldEntity(String json){
         Map<String,String> tempPartMap = new LinkedHashMap<>();
         char[] ca = json.toCharArray();
         int tempPointer=1;int tempLeftPointer=0;int tempPartLeftPointer=0;boolean isNotFirst=false;
@@ -63,7 +64,6 @@ public class ConverterFactory {
                 }else if(isNotFirst && tempPartLeftPointer==0){
                     tempFiledName = firstCharCounter==0 ? ""+noFieldNameInt : tempFiledName;
                     noFieldNameInt++;
-                    sbMain.append(ca[i-1]);
                     tempPartMap.put(tempFiledName,sbPart.toString());
                     sbPart.setLength(0);
                     isReadPart = false;
@@ -78,21 +78,29 @@ public class ConverterFactory {
             }else {
                 if(ca[i] == ','){
                     tempPointer=i+1;
-                    sbMain.append(ca[i]);
                 } else if (tempLeftPointer!=2 &&(ca[i] == '{' || ca[i] == '[')) {
                     tempLeftPointer ++;
-                    sbMain.append(ca[i]);
-                } else if (ca[i] == '}' || ca[i] == ']') {
-                    sbMain.append(ca[i]);
                 } else if (tempLeftPointer>1) {
                     isReadPart = true;
                     i = tempPointer-1;
-                }else {
-                    sbMain.append(ca[i]);
                 }
             }
         }
         return tempPartMap;
+    }
+
+    public static String concatMapValuesToStr(Map<String,String> map){
+        StringBuilder sb =new StringBuilder();
+        Collection<String> values = map.values();
+        int tempCount=0;int totalCount = values.size();
+        for (String s:values){
+            sb.append(s);
+            tempCount++;
+            if (tempCount<totalCount){
+                sb.append(",");
+            }
+        }
+        return sb.toString();
     }
 
 }

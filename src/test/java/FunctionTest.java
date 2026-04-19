@@ -1,5 +1,6 @@
 import com.fangxiong.annotations.GenericType;
 import com.fangxiong.common.*;
+import com.fangxiong.common.parsers.ObjectParser;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,10 +24,8 @@ public class FunctionTest {
     public void testJsonTOOneMap(){
         String json = """
                 {"This":null}""";
-        StringBuilder sb = new StringBuilder();
         String undecoratedJSONStr = ConverterFactory.getUndecoratedJSONStr(json);
-        System.out.println(ConverterFactory.getSplitMainEntityAndFieldEntity(sb,undecoratedJSONStr));
-        System.out.println(sb);
+        System.out.println(ConverterFactory.getSplitMainEntityAndFieldEntity(undecoratedJSONStr));
         Map<String,String> map = (Map<String,String>) JSONUtils.jsonToBean(json, Map.class);
         System.out.println(map);
     }
@@ -49,6 +48,12 @@ public class FunctionTest {
         TestGetGenericTypeEntity test = new TestGetGenericTypeEntity();
         TestGetGenericTypeEntity testGetGenericTypeEntity = JSONUtils.jsonToBean(json,TestGetGenericTypeEntity.class);
         System.out.println(testGetGenericTypeEntity);
+    }
+
+    @Test
+    public void testJsonIsNotBlank(){
+        String json = "[   22  ]";
+        System.out.println(StrUtils.jsonIsNotBlank(json));
     }
 
     @Test
@@ -75,8 +80,28 @@ public class FunctionTest {
                     }
                   }
                 }""";
-        TestGetGenericTypeEntity testGetGenericTypeEntity = JSONUtils.jsonToBean(json, TestGetGenericTypeEntity.class);
-        System.out.println(testGetGenericTypeEntity);
+        StringBuilder sb1 = new StringBuilder();
+        StringBuilder sb2 = new StringBuilder();
+        String undecoratedJSONStr = ConverterFactory.getUndecoratedJSONStr(json);
+        ArrayList<Integer> arrayList = new ArrayList<>();
+        while (true){
+            Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(undecoratedJSONStr);
+            undecoratedJSONStr = ConverterFactory.concatMapValuesToStr(splitMainEntityAndFieldEntity);
+            arrayList.add(splitMainEntityAndFieldEntity.size());
+            if(!StrUtils.jsonIsNotBlank(undecoratedJSONStr)){
+                break;
+            }else {
+
+            }
+        }
+        System.out.println(arrayList);
+    }
+
+    @Test
+    public void testSplitJson(){
+        String json ="{\"level1Key1\":{\"level2Key1\":{\"name\":\"张三\",\"age\":\"22\",\"school\":\"青海民族大学\"},\"level2Key2\":{\"goods\":\"二手电脑\",\"price\":\"3000\"}},\"level1Key2\":{\"level2KeyA\":{\"type\":\"电子产品\",\"status\":\"在售\"}}}";
+        Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(json);
+        System.out.println(splitMainEntityAndFieldEntity);
     }
 
     @Test
@@ -119,9 +144,7 @@ public class FunctionTest {
     @Test
     public void testSplitJSON(){
         String json ="{\"id\":10,\"name\":\"Su\",\"age\":22,\"Header\":{\"id\":1,\"name\":\"FX\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"},\"map\":{\"Test1\":{\"id\":20,\"name\":\"fx\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"}},\"list\":[\"测试\",100,99.9,true,null]}\n";
-        StringBuilder sb = new StringBuilder();
-        Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(sb, json);
-        System.out.println(sb);
+        Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(json);
         System.out.println(splitMainEntityAndFieldEntity);
         System.out.println(splitMainEntityAndFieldEntity.get("\"map\""));
     }
@@ -129,20 +152,16 @@ public class FunctionTest {
     @Test
     public void testSplitJSON2(){
         String json ="{\"Test1\":{\"id\":20,\"name\":\"fx\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"}}";
-        StringBuilder sb = new StringBuilder();
-        Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(sb, json);
+        Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(json);
         System.out.println(json);
-        System.out.println(sb);
         System.out.println(splitMainEntityAndFieldEntity);
     }
 
     @Test
     public void testSplitJSON3(){
         String json = "{\"id\":20,\"name\":\"fx\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"}";
-        StringBuilder sb = new StringBuilder();
-        Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(sb, json);
+        Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(json);
         System.out.println(json);
-        System.out.println(sb);
         System.out.println(splitMainEntityAndFieldEntity);
     }
 
@@ -153,12 +172,10 @@ public class FunctionTest {
                   {"k1":"v1","k2":"v2"},
                   {"k3":"v3","k4":"v4"}
                 ]""";
-        StringBuilder sb = new StringBuilder();
         String undecoratedJSONStr = ConverterFactory.getUndecoratedJSONStr(json);
         System.out.println(undecoratedJSONStr);
-        System.out.println(ConverterFactory.getSplitMainEntityAndFieldEntity(sb, undecoratedJSONStr));
+        System.out.println(ConverterFactory.getSplitMainEntityAndFieldEntity(undecoratedJSONStr));
         System.out.println();
-        System.out.println(sb);
     }
 
     @Test
@@ -173,11 +190,9 @@ public class FunctionTest {
                         ["e", "f"]
                     ]
                 ]""";
-        StringBuilder sb = new StringBuilder();
         String undecoratedJSONStr = ConverterFactory.getUndecoratedJSONStr(json);
         System.out.println(undecoratedJSONStr);
-        System.out.println(ConverterFactory.getSplitMainEntityAndFieldEntity(sb, undecoratedJSONStr));
-        System.out.println(sb);
+        System.out.println(ConverterFactory.getSplitMainEntityAndFieldEntity(undecoratedJSONStr));
     }
 
     @Test
