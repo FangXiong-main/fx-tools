@@ -1,73 +1,98 @@
 package com.fangxiong.common.converters;
 
-import com.fangxiong.common.ConverterFactory;
-import com.fangxiong.common.JSONConverter;
-import com.fangxiong.common.ParserFactory;
+import com.fangxiong.common.NonGenericTypeConverterFactory;
+import com.fangxiong.common.NonGenericTypeJsonConverter;
+import com.fangxiong.common.StrUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static com.fangxiong.redis.SystemConstants.SET;
 
-public class ObjectConverter implements JSONConverter {
-    private static final ThreadLocal<Deque<Type>> convertRawTypesDeque = ThreadLocal.withInitial(ArrayDeque::new);
-    private static final ThreadLocal<Deque<Type[]>> convertActualTypesDeque = ThreadLocal.withInitial(ArrayDeque::new);
+public class ObjectConverter implements NonGenericTypeJsonConverter {
+
+    private static final ThreadLocal<Deque<String>> currentConvertingStringDeque = ThreadLocal.withInitial(ArrayDeque::new);
 
     @Override
     public Object convert(String s, Class<?> clazz) {
-        Map<String,String> tempPartMap = ConverterFactory.getSplitMainEntityAndFieldEntity(s);
-        Field[] df = clazz.getDeclaredFields();Class<?> rawType;
-
         try {
+            Map<String,Method> setMethodCache = cacheAllSetMethod(clazz);
+            Map<String,Type> partTypeCache = cacheAllFieldType(clazz);
+            Map<String, String> allFieldValueCache = cacheAllFieldValue(clazz, s);
+            Map<String, ArrayList<String>> currentFieldInnerValue;
             Object convertedObj = clazz.getDeclaredConstructor().newInstance();
-            for (Field f : df) {
-                Method setMd = clazz.getDeclaredMethod(SET + Character.toUpperCase(f.getName().charAt(0))+f.getName().substring(1), f.getType());
-                if(f.getGenericType() instanceof ParameterizedType pt){
-                    rawType = (Class<?>) pt.getRawType();
-                    while(true){
-                        Type[] actualTypeArguments = pt.getActualTypeArguments();
-                        if(actualTypeArguments.length==2){
-                            convertRawTypesDeque.get().add(pt.getRawType());
-                            convertActualTypesDeque.get().add(pt.getActualTypeArguments());
-                            if(!(actualTypeArguments[1] instanceof ParameterizedType)){
-                                break;
-                            }else {
-                                pt = (ParameterizedType) pt.getActualTypeArguments()[1];
-                            }
-                        }else{
-                            convertRawTypesDeque.get().add(pt.getRawType());
-                            convertActualTypesDeque.get().add(pt.getActualTypeArguments());
-                            if(!(actualTypeArguments[0] instanceof ParameterizedType)){
-                                break;
-                            }else {
-                                pt = (ParameterizedType) pt.getActualTypeArguments()[0];
-                            }
-                        }
-                    }
-                    setMd.invoke(convertedObj,ConverterFactory.getConverter(rawType).convert(tempPartMap.get("\"" + f.getName() + "\""), null));
-                }else{
-                    setMd.invoke(convertedObj,ConverterFactory.getConverter(f.getType()).convert(tempPartMap.get(f.getName()),f.getType()));
-                }
+            for(Field f : clazz.getDeclaredFields()){
+                setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(allFieldValueCache.get(f.getName()),partTypeCache.get(f.getName())));
             }
-            convertRawTypesDeque.remove();
-            convertActualTypesDeque.remove();
-            MapConverter.removeMapConverterLocalThreadCache();
+            currentConvertingStringDeque.get().clear();
+            currentConvertingStringDeque.remove();
             return convertedObj;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static Type pollConvertRawTypesDeque(){
-        return convertRawTypesDeque.get().poll();
+    private static Map<String,String> cacheAllFieldValue(Class<?> clazz,String json){
+        StringBuilder sbMain = new StringBuilder();
+        Field[] df = clazz.getDeclaredFields();
+        Map<String,String> cacheFiledValueMap = new HashMap<>();
+        Map<String,String> cacheMapOrListValueMap = StrUtils.getSplitMainJsonToPartlyMap(sbMain,json);
+        Map<String,String> cacheNormalFieldValueMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(sbMain.toString());
+        for (Field f:df){
+            cacheFiledValueMap.put(f.getName(),cacheNormalFieldValueMap.get(f.getName()));
+        }
+        for (String key : cacheMapOrListValueMap.keySet()){
+            cacheFiledValueMap.put(key.substring(1,key.length()-1),cacheMapOrListValueMap.get(key));
+        }
+        return cacheFiledValueMap;
     }
 
-    public static Type[] pollConvertActualTypesDeque(){
-        return convertActualTypesDeque.get().poll();
+//    private static Map<String,ArrayList<String>> cacheEntityFieldInnerValueList(String json,Class<?> clazz){
+//
+//    }
+
+    private static Map<String,Type> cacheAllFieldType(Class<?> clazz){
+        Field[] df = clazz.getDeclaredFields();
+        Map<String,Type> cacheMap = new HashMap<>();
+        for(Field f : df){
+            cacheMap.put(f.getName(),f.getGenericType());
+        }
+        return cacheMap;
     }
 
+    private static Object convertFiled(String s,Type type){
+        if (type instanceof ParameterizedType pt){
+            if(pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1] instanceof ParameterizedType tempPt){
+                StringBuilder sb = new StringBuilder();
+                Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, s);
+                for (String key : splitMainJsonToPartlyMap.keySet()){
+                    currentConvertingStringDeque.get().offer(splitMainJsonToPartlyMap.get(key));
+                }
+                convertFiled(currentConvertingStringDeque.get().poll(),tempPt);
+            }else{
+                return NonGenericTypeConverterFactory.getConverter((Class<?>) pt.getRawType()).convert(s,(Class<?>) pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1]);
+            }
+        }else{
+            return NonGenericTypeConverterFactory.getConverter((Class<?>) type).convert(s,(Class<?>) type);
+        }
+    }
+
+    private static Map<String,Method> cacheAllSetMethod(Class<?> clazz) throws NoSuchMethodException {
+        Field[] df = clazz.getDeclaredFields();
+        Map<String,Method> cacheMap = new HashMap<>();
+        String methodName ="";
+        for(Field f : df){
+            if(f.getName().length()==1){
+                methodName = SET+Character.toUpperCase(f.getName().charAt(0));
+                cacheMap.put(f.getName(),clazz.getDeclaredMethod(methodName,f.getType()));
+            }else{
+                methodName = SET+Character.toUpperCase(f.getName().charAt(0))+f.getName().substring(1);
+                cacheMap.put(f.getName(), clazz.getDeclaredMethod(methodName,f.getType()));
+            }
+        }
+        return cacheMap;
+    }
 }

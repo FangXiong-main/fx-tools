@@ -1,10 +1,7 @@
-import com.fangxiong.annotations.GenericType;
 import com.fangxiong.common.*;
-import com.fangxiong.common.parsers.ObjectParser;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -21,87 +18,31 @@ public class FunctionTest {
     }
 
     @Test
-    public void testJsonTOOneMap(){
-        String json = """
-                {"This":null}""";
-        String undecoratedJSONStr = ConverterFactory.getUndecoratedJSONStr(json);
-        System.out.println(ConverterFactory.getSplitMainEntityAndFieldEntity(undecoratedJSONStr));
-        Map<String,String> map = (Map<String,String>) JSONUtils.jsonToBean(json, Map.class);
-        System.out.println(map);
-    }
-
-    @Test
-    public void testJsonToOneMap2(){
+    public void testConvertMap(){
         String json = """
                 {
-                  "test": {
+                  "id": 1001,
+                  "name": "测试名称",
+                  "record": {
                     "group1": {
-                      "name": "校园二手平台",
-                      "type": "全栈项目"
+                      "key1": "value1",
+                      "key2": "value2"
                     },
                     "group2": {
-                      "author": "软件工程",
-                      "school": "青海民族大学"
+                      "remark": "测试备注",
+                      "info": "详细信息"
                     }
                   }
                 }""";
-        TestGetGenericTypeEntity test = new TestGetGenericTypeEntity();
-        TestGetGenericTypeEntity testGetGenericTypeEntity = JSONUtils.jsonToBean(json,TestGetGenericTypeEntity.class);
-        System.out.println(testGetGenericTypeEntity);
-    }
-
-    @Test
-    public void testJsonIsNotBlank(){
-        String json = "[   22  ]";
-        System.out.println(StrUtils.jsonIsNotBlank(json));
-    }
-
-    @Test
-    public void testJsonToOneMap3(){
-        String json = """
-                {
-                  "test": {
-                    "level1Key1": {
-                      "level2Key1": {
-                        "name": "张三",
-                        "age": "22",
-                        "school": "青海民族大学"
-                      },
-                      "level2Key2": {
-                        "goods": "二手电脑",
-                        "price": "3000"
-                      }
-                    },
-                    "level1Key2": {
-                      "level2KeyA": {
-                        "type": "电子产品",
-                        "status": "在售"
-                      }
-                    }
-                  }
-                }""";
-        StringBuilder sb1 = new StringBuilder();
-        StringBuilder sb2 = new StringBuilder();
-        String undecoratedJSONStr = ConverterFactory.getUndecoratedJSONStr(json);
-        ArrayList<Integer> arrayList = new ArrayList<>();
-        while (true){
-            Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(undecoratedJSONStr);
-            undecoratedJSONStr = ConverterFactory.concatMapValuesToStr(splitMainEntityAndFieldEntity);
-            arrayList.add(splitMainEntityAndFieldEntity.size());
-            if(!StrUtils.jsonIsNotBlank(undecoratedJSONStr)){
-                break;
-            }else {
-
-            }
-        }
-        System.out.println(arrayList);
-    }
-
-    @Test
-    public void testSplitJson(){
-        String json ="{\"level1Key1\":{\"level2Key1\":{\"name\":\"张三\",\"age\":\"22\",\"school\":\"青海民族大学\"},\"level2Key2\":{\"goods\":\"二手电脑\",\"price\":\"3000\"}},\"level1Key2\":{\"level2KeyA\":{\"type\":\"电子产品\",\"status\":\"在售\"}}}";
-        Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(json);
-        System.out.println(splitMainEntityAndFieldEntity);
+        TestConvertEntity testConvertEntity = JSONUtils.jsonToBean(json, TestConvertEntity.class);
+        System.out.println(testConvertEntity);
+        System.out.println(JSONUtils.toJSONStr(testConvertEntity));
+//        StringBuilder sb = new StringBuilder();
+//        Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, ConverterFactory.getUndecoratedJSONStr(json));
+//        System.out.println(splitMainJsonToPartlyMap);
+//        String s = "{\"group1\":{\"key1\":\"value1\",\"key2\":\"value2\"},\"group2\":{\"remark\":\"测试备注\",\"info\":\"详细信息\"}}";
+//        Map<String, String> splitMainJsonToPartlyMap1 = StrUtils.getSplitMainJsonToPartlyMap(sb, s);
+//        System.out.println(splitMainJsonToPartlyMap1);
     }
 
     @Test
@@ -143,57 +84,16 @@ public class FunctionTest {
 
     @Test
     public void testSplitJSON(){
-        String json ="{\"id\":10,\"name\":\"Su\",\"age\":22,\"Header\":{\"id\":1,\"name\":\"FX\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"},\"map\":{\"Test1\":{\"id\":20,\"name\":\"fx\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"}},\"list\":[\"测试\",100,99.9,true,null]}\n";
-        Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(json);
+        String json ="{\"id\":10,\"name\":\"Su\",\"age\":22,\"Header\":{\"id\":1,\"name\":\"FX\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"},\"map\":{\"Test1\":{\"id\":20,\"name\":\"fx\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"}},\"list\":[\"测试\",100,99.9,true,null]}";
+        String json2 = "[\"Header\":{\"id\":1,\"name\":\"FX\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"},\"map\":{\"id\":20,\"name\":\"fx\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"}]";
+        StringBuilder sb = new StringBuilder();
+        Map<String, String> splitMainEntityAndFieldEntity = StrUtils.getSplitMainJsonToPartlyMap(sb,json);
+        System.out.println(StrUtils.getJSONKeysAndValuesWithPartlyMap(sb.toString()));
+        System.out.println(sb);
         System.out.println(splitMainEntityAndFieldEntity);
-        System.out.println(splitMainEntityAndFieldEntity.get("\"map\""));
+        System.out.println(splitMainEntityAndFieldEntity.keySet());
     }
 
-    @Test
-    public void testSplitJSON2(){
-        String json ="{\"Test1\":{\"id\":20,\"name\":\"fx\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"}}";
-        Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(json);
-        System.out.println(json);
-        System.out.println(splitMainEntityAndFieldEntity);
-    }
-
-    @Test
-    public void testSplitJSON3(){
-        String json = "{\"id\":20,\"name\":\"fx\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"}";
-        Map<String, String> splitMainEntityAndFieldEntity = ConverterFactory.getSplitMainEntityAndFieldEntity(json);
-        System.out.println(json);
-        System.out.println(splitMainEntityAndFieldEntity);
-    }
-
-    @Test
-    public void testSplitJSON4(){
-        String json = """
-                [
-                  {"k1":"v1","k2":"v2"},
-                  {"k3":"v3","k4":"v4"}
-                ]""";
-        String undecoratedJSONStr = ConverterFactory.getUndecoratedJSONStr(json);
-        System.out.println(undecoratedJSONStr);
-        System.out.println(ConverterFactory.getSplitMainEntityAndFieldEntity(undecoratedJSONStr));
-        System.out.println();
-    }
-
-    @Test
-    public void testSplitJSON5(){
-        String json = """
-                [
-                    [
-                        ["a", "b"],
-                        ["c", "d"]
-                    ],
-                    [
-                        ["e", "f"]
-                    ]
-                ]""";
-        String undecoratedJSONStr = ConverterFactory.getUndecoratedJSONStr(json);
-        System.out.println(undecoratedJSONStr);
-        System.out.println(ConverterFactory.getSplitMainEntityAndFieldEntity(undecoratedJSONStr));
-    }
 
     @Test
     public void testRemoveEmptyFromJSON(){
@@ -226,7 +126,7 @@ public class FunctionTest {
                     null
                   ]
                 }""";
-        System.out.println(ConverterFactory.getUndecoratedJSONStr(test));
+        System.out.println(NonGenericTypeConverterFactory.getUndecoratedJSONStr(test));
     }
 
     @Test

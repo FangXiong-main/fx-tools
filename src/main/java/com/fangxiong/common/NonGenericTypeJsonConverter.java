@@ -1,8 +1,6 @@
 package com.fangxiong.common;
 
-import java.lang.reflect.Field;
-
 @FunctionalInterface
-public interface JSONConverter {
+public interface NonGenericTypeJsonConverter {
     Object convert(String s, Class<?> clazz);
 }

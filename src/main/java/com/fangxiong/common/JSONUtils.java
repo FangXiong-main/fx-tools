@@ -8,7 +8,7 @@ public class JSONUtils {
         return ParserFactory.decorateJSONStr(ParserFactory.getParser(c).parse(o, null));
     }
     public static <T> T jsonToBean(String jsonString, Class<T> clazz) {
-        return (T) ConverterFactory.getConverter(clazz).convert(ConverterFactory.getUndecoratedJSONStr(jsonString), clazz);
+        return (T) NonGenericTypeConverterFactory.getConverter(clazz).convert(NonGenericTypeConverterFactory.getUndecoratedJSONStr(jsonString), clazz);
     }
 
 
