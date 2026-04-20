@@ -10,5 +10,5 @@ import java.util.Map;
 public class TestConvertEntity {
     private Integer id;
     private String name;
-    private Map<String,Map<String,String>> record;
+    private Map<String,Map<String,Map<String,Map<String,Map<String,Map<String,Map<String,String>>>>>>> record;
 }

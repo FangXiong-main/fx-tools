@@ -1,5 +1,6 @@
 package com.fangxiong.common.converters;
 
+import com.fangxiong.common.GenericTypeConverterFactory;
 import com.fangxiong.common.NonGenericTypeConverterFactory;
 import com.fangxiong.common.NonGenericTypeJsonConverter;
 import com.fangxiong.common.StrUtils;
@@ -22,7 +23,6 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
             Map<String,Method> setMethodCache = cacheAllSetMethod(clazz);
             Map<String,Type> partTypeCache = cacheAllFieldType(clazz);
             Map<String, String> allFieldValueCache = cacheAllFieldValue(clazz, s);
-            Map<String, ArrayList<String>> currentFieldInnerValue;
             Object convertedObj = clazz.getDeclaredConstructor().newInstance();
             for(Field f : clazz.getDeclaredFields()){
                 setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(allFieldValueCache.get(f.getName()),partTypeCache.get(f.getName())));
@@ -65,16 +65,7 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
 
     private static Object convertFiled(String s,Type type){
         if (type instanceof ParameterizedType pt){
-            if(pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1] instanceof ParameterizedType tempPt){
-                StringBuilder sb = new StringBuilder();
-                Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, s);
-                for (String key : splitMainJsonToPartlyMap.keySet()){
-                    currentConvertingStringDeque.get().offer(splitMainJsonToPartlyMap.get(key));
-                }
-                convertFiled(currentConvertingStringDeque.get().poll(),tempPt);
-            }else{
-                return NonGenericTypeConverterFactory.getConverter((Class<?>) pt.getRawType()).convert(s,(Class<?>) pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1]);
-            }
+            return GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt.getRawType()).convert(s,pt);
         }else{
             return NonGenericTypeConverterFactory.getConverter((Class<?>) type).convert(s,(Class<?>) type);
         }

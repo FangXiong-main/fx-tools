@@ -19,26 +19,44 @@ public class FunctionTest {
 
     @Test
     public void testConvertMap(){
-        String json = """
-                {
-                  "id": 1001,
-                  "name": "测试名称",
-                  "record": {
-                    "group1": {
-                      "key1": "value1",
-                      "key2": "value2"
-                    },
-                    "group2": {
-                      "remark": "测试备注",
-                      "info": "详细信息"
-                    }
-                  }
-                }""";
+        String json = "{\n" +
+                "  \"id\": 1001,\n" +
+                "  \"name\": \"七层等量复杂测试\",\n" +
+                "  \"record\": {\n" +
+                "    \"L1_A\": {\n" +
+                "      \"L2_X\": {\n" +
+                "        \"L3_1\": {\n" +
+                "          \"L4_ONE\": {\n" +
+                "            \"L5_TOP\": {\n" +
+                "              \"L6_SUN\": {\n" +
+                "                \"L7_MSG1\": \"七层测试内容1\",\n" +
+                "                \"L7_MSG2\": \"七层测试内容2\"\n" +
+                "              }\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    },\n" +
+                "    \"L1_B\": {\n" +
+                "      \"L2_Y\": {\n" +
+                "        \"L3_2\": {\n" +
+                "          \"L4_TWO\": {\n" +
+                "            \"L5_BOTTOM\": {\n" +
+                "              \"L6_MOON\": {\n" +
+                "                \"L7_NOTE\": \"七层多节点压力测试\"\n" +
+                "              }\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
         TestConvertEntity testConvertEntity = JSONUtils.jsonToBean(json, TestConvertEntity.class);
         System.out.println(testConvertEntity);
         System.out.println(JSONUtils.toJSONStr(testConvertEntity));
 //        StringBuilder sb = new StringBuilder();
-//        Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, ConverterFactory.getUndecoratedJSONStr(json));
+//        Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, NonGenericTypeConverterFactory.getUndecoratedJSONStr(json));
 //        System.out.println(splitMainJsonToPartlyMap);
 //        String s = "{\"group1\":{\"key1\":\"value1\",\"key2\":\"value2\"},\"group2\":{\"remark\":\"测试备注\",\"info\":\"详细信息\"}}";
 //        Map<String, String> splitMainJsonToPartlyMap1 = StrUtils.getSplitMainJsonToPartlyMap(sb, s);
