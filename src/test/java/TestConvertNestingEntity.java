@@ -11,7 +11,7 @@ import java.util.Map;
 public class TestConvertNestingEntity {
     private Integer id;
     private String name;
-    private Boolean isStudent;
+    private Boolean isActive;
     private Double score;
-    private List<Map<String, List<Map<String, List<String>>>>> ultimateTest;
+    private List<Map<String, List<Map<String, Object>>>> ultimateTest;
 }

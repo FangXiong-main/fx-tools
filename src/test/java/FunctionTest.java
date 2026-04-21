@@ -17,6 +17,56 @@ public class FunctionTest {
         JSONUtils.toJSONStr(set);
     }
 
+    //TODO optimizeMapConverterToSupportObjectType
+    @Test
+    public void testConvertMapWithObject(){
+        String json = """
+                {
+                  "id": 88888,
+                  "name": "终极全场景混合测试",
+                  "isActive": true,
+                  "score": 98.5,
+                  "ultimateTest": [
+                    {
+                      "第一层A": [
+                        {
+                          "字符串": "测试文本",
+                          "数字": 666,
+                          "布尔": false,
+                          "空值": null,
+                          "列表": ["A", "B", "C"]
+                        },
+                        {
+                          "嵌套Map": {
+                            "k1": "v1",
+                            "k2": 123.45,
+                            "k3": null
+                          },
+                          "深层List": [111, 222, 333]
+                        }
+                      ]
+                    },
+                    {
+                      "第一层B": [
+                        {
+                          "混合类型": [1, true, "字符串", null, 3.14]
+                        }
+                      ]
+                    }
+                  ]
+                }""";
+        TestConvertNestingEntity testConvertNestingEntity = JSONUtils.jsonToBean(json, TestConvertNestingEntity.class);
+        System.out.println(JSONUtils.toJSONStr(testConvertNestingEntity));
+    }
+
+    @Test
+    public void testGetKeyAndValueFromJson(){
+        String json = "{\"项目1\":[\"Java\",\"JSON\",\"序列化\"],\"项目2\":[\"递归\",\"泛型\",\"反射\"]}";
+        String undecoratedJSONStr = NonGenericTypeConverterFactory.getUndecoratedJSONStr(json);
+        Map<String, String> jsonKeysAndValuesWithPartlyMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(undecoratedJSONStr);
+        System.out.println(jsonKeysAndValuesWithPartlyMap);
+    }
+
     @Test
     public void testConvertJsonValuesToList(){
         String json = "[\"苹果\", \"香蕉\", \"橙子\"]";

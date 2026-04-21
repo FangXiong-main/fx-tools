@@ -1,9 +1,6 @@
 package com.fangxiong.common.converters;
 
-import com.fangxiong.common.GenericTypeConverterFactory;
-import com.fangxiong.common.NonGenericTypeConverterFactory;
-import com.fangxiong.common.NonGenericTypeJsonConverter;
-import com.fangxiong.common.StrUtils;
+import com.fangxiong.common.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -17,18 +14,23 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
 
     @Override
     public Object convert(String s, Class<?> clazz) {
-        try {
-            Map<String,Method> setMethodCache = cacheAllSetMethod(clazz);
-            Map<String,Type> partTypeCache = cacheAllFieldType(clazz);
-            Map<String, String> allFieldValueCache = cacheAllFieldValue(clazz, s);
-            Object convertedObj = clazz.getDeclaredConstructor().newInstance();
-            for(Field f : clazz.getDeclaredFields()){
-                setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(allFieldValueCache.get(f.getName()),partTypeCache.get(f.getName())));
+        if(CustomizeClazzDetector.isCustomizeClazz(clazz)){
+            try {
+                Map<String,Method> setMethodCache = cacheAllSetMethod(clazz);
+                Map<String,Type> partTypeCache = cacheAllFieldType(clazz);
+                Map<String, String> allFieldValueCache = cacheAllFieldValue(clazz, s);
+                Object convertedObj = clazz.getDeclaredConstructor().newInstance();
+                for(Field f : clazz.getDeclaredFields()){
+                    setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(allFieldValueCache.get(f.getName()),partTypeCache.get(f.getName())));
+                }
+                return convertedObj;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-            return convertedObj;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        }else {
+
         }
+        return null;
     }
 
     private static Map<String,String> cacheAllFieldValue(Class<?> clazz,String json){
