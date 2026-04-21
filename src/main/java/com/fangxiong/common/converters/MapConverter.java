@@ -14,9 +14,9 @@ public class MapConverter implements GenericTypeJsonConverter {
         Map<Object,Object> convertedMap = new HashMap<>();
         if(type instanceof ParameterizedType pt){
             if(pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1] instanceof ParameterizedType pt2){
-                Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sbMain, json);
-                for(String key : splitMainJsonToPartlyMap.keySet()){
-                    convertedMap.put(key.substring(1,key.length()-1), GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt2.getRawType()).convert(splitMainJsonToPartlyMap.get(key),pt2));
+                Map<String, String> partlyMap = StrUtils.getSplitMainJsonToPartlyMap(sbMain, json);
+                for(String key : partlyMap.keySet()){
+                    convertedMap.put(key.substring(1,key.length()-1), GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt2.getRawType()).convert(partlyMap.get(key),pt2));
                 }
             }else{
                 ParameterizedType ptTemp = (ParameterizedType) type;
@@ -24,9 +24,9 @@ public class MapConverter implements GenericTypeJsonConverter {
                 return GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) ptTemp.getRawType()).convert(json,tempClazz);
             }
         }else {
-            Map<String, String> jsonKeysAndValuesWithPartlyMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(json);
-            for(String key : jsonKeysAndValuesWithPartlyMap.keySet()){
-                convertedMap.put(key,NonGenericTypeConverterFactory.getConverter((Class<?>) type).convert(jsonKeysAndValuesWithPartlyMap.get(key),(Class<?>) type));
+            Map<String, String> partlyMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(json);
+            for(String key : partlyMap.keySet()){
+                convertedMap.put(key,NonGenericTypeConverterFactory.getConverter((Class<?>) type).convert(partlyMap.get(key),(Class<?>) type));
             }
         }
         return convertedMap;

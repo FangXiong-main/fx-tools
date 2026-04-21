@@ -15,8 +15,6 @@ import static com.fangxiong.redis.SystemConstants.SET;
 
 public class ObjectConverter implements NonGenericTypeJsonConverter {
 
-    private static final ThreadLocal<Deque<String>> currentConvertingStringDeque = ThreadLocal.withInitial(ArrayDeque::new);
-
     @Override
     public Object convert(String s, Class<?> clazz) {
         try {
@@ -27,8 +25,6 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
             for(Field f : clazz.getDeclaredFields()){
                 setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(allFieldValueCache.get(f.getName()),partTypeCache.get(f.getName())));
             }
-            currentConvertingStringDeque.get().clear();
-            currentConvertingStringDeque.remove();
             return convertedObj;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -45,6 +41,7 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
             cacheFiledValueMap.put(f.getName(),cacheNormalFieldValueMap.get(f.getName()));
         }
         for (String key : cacheMapOrListValueMap.keySet()){
+            cacheFiledValueMap.remove(key);
             cacheFiledValueMap.put(key.substring(1,key.length()-1),cacheMapOrListValueMap.get(key));
         }
         return cacheFiledValueMap;

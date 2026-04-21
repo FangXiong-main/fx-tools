@@ -38,6 +38,4 @@ public class ObjectParser implements JSONParser {
         sb.append("}");
         return sb.toString();
     }
-
-
 }

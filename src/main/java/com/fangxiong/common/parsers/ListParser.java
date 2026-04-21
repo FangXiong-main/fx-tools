@@ -25,8 +25,7 @@ public class ListParser implements JSONParser {
             if(obj == null){
                 sb.append("null");
             }else{
-                String parsed = ParserFactory.getParser(obj.getClass()).parse(obj, f);
-                sb.append(parsed);
+                sb.append(ParserFactory.getParser(obj.getClass()).parse(obj, f));
             }
             tempCount++;
             if(tempCount<totalCount){

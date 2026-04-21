@@ -1,9 +1,12 @@
 package com.fangxiong.common;
 
+import com.fangxiong.common.converters.ListConverter;
 import com.fangxiong.common.converters.LocalDateTimeConverter;
 import com.fangxiong.common.converters.ObjectConverter;
+import com.fangxiong.common.parsers.ListParser;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +21,11 @@ public class NonGenericTypeConverterFactory {
         converterMap.put(String.class,(s,f)-> s);
         converterMap.put(int.class, (s,f)-> Integer.parseInt(s));
         converterMap.put(long.class,(s,f)-> Long.parseLong(s));
+        converterMap.put(Boolean.class,(s,f)-> Boolean.parseBoolean(s));
+        converterMap.put(Double.class,(s,f)-> Double.parseDouble(s));
+        converterMap.put(Float.class,(s,f)-> Float.parseFloat(s));
+        converterMap.put(double.class,(s,f)-> Double.parseDouble(s));
+        converterMap.put(float.class,(s,f)-> Float.parseFloat(s));
     }
 
     public static NonGenericTypeJsonConverter addConverter(Class<?> clazz) {

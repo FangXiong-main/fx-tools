@@ -18,6 +18,110 @@ public class FunctionTest {
     }
 
     @Test
+    public void testConvertJsonValuesToList(){
+        String json = "[\"苹果\", \"香蕉\", \"橙子\"]";
+        ArrayList<String> convertJsonValueListToArr = StrUtils.getConvertJsonValueListToArr(NonGenericTypeConverterFactory.getUndecoratedJSONStr(json));
+        System.out.println(convertJsonValueListToArr);
+    }
+
+    @Test
+    public void testSplitJson(){
+        String json = "[\n" +
+                "  [\"Java\", \"Python\", \"C++\"],\n" +
+                "  [\"足球\", \"篮球\", \"乒乓球\"],\n" +
+                "  [\"电影\", \"音乐\", \"阅读\"]\n" +
+                "]";
+        StringBuilder sb = new StringBuilder();
+        String undecoratedJSONStr = NonGenericTypeConverterFactory.getUndecoratedJSONStr(json);
+        Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, undecoratedJSONStr);
+        System.out.println(splitMainJsonToPartlyMap);
+    }
+
+    @Test
+    public void nestingGenericConvertTest(){
+        String json = "{\n" +
+                "  \"id\": 88888,\n" +
+                "  \"name\": \"强类型终极测试\",\n" +
+                "  \"isStudent\": true,\n" +
+                "  \"score\": 98.5,\n" +
+                "  \"ultimateTest\": [\n" +
+                "    {\n" +
+                "      \"分类A\": [\n" +
+                "        {\n" +
+                "          \"项目1\": [\"Java\", \"JSON\", \"序列化\"],\n" +
+                "          \"项目2\": [\"递归\", \"泛型\", \"反射\"]\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"项目3\": [\"性能\", \"嵌套\", \"工具类\"]\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"分类B\": [\n" +
+                "        {\n" +
+                "          \"项目4\": [\"终极测试\", \"强类型\", \"无Object\"]\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+        TestConvertNestingEntity testConvertNestingEntity = JSONUtils.jsonToBean(json, TestConvertNestingEntity.class);
+        System.out.println(testConvertNestingEntity);
+        System.out.println(JSONUtils.toJSONStr(testConvertNestingEntity));
+    }
+
+    @Test
+    public void testConvertList(){
+        String json = "{\n" +
+                "  \"id\": 1001,\n" +
+                "  \"name\": \"张三\",\n" +
+                "  \"hobby\": [\n" +
+                "    [\"篮球\", \"编程\"],\n" +
+                "    [\"阅读\", \"音乐\"],\n" +
+                "    [\"旅行\", \"电影\"]\n" +
+                "  ]\n" +
+                "}";
+        TestConvertNestingEntity testConvertNestingEntity = JSONUtils.jsonToBean(json, TestConvertNestingEntity.class);
+        System.out.println(testConvertNestingEntity);
+        String jsonStr = JSONUtils.toJSONStr(testConvertNestingEntity);
+        System.out.println(jsonStr);
+    }
+
+    @Test
+    public void testSplitPart2(){
+        String json = "{\n" +
+                "  \"hobby\": [\n" +
+                "    [\"跑步\", \"游泳\"],\n" +
+                "    [\"看书\", \"写字\"]\n" +
+                "  ]\n" +
+                "}";
+        StringBuilder sb = new StringBuilder();
+        Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, NonGenericTypeConverterFactory.getUndecoratedJSONStr(json));
+        System.out.println(sb);
+        System.out.println(splitMainJsonToPartlyMap);
+    }
+    private Map<String,Map<String,String>> test;
+    @Test
+    public void testSplitPart3(){
+        String json = "{\n" +
+                "  \"test\": {\n" +
+                "    \"group1\": {\n" +
+                "      \"key1\": \"value1\",\n" +
+                "      \"key2\": \"value2\"\n" +
+                "    },\n" +
+                "    \"group2\": {\n" +
+                "      \"name\": \"张三\",\n" +
+                "      \"age\": \"20\"\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+        StringBuilder sb = new StringBuilder();
+        Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, NonGenericTypeConverterFactory.getUndecoratedJSONStr(json));
+        System.out.println(sb);
+        System.out.println(splitMainJsonToPartlyMap);
+    }
+
+    @Test
     public void testConvertMap(){
         String json = "{\n" +
                 "  \"id\": 1001,\n" +
@@ -52,9 +156,12 @@ public class FunctionTest {
                 "    }\n" +
                 "  }\n" +
                 "}";
-        TestConvertEntity testConvertEntity = JSONUtils.jsonToBean(json, TestConvertEntity.class);
-        System.out.println(testConvertEntity);
-        System.out.println(JSONUtils.toJSONStr(testConvertEntity));
+//        TestConvertEntity testConvertEntity = JSONUtils.jsonToBean(json, TestConvertEntity.class);
+//        System.out.println(testConvertEntity);
+//        System.out.println(JSONUtils.toJSONStr(testConvertEntity));
+        StringBuilder sb= new StringBuilder();
+        Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, NonGenericTypeConverterFactory.getUndecoratedJSONStr(json));
+
 //        StringBuilder sb = new StringBuilder();
 //        Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, NonGenericTypeConverterFactory.getUndecoratedJSONStr(json));
 //        System.out.println(splitMainJsonToPartlyMap);
