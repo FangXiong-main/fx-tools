@@ -28,7 +28,7 @@ public class NonGenericTypeConverterFactory {
         converterMap.put(float.class,(s,f)-> Float.parseFloat(s));
     }
 
-    public static NonGenericTypeJsonConverter addConverter(Class<?> clazz) {
+    private static NonGenericTypeJsonConverter addConverter(Class<?> clazz) {
         converterMap.put(clazz,new ObjectConverter());
         return converterMap.get(clazz);
     }

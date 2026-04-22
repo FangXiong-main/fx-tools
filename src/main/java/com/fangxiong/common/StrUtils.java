@@ -34,35 +34,55 @@ public class StrUtils {
         char[] ca = s.toCharArray();
         int quotationMarksCount = 0;
         boolean isReadingKey = false;boolean isReadingValue = false;boolean isEmptyEntity = false;int isEmptyEntityCount=0;
-        boolean readValueFinished=false;boolean readKeyFinished=false;boolean valueIsNotString=false;
+        boolean readValueFinished=false;boolean readKeyFinished=false;boolean valueIsNotString=false;boolean isListOrMapValue = false;int tempListOrMapCount=0;
         for (int i = 0; i < ca.length; i++) {
-            if(i<=ca.length-2&&ca[i+1]!='\"'&&ca[i]==':') {
+            if(!isListOrMapValue&&i<=ca.length-2&&ca[i+1]!='\"'&&ca[i+1]!='['&&ca[i+1]!='{'&&ca[i]==':') {
                 isReadingValue=true;isReadingKey=false;readKeyFinished=true;valueIsNotString=true;
-            } else if (i<=ca.length-2&&ca[i+1]=='\"'&&ca[i]==':'){
+            } else if (!isReadingValue&&i<=ca.length-2&&(ca[i+1]=='[' || ca[i+1]=='{')&&ca[i]==':') {
+                isListOrMapValue=true;isReadingKey=false;readKeyFinished=true;isReadingValue=true;
+            } else if (isListOrMapValue && isReadingValue && (ca[i]=='['||ca[i]=='{')) {
+                sbValues.append(ca[i]);tempListOrMapCount++;
+            } else if (!isListOrMapValue&&i<=ca.length-2&&ca[i+1]=='\"'&&ca[i]==':'){
                 isReadingValue=true;isReadingKey=false;readKeyFinished=true;
-            } else if (i>=1 && ca[i-1]==':' && (ca[i]=='{' || ca[i] == ']')) {
+            } else if (isReadingValue&&isListOrMapValue&&i<=ca.length-2&&ca[i+1]=='\"'&&ca[i]==':') {
+                isReadingKey=false;readKeyFinished=true;sbValues.append(ca[i]);
+            } else if (i>=1 && ca[i-1]==':' && (ca[i]=='}' || ca[i] == ']')) {
                 sbValues.append(ca[i]);isEmptyEntity=true;isEmptyEntityCount++;
             } else if (isEmptyEntity &&isEmptyEntityCount!=0 && ( ca[i]=='}' || ca[i] == ']')) {
                 isReadingValue = false; readValueFinished = true;sbValues.append(ca[i]);isEmptyEntity = false;isEmptyEntityCount=0;
-            } else if (i>=1 && ca[i]=='\"' && !isReadingKey && (ca[i-1]==':'||ca[i-1]=='{'||ca[i-1]==',') && !valueIsNotString) {
+            } else if ( !isListOrMapValue&&i>=1 && ca[i]=='\"' && !isReadingKey && (ca[i-1]==':'||ca[i-1]=='{'||ca[i-1]==','||ca[i-1]=='[') && !valueIsNotString) {
                 quotationMarksCount++;
+            } else if (isListOrMapValue&&i>=1 && ca[i]=='\"' && !isReadingKey && (ca[i-1]==':'||ca[i-1]=='{'||ca[i-1]==','||ca[i-1]=='[') && !valueIsNotString) {
+                quotationMarksCount++;sbValues.append(ca[i]);
             } else if (valueIsNotString && isReadingValue && (ca[i]==','||ca[i]=='}')) {
                 readValueFinished=true;isReadingValue=false;valueIsNotString=false;i--;
-            } else if (ca[i]=='\"' && (isReadingKey||isReadingValue)) {
+            } else if (!isListOrMapValue&&ca[i]=='\"' && (isReadingKey||isReadingValue)) {
                 quotationMarksCount--;
+            } else if (isListOrMapValue&&ca[i]=='\"' && (isReadingKey||isReadingValue)) {
+                quotationMarksCount--;sbValues.append(ca[i]);
             } else if (quotationMarksCount == 1 && !isReadingKey && !isReadingValue) {
                 sbKeys.append(ca[i]);
                 isReadingKey = true;
+            } else if (tempListOrMapCount!=0&&isListOrMapValue && (ca[i]==']'||ca[i]=='}')) {
+                tempListOrMapCount--;
+                sbValues.append(ca[i]);
+            } else if (isListOrMapValue&&tempListOrMapCount==0) {
+                mapKeysAndValues.put(sbKeys.toString(),sbValues.toString());
+                sbKeys.setLength(0);sbValues.setLength(0);
+                isReadingKey = false;isReadingValue = false;
+                readKeyFinished = false;readValueFinished = false;
+                valueIsNotString = false;isListOrMapValue = false;;
             } else if (quotationMarksCount == 0 && readKeyFinished && readValueFinished) {
                 mapKeysAndValues.put(sbKeys.toString(),sbValues.toString());
                 sbKeys.setLength(0);sbValues.setLength(0);
                 isReadingKey = false;isReadingValue = false;
                 readKeyFinished = false;readValueFinished = false;
-                valueIsNotString = false;
+                valueIsNotString = false;isListOrMapValue = false;
+                tempListOrMapCount=0;
             } else if (quotationMarksCount == 0 && isReadingKey) {
                 isReadingKey = false;
                 readKeyFinished = true;
-            } else if (quotationMarksCount == 0 && isReadingValue && !valueIsNotString) {
+            } else if (quotationMarksCount == 0 && isReadingValue && !valueIsNotString && !isListOrMapValue) {
                 isReadingValue = false;
                 readValueFinished = true;
                 i--;
@@ -152,12 +172,43 @@ public class StrUtils {
         ArrayList<String> cacheArr = new ArrayList<>();
         char[] ca = json.toCharArray();
         StringBuilder sb = new StringBuilder();
-        for (char c : ca) {
-            if (c == ',' || c == ']') {
+        boolean isReadingMap=false;boolean isReadingList =false;int detListCount=0;int readingNormalValue =0;
+        for(int i=0;i<ca.length;i++){
+            if (ca[i] == '[' && detListCount>=1) {
+                isReadingList=true;
+                sb.append(ca[i]);
+            } else if(ca[i] == '['){
+                detListCount++;
+            } else if (ca[i] =='{') {
+                isReadingMap=true;
+                sb.append(ca[i]);
+            } else if (ca[i]=='}') {
+                isReadingMap=false;
+                sb.append(ca[i]);
+                i++;
                 cacheArr.add(sb.toString());
                 sb.setLength(0);
-            } else if(c != '[' && c!='"'){
-                sb.append(c);
+            } else if (ca[i] == ']' && isReadingList) {
+                sb.append(ca[i]);
+                cacheArr.add(sb.toString());
+                sb.setLength(0);
+                i++;
+                isReadingList=false;
+            } else if (isReadingMap) {
+                sb.append(ca[i]);
+            } else if (isReadingList&&ca[i]!='"') {
+                sb.append(ca[i]);
+            } else if (i==ca.length-1 && !sb.isEmpty()) {
+                cacheArr.add(sb.toString());
+            } else if (ca[i]==',' && readingNormalValue==0) {
+                cacheArr.add(sb.toString()); // ["T,T"]
+                sb.setLength(0);
+            } else if(ca[i]!='"'){
+                sb.append(ca[i]);
+            } else if (ca[i]=='"' && !isReadingList && readingNormalValue==0) {
+                readingNormalValue++;
+            } else if (ca[i]=='"' && !isReadingList && readingNormalValue>=1) {
+                readingNormalValue--;
             }
         }
         return cacheArr;

@@ -18,7 +18,7 @@ public class ListConverter implements GenericTypeJsonConverter {
         List<Object> convertedList = new ArrayList<>();
         if (type instanceof ParameterizedType pt){
             if(pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1] instanceof ParameterizedType pt2){
-                Map<String, String> partlyMap = StrUtils.getSplitMainJsonToPartlyMap(tempSb, json);
+                Map<String, String> partlyMap = StrUtils.getSplitMainJsonToPartlyMap(tempSb,json);
                 for (String key : partlyMap.keySet()){
                     convertedList.add(GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt2.getRawType()).convert(partlyMap.get(key),pt2));
                 }
@@ -28,10 +28,21 @@ public class ListConverter implements GenericTypeJsonConverter {
                 return GenericTypeConverterFactory.getGenericTypeJsonConverter(rawClazz).convert(json,ptTemp.getActualTypeArguments()[pt.getActualTypeArguments().length-1]);
             }
         }else{
-            Class<?> tempClazz = (Class<?>) type;
             ArrayList<String> valueListToArr = StrUtils.getConvertJsonValueListToArr(json);
-            for(String value : valueListToArr){
-                convertedList.add(NonGenericTypeConverterFactory.getConverter(tempClazz).convert(value,tempClazz));
+            if (type == Object.class){
+                for (String values: valueListToArr){
+                    Type tempType = ObjectConverter.detectObjectType(values);
+                    if (tempType instanceof ParameterizedType pt){
+                        convertedList.add(GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt.getRawType()).convert(values,pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1]));
+                    }else {
+                        convertedList.add(NonGenericTypeConverterFactory.getConverter((Class<?>) tempType).convert(values,(Class<?>) tempType));
+                    }
+                }
+            }else{
+                Class<?> tempClazz = (Class<?>) type;
+                for(String value : valueListToArr){
+                    convertedList.add(NonGenericTypeConverterFactory.getConverter(tempClazz).convert(value,tempClazz));
+                }
             }
         }
         return convertedList;

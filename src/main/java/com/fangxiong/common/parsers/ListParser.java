@@ -1,10 +1,13 @@
 package com.fangxiong.common.parsers;
 
+import com.fangxiong.common.CustomizeClazzDetector;
 import com.fangxiong.common.JSONParser;
 import com.fangxiong.common.JSONUtils;
 import com.fangxiong.common.ParserFactory;
+import com.fangxiong.common.converters.ObjectConverter;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.List;
 
 public class ListParser implements JSONParser {

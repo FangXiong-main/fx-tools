@@ -1,5 +1,6 @@
 package com.fangxiong.common.converters;
 
+import com.fangxiong.common.CustomizeGenericTypes;
 import com.fangxiong.common.*;
 
 import java.lang.reflect.Field;
@@ -7,10 +8,15 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.fangxiong.redis.SystemConstants.SET;
 
 public class ObjectConverter implements NonGenericTypeJsonConverter {
+
+    private static final Pattern isIntegerPattern = Pattern.compile("-?(\\d+)");
+    private static final Pattern isDicimalPattern = Pattern.compile("-?(\\d+\\.\\d+)");
 
     @Override
     public Object convert(String s, Class<?> clazz) {
@@ -28,30 +34,63 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
                 throw new RuntimeException(e);
             }
         }else {
-
+            Type type = detectObjectType(s);
+            if (type instanceof ParameterizedType pt){
+                return GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt.getRawType()).convert(s,pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1]);
+            }else {
+                return NonGenericTypeConverterFactory.getConverter((Class<?>) type).convert(s,(Class<?>) type);
+            }
         }
-        return null;
+    }
+
+    public static Type detectObjectType(String objectValueStr){
+        if (objectValueStr.isEmpty()){
+            return String.class;
+        }else if (Character.isDigit(objectValueStr.charAt(0))){
+            Matcher intergerMatcher = isIntegerPattern.matcher(objectValueStr);
+            Matcher dicimalMatcher = isDicimalPattern.matcher(objectValueStr);
+            if(intergerMatcher.matches()){
+                return Integer.class;
+            }else if (dicimalMatcher.matches()){
+                return Double.class;
+            }
+            return String.class;
+        } else if (objectValueStr.equals("false")||objectValueStr.equals("true")) {
+            return Boolean.class;
+        } else if (objectValueStr.charAt(0)=='[') {
+            ArrayList<String> listToArr = StrUtils.getConvertJsonValueListToArr(objectValueStr);
+            if (!listToArr.isEmpty()){
+                return new CustomizeGenericTypes(List.class,Object.class);
+            }else {
+                return String.class;
+            }
+        } else if (objectValueStr.charAt(0)=='{') {
+            Map<String, String> partlyMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(objectValueStr);
+            if(!partlyMap.isEmpty()){
+                return new CustomizeGenericTypes(Map.class,Object.class);
+            }else {
+                return String.class;
+            }
+        }
+        return String.class;
     }
 
     private static Map<String,String> cacheAllFieldValue(Class<?> clazz,String json){
         StringBuilder sbMain = new StringBuilder();
         Field[] df = clazz.getDeclaredFields();
         Map<String,String> cacheFiledValueMap = new HashMap<>();
-        Map<String,String> cacheMapOrListValueMap = StrUtils.getSplitMainJsonToPartlyMap(sbMain,json);
-        Map<String,String> cacheNormalFieldValueMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(sbMain.toString());
+        Map<String,String> cacheMapOrListValueMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(json);
+        Map<String,String> cacheFieldValueMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(json);
         for (Field f:df){
-            cacheFiledValueMap.put(f.getName(),cacheNormalFieldValueMap.get(f.getName()));
+            cacheFiledValueMap.put(f.getName(),cacheFieldValueMap.get(f.getName()));
         }
-        for (String key : cacheMapOrListValueMap.keySet()){
-            cacheFiledValueMap.remove(key);
-            cacheFiledValueMap.put(key.substring(1,key.length()-1),cacheMapOrListValueMap.get(key));
-        }
+//        for (String key : cacheMapOrListValueMap.keySet()){
+//            cacheFiledValueMap.remove(key);
+//            cacheFiledValueMap.put(key.substring(1,key.length()-1),cacheMapOrListValueMap.get(key));
+//        }
         return cacheFiledValueMap;
     }
 
-//    private static Map<String,ArrayList<String>> cacheEntityFieldInnerValueList(String json,Class<?> clazz){
-//
-//    }
 
     private static Map<String,Type> cacheAllFieldType(Class<?> clazz){
         Field[] df = clazz.getDeclaredFields();

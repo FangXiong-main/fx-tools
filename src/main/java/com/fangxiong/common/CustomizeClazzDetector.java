@@ -14,6 +14,7 @@ import java.util.Set;
 
 public class CustomizeClazzDetector {
     private static final ArrayList<Class<?>> clazzList = new ArrayList<>();
+    private static final ArrayList<Class<?>> genericClazzList = new ArrayList<>();
     static {
         clazzList.add(Integer.class);
         clazzList.add(Long.class);
@@ -44,6 +45,19 @@ public class CustomizeClazzDetector {
         clazzList.add(float.class);
         clazzList.add(boolean.class);
         clazzList.add(char.class);
+
+        genericClazzList.add(Map.class);
+        genericClazzList.add(List.class);
+    }
+
+    public static Boolean isGenericTypeClazz(Class<?> clazz){
+        Class<?>[] interfaces = clazz.getInterfaces();
+        for(Class<?> i : interfaces){
+            if(genericClazzList.contains(i)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public static Boolean isCustomizeClazz(Class<?> clazz) {

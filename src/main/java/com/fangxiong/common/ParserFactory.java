@@ -16,8 +16,13 @@ public class ParserFactory {
 
     static{
         parserMap.put(String.class,(o,f)->{
-            if(o==null) return null;
-            return "\""+ParserFactory.convertEscapeCharacterToStr(o.toString())+"\"";
+            if(o==null || o.equals("null")) {
+                return null;
+            } else if (StrUtils.strIsNotBlank(o.toString())) {
+                return "\""+ParserFactory.convertEscapeCharacterToStr(o.toString())+"\"";
+            }else {
+                return "\"\"";
+            }
         });
         parserMap.put(int.class,(o,f)->o==null ? null : o.toString());
         parserMap.put(long.class,(o,f)->o==null ? null : o.toString());

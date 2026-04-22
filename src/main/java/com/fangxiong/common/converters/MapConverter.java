@@ -14,9 +14,9 @@ public class MapConverter implements GenericTypeJsonConverter {
         Map<Object,Object> convertedMap = new HashMap<>();
         if(type instanceof ParameterizedType pt){
             if(pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1] instanceof ParameterizedType pt2){
-                Map<String, String> partlyMap = StrUtils.getSplitMainJsonToPartlyMap(sbMain, json);
+                Map<String, String> partlyMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(json);
                 for(String key : partlyMap.keySet()){
-                    convertedMap.put(key.substring(1,key.length()-1), GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt2.getRawType()).convert(partlyMap.get(key),pt2));
+                    convertedMap.put(key, GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt2.getRawType()).convert(partlyMap.get(key),pt2));
                 }
             }else{
                 ParameterizedType ptTemp = (ParameterizedType) type;
@@ -25,8 +25,19 @@ public class MapConverter implements GenericTypeJsonConverter {
             }
         }else {
             Map<String, String> partlyMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(json);
-            for(String key : partlyMap.keySet()){
-                convertedMap.put(key,NonGenericTypeConverterFactory.getConverter((Class<?>) type).convert(partlyMap.get(key),(Class<?>) type));
+            if(type == Object.class){
+                for(String key : partlyMap.keySet()){
+                    Type tempType = ObjectConverter.detectObjectType(partlyMap.get(key));
+                    if (tempType instanceof ParameterizedType pt){
+                        convertedMap.put(key,GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt.getRawType()).convert(partlyMap.get(key),pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1]));
+                    }else{
+                        convertedMap.put(key,NonGenericTypeConverterFactory.getConverter((Class<?>) tempType).convert(partlyMap.get(key),(Class<?>) tempType));
+                    }
+                }
+            }else {
+                for(String key : partlyMap.keySet()){
+                    convertedMap.put(key,NonGenericTypeConverterFactory.getConverter((Class<?>) type).convert(partlyMap.get(key),(Class<?>) type));
+                }
             }
         }
         return convertedMap;

@@ -19,58 +19,177 @@ public class FunctionTest {
 
     //TODO optimizeMapConverterToSupportObjectType
     @Test
+    public void finalTestConvertMapWithObject(){
+        String json = "{\n" +
+                "  \"id\": 100000,\n" +
+                "  \"name\": \"真·终极最终测试\",\n" +
+                "  \"isActive\": true,\n" +
+                "  \"score\": 99.999,\n" +
+                "  \"ultimateTest\": [\n" +
+                "    {\n" +
+                "      \"finalGroupA\": [\n" +
+                "        {\n" +
+                "          \"normalStr\": \"最后一轮\",\n" +
+                "          \"normalInt\": 999999,\n" +
+                "          \"normalBool\": false,\n" +
+                "          \"normalDouble\": 12345.6789,\n" +
+                "          \"nullValue\": null,\n" +
+                "          \"deepMap\": {\n" +
+                "            \"a\": {\n" +
+                "              \"b\": {\n" +
+                "                \"c\": \"最深层结束\",\n" +
+                "                \"d\": 100\n" +
+                "              }\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"arrayAllType\": [0, false, \"\", null, 9.9, { \"key\": \"数组内MAP\" }],\n" +
+                "          \"multiLayerArray\": [[1, true, null], [\"字符串\", 2.2, false]]\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"finalGroupB\": [\n" +
+                "        {\n" +
+                "          \"lastObj\": {\n" +
+                "            \"finalField\": \"完美收官\",\n" +
+                "            \"finalCode\": 200,\n" +
+                "            \"finalFlag\": true\n" +
+                "          },\n" +
+                "          \"endNull\": null\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+        FinalTestEntity finalTestEntity = JSONUtils.jsonToBean(json, FinalTestEntity.class);
+        System.out.println(finalTestEntity);
+        System.out.println(JSONUtils.toJSONStr(finalTestEntity));
+    }
+
+
+    @Test
     public void testConvertMapWithObject(){
-        String json = """
-                {
-                  "id": 88888,
-                  "name": "终极全场景混合测试",
-                  "isActive": true,
-                  "score": 98.5,
-                  "ultimateTest": [
-                    {
-                      "第一层A": [
-                        {
-                          "字符串": "测试文本",
-                          "数字": 666,
-                          "布尔": false,
-                          "空值": null,
-                          "列表": ["A", "B", "C"]
-                        },
-                        {
-                          "嵌套Map": {
-                            "k1": "v1",
-                            "k2": 123.45,
-                            "k3": null
-                          },
-                          "深层List": [111, 222, 333]
-                        }
-                      ]
-                    },
-                    {
-                      "第一层B": [
-                        {
-                          "混合类型": [1, true, "字符串", null, 3.14]
-                        }
-                      ]
-                    }
-                  ]
-                }""";
+        String json = "{\n" +
+                "  \"id\": 9999,\n" +
+                "  \"name\": \"超深度嵌套Object测试\",\n" +
+                "  \"isActive\": true,\n" +
+                "  \"score\": 99.9,\n" +
+                "  \"deepTest\": [\n" +
+                "    {\n" +
+                "      \"level1\": [\n" +
+                "        {\n" +
+                "          \"level2\": [\n" +
+                "            {\n" +
+                "              \"level3\": \"字符串\",\n" +
+                "              \"level4\": 666,\n" +
+                "              \"level5\": true,\n" +
+                "              \"level6\": 3.14,\n" +
+                "              \"level7\": null\n" +
+                "            }\n" +
+                "          ]\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"A\": [\n" +
+                "        {\n" +
+                "          \"B\": [\n" +
+                "            {\n" +
+                "              \"C\": \"测试\",\n" +
+                "              \"D\": 123,\n" +
+                "              \"E\": false,\n" +
+                "              \"F\": 9.9\n" +
+                "            }\n" +
+                "          ]\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
         TestConvertNestingEntity testConvertNestingEntity = JSONUtils.jsonToBean(json, TestConvertNestingEntity.class);
+        System.out.println(testConvertNestingEntity);
         System.out.println(JSONUtils.toJSONStr(testConvertNestingEntity));
     }
 
     @Test
     public void testGetKeyAndValueFromJson(){
-        String json = "{\"项目1\":[\"Java\",\"JSON\",\"序列化\"],\"项目2\":[\"递归\",\"泛型\",\"反射\"]}";
+        String s = "\"testArray\": [\n" +
+                "            {\n" +
+                "              \"key\": \"数组内Map\"\n" +
+                "            }\n" +
+                "          ]";
+        System.out.println(NonGenericTypeConverterFactory.getUndecoratedJSONStr(s));
+        String json = "[{\"key\":\"数组内Map\"}]";
         String undecoratedJSONStr = NonGenericTypeConverterFactory.getUndecoratedJSONStr(json);
         Map<String, String> jsonKeysAndValuesWithPartlyMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(undecoratedJSONStr);
         System.out.println(jsonKeysAndValuesWithPartlyMap);
     }
 
     @Test
+    public void testTwoDifferentTool(){
+        String json1 = "[[\n" +
+                "    {\n" +
+                "      \"finalTest1\": [\n" +
+                "        {\n" +
+                "          \"field1\": \"最后测试\",\n" +
+                "          \"field2\": 88888,\n" +
+                "          \"field3\": true,\n" +
+                "          \"field4\": 1234.567,\n" +
+                "          \"field5\": null,\n" +
+                "          \"deepNested\": {\n" +
+                "            \"levelA\": {\n" +
+                "              \"levelB\": {\n" +
+                "                \"levelC\": \"究极深层\",\n" +
+                "                \"levelD\": 666\n" +
+                "              }\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"complexArray\": [ null, false, \"文本\", 9.9, { \"key\": \"数组内对象\" } ],\n" +
+                "          \"arrayInArray\": [ [1,2,3], [true, false, null] ]\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"finalTest2\": [\n" +
+                "        {\n" +
+                "          \"lastObj\": {\n" +
+                "            \"name\": \"结束\",\n" +
+                "            \"value\": 100,\n" +
+                "            \"flag\": true,\n" +
+                "            \"decimal\": 0.0001\n" +
+                "          },\n" +
+                "          \"finalNull\": null\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ]\n" +
+                "]";
+        String json = NonGenericTypeConverterFactory.getUndecoratedJSONStr(json1);
+        System.out.println(json);
+        Map<String, String> m1 = StrUtils.getJSONKeysAndValuesWithPartlyMap(json);
+        System.out.println(m1);
+        StringBuilder sb = new StringBuilder();
+        System.out.println(StrUtils.getSplitMainJsonToPartlyMap(sb, json));
+
+    }
+
+    @Test
     public void testConvertJsonValuesToList(){
-        String json = "[\"苹果\", \"香蕉\", \"橙子\"]";
+        String json = "[\n" +
+                "            null,\n" +
+                "            false,\n" +
+                "            \"文本\",\n" +
+                "            9.9,\n" +
+                "            {\n" +
+                "              \"key\": \"数组内对象\"\n" +
+                "            }\n" +
+                "          ]";
         ArrayList<String> convertJsonValueListToArr = StrUtils.getConvertJsonValueListToArr(NonGenericTypeConverterFactory.getUndecoratedJSONStr(json));
+        System.out.println(convertJsonValueListToArr.size());
         System.out.println(convertJsonValueListToArr);
     }
 
@@ -115,9 +234,9 @@ public class FunctionTest {
                 "    }\n" +
                 "  ]\n" +
                 "}";
-        TestConvertNestingEntity testConvertNestingEntity = JSONUtils.jsonToBean(json, TestConvertNestingEntity.class);
-        System.out.println(testConvertNestingEntity);
-        System.out.println(JSONUtils.toJSONStr(testConvertNestingEntity));
+        TestConvertNestingNonObjEntity testConvertNestingNonObjEntity = JSONUtils.jsonToBean(json, TestConvertNestingNonObjEntity.class);
+        System.out.println(testConvertNestingNonObjEntity);
+        System.out.println(JSONUtils.toJSONStr(testConvertNestingNonObjEntity));
     }
 
     @Test
@@ -206,11 +325,11 @@ public class FunctionTest {
                 "    }\n" +
                 "  }\n" +
                 "}";
-//        TestConvertEntity testConvertEntity = JSONUtils.jsonToBean(json, TestConvertEntity.class);
-//        System.out.println(testConvertEntity);
-//        System.out.println(JSONUtils.toJSONStr(testConvertEntity));
-        StringBuilder sb= new StringBuilder();
-        Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, NonGenericTypeConverterFactory.getUndecoratedJSONStr(json));
+        TestConvertEntity testConvertEntity = JSONUtils.jsonToBean(json, TestConvertEntity.class);
+        System.out.println(testConvertEntity);
+        System.out.println(JSONUtils.toJSONStr(testConvertEntity));
+//        StringBuilder sb= new StringBuilder();
+//        Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, NonGenericTypeConverterFactory.getUndecoratedJSONStr(json));
 
 //        StringBuilder sb = new StringBuilder();
 //        Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, NonGenericTypeConverterFactory.getUndecoratedJSONStr(json));
