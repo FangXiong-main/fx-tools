@@ -5,16 +5,13 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 public class CustomizeClazzDetector {
     private static final ArrayList<Class<?>> clazzList = new ArrayList<>();
     private static final ArrayList<Class<?>> genericClazzList = new ArrayList<>();
+    private static final Map<String,Class<?>> detClazzWithStr = new HashMap<>();
     static {
         clazzList.add(Integer.class);
         clazzList.add(Long.class);
@@ -48,6 +45,19 @@ public class CustomizeClazzDetector {
 
         genericClazzList.add(Map.class);
         genericClazzList.add(List.class);
+
+        detClazzWithStr.put("String",String.class);
+        detClazzWithStr.put("Map",Map.class);
+        detClazzWithStr.put("Object",Object.class);
+        detClazzWithStr.put("Boolean",Boolean.class);
+        detClazzWithStr.put("Integer",Integer.class);
+        detClazzWithStr.put("Double",Double.class);
+        detClazzWithStr.put("ArrayList",ArrayList.class);
+        detClazzWithStr.put("List",List.class);
+    }
+
+    public static Class<?> getClazzWithStr(String str){
+        return detClazzWithStr.get(str);
     }
 
     public static Boolean isGenericTypeClazz(Class<?> clazz){

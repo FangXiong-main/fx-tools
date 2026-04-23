@@ -14,10 +14,82 @@ public class FunctionTest {
     public void errorTest(){
         Set<String> set = new HashSet<>();
         set.add("FX");
-        JSONUtils.toJSONStr(set);
+        JSONUtils.BeanToJson(set);
     }
 
-    //TODO optimizeMapConverterToSupportObjectType
+    @Test
+    public void testCustomGenericTypes(){
+        CustomizeGenericTypes c =new CustomizeGenericTypes("Map<String,Map<String,List<Object>>>");
+        System.out.println(c.getRawType());
+        System.out.println(c.getActualTypeArguments()[0]);
+        System.out.println(c.getActualTypeArguments().length);
+        Type actualTypeArgument = c.getActualTypeArguments()[1];
+        ParameterizedType t1 =(ParameterizedType) actualTypeArgument;
+        System.out.println(t1.getRawType());
+        Type actualTypeArgument1 = t1.getActualTypeArguments()[1];
+        System.out.println(t1.getActualTypeArguments()[0]);
+        ParameterizedType t2 =(ParameterizedType) actualTypeArgument1;
+        System.out.println(t2.getRawType());
+        System.out.println(t2.getActualTypeArguments()[0]);
+    }
+
+    @Test
+    public void testJsonToLocalVariable(){
+        String json="{\n" +
+                "  \"userInfo\": [\n" +
+                "    2024001,\n" +
+                "    \"张三\",\n" +
+                "    20,\n" +
+                "    \"计算机学院\",\n" +
+                "    true,\n" +
+                "    {\n" +
+                "      \"phone\": \"13800138000\",\n" +
+                "      \"address\": \"3号楼201\"\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"goodsList\": [\n" +
+                "    1001,\n" +
+                "    \"二手iPad\",\n" +
+                "    1500.0,\n" +
+                "    \"九五新\",\n" +
+                "    {\n" +
+                "      \"publishTime\": \"2026-04-22\",\n" +
+                "      \"category\": \"电子产品\"\n" +
+                "    },\n" +
+                "    [\n" +
+                "      \"可小刀\",\n" +
+                "      \"支持自提\",\n" +
+                "      \"原装无修\"\n" +
+                "    ]\n" +
+                "  ],\n" +
+                "  \"orderData\": [\n" +
+                "    5001,\n" +
+                "    \"待交易\",\n" +
+                "    1500.0,\n" +
+                "    {\n" +
+                "      \"buyerId\": 2024002,\n" +
+                "      \"buyerName\": \"李四\"\n" +
+                "    },\n" +
+                "    false\n" +
+                "  ],\n" +
+                "  \"recommendTags\": [\n" +
+                "    \"教材\",\n" +
+                "    \"数码\",\n" +
+                "    \"生活用品\",\n" +
+                "    90,\n" +
+                "    {\n" +
+                "      \"hotLevel\": \"高\",\n" +
+                "      \"showCount\": 1200\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+        Map<String,List<Object>>  localJsonData;
+        Object o = JSONUtils.jsonToBean(json, new CustomizeGenericTypes("Map<String,List<Object>>"));
+        System.out.println(o);
+        System.out.println(JSONUtils.BeanToJson(o));
+    }
+
+    //optimizeMapConverterToSupportObjectType
     @Test
     public void finalTestConvertMapWithObject(){
         String json = "{\n" +
@@ -65,7 +137,7 @@ public class FunctionTest {
                 "}";
         FinalTestEntity finalTestEntity = JSONUtils.jsonToBean(json, FinalTestEntity.class);
         System.out.println(finalTestEntity);
-        System.out.println(JSONUtils.toJSONStr(finalTestEntity));
+        System.out.println(JSONUtils.BeanToJson(finalTestEntity));
     }
 
 
@@ -110,7 +182,7 @@ public class FunctionTest {
                 "}";
         TestConvertNestingEntity testConvertNestingEntity = JSONUtils.jsonToBean(json, TestConvertNestingEntity.class);
         System.out.println(testConvertNestingEntity);
-        System.out.println(JSONUtils.toJSONStr(testConvertNestingEntity));
+        System.out.println(JSONUtils.BeanToJson(testConvertNestingEntity));
     }
 
     @Test
@@ -236,7 +308,7 @@ public class FunctionTest {
                 "}";
         TestConvertNestingNonObjEntity testConvertNestingNonObjEntity = JSONUtils.jsonToBean(json, TestConvertNestingNonObjEntity.class);
         System.out.println(testConvertNestingNonObjEntity);
-        System.out.println(JSONUtils.toJSONStr(testConvertNestingNonObjEntity));
+        System.out.println(JSONUtils.BeanToJson(testConvertNestingNonObjEntity));
     }
 
     @Test
@@ -252,7 +324,7 @@ public class FunctionTest {
                 "}";
         TestConvertNestingEntity testConvertNestingEntity = JSONUtils.jsonToBean(json, TestConvertNestingEntity.class);
         System.out.println(testConvertNestingEntity);
-        String jsonStr = JSONUtils.toJSONStr(testConvertNestingEntity);
+        String jsonStr = JSONUtils.BeanToJson(testConvertNestingEntity);
         System.out.println(jsonStr);
     }
 
@@ -327,7 +399,7 @@ public class FunctionTest {
                 "}";
         TestConvertEntity testConvertEntity = JSONUtils.jsonToBean(json, TestConvertEntity.class);
         System.out.println(testConvertEntity);
-        System.out.println(JSONUtils.toJSONStr(testConvertEntity));
+        System.out.println(JSONUtils.BeanToJson(testConvertEntity));
 //        StringBuilder sb= new StringBuilder();
 //        Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, NonGenericTypeConverterFactory.getUndecoratedJSONStr(json));
 
@@ -429,7 +501,7 @@ public class FunctionTest {
         Map<String,TestEntity> map = new HashMap<>();
         map.put("Test1",new TestEntity(20,"fx",20,"male",LocalDateTime.now()));
         TestEntity2 testEntity2 = new TestEntity2(10,"Su",22,testEntity,map,null);
-        String json = JSONUtils.toJSONStr(testEntity2);
+        String json = JSONUtils.BeanToJson(testEntity2);
         System.out.println(json);
     }
 
@@ -437,7 +509,7 @@ public class FunctionTest {
     public void beanToJSONFinalTest(){
         // 1. 基础实体 TestEntity
         TestEntity testEntity = new TestEntity(1, "hello\"Java\\Json\n测试\t制表符'单引号'", 20, "男", LocalDateTime.now());
-        System.out.println(JSONUtils.toJSONStr(testEntity));
+        System.out.println(JSONUtils.BeanToJson(testEntity));
 
         // 2. 复杂嵌套实体 TestEntity2
         TestEntity header = new TestEntity(2, "子对象\n内容", 18, "女", LocalDateTime.now());
@@ -453,7 +525,7 @@ public class FunctionTest {
         list.add(new TestEntity(4, "List里的实体", 30, "男", LocalDateTime.now()));
 
         TestEntity2 testEntity2 = new TestEntity2(1001, "嵌套测试<>&\"特殊字符'", 22, header, map, list);
-        System.out.println(JSONUtils.toJSONStr(testEntity2));
+        System.out.println(JSONUtils.BeanToJson(testEntity2));
 
         // 3. ArrayList 混合类型（无 null，安全版）
         List<Object> arrayList = new ArrayList<>();
@@ -461,26 +533,26 @@ public class FunctionTest {
         arrayList.add(20.5);
         arrayList.add("换行\n测试\\反斜杠");
         arrayList.add(Integer.MAX_VALUE);
-        System.out.println(JSONUtils.toJSONStr(arrayList));
+        System.out.println(JSONUtils.BeanToJson(arrayList));
 
         // 4. Map 混合类型
         Map<String, Object> testMap = new HashMap<>();
         testMap.put("title", "标题\"双引号测试\"");
         testMap.put("data", new TestEntity(5, "map-value实体", 28, "女", LocalDateTime.now()));
         testMap.put("num", 666);
-        System.out.println(JSONUtils.toJSONStr(testMap));
+        System.out.println(JSONUtils.BeanToJson(testMap));
 
         // 5. 字符串高强度转义测试
         String testStr = "\"首尾双引号\\中间反斜杠\n换行\r回车\t制表\b退格\u0001隐藏符测试";
-        System.out.println(JSONUtils.toJSONStr(testStr));
+        System.out.println(JSONUtils.BeanToJson(testStr));
 
         // 6. 普通数字
         Integer num = 9527;
-        System.out.println(JSONUtils.toJSONStr(num));
+        System.out.println(JSONUtils.BeanToJson(num));
 
         // 7. 普通布尔
         Boolean flag = true;
-        System.out.println(JSONUtils.toJSONStr(flag));
+        System.out.println(JSONUtils.BeanToJson(flag));
     }
 
     @Test
@@ -502,7 +574,7 @@ public class FunctionTest {
         list1.add("b");
         list1.add("c");
         System.out.println("// List<String>");
-        System.out.println(JSONUtils.toJSONStr(list1));
+        System.out.println(JSONUtils.BeanToJson(list1));
         System.out.println();
 
         // 2. List<Integer>
@@ -511,7 +583,7 @@ public class FunctionTest {
         list2.add(20);
         list2.add(30);
         System.out.println("// List<Integer>");
-        System.out.println(JSONUtils.toJSONStr(list2));
+        System.out.println(JSONUtils.BeanToJson(list2));
         System.out.println();
 
         // 3. List<Long>
@@ -520,7 +592,7 @@ public class FunctionTest {
         list3.add(2000L);
         list3.add(3000L);
         System.out.println("// List<Long>");
-        System.out.println(JSONUtils.toJSONStr(list3));
+        System.out.println(JSONUtils.BeanToJson(list3));
         System.out.println();
 
         // 4. List<Double>
@@ -529,7 +601,7 @@ public class FunctionTest {
         list4.add(2.2);
         list4.add(3.3);
         System.out.println("// List<Double>");
-        System.out.println(JSONUtils.toJSONStr(list4));
+        System.out.println(JSONUtils.BeanToJson(list4));
         System.out.println();
 
         // 5. List<Boolean>
@@ -538,20 +610,20 @@ public class FunctionTest {
         list5.add(false);
         list5.add(true);
         System.out.println("// List<Boolean>");
-        System.out.println(JSONUtils.toJSONStr(list5));
+        System.out.println(JSONUtils.BeanToJson(list5));
         System.out.println();
 
         // 6. List<Date>
         ArrayList<LocalDateTime> list6 = new ArrayList<>();
         list6.add(LocalDateTime.now());
         System.out.println("// List<LocalDateTime>");
-        System.out.println(JSONUtils.toJSONStr(list6));
+        System.out.println(JSONUtils.BeanToJson(list6));
         System.out.println();
 
         // 7. 空 List
         ArrayList<String> list7 = new ArrayList<>();
         System.out.println("// 空 List");
-        System.out.println(JSONUtils.toJSONStr(list7));
+        System.out.println(JSONUtils.BeanToJson(list7));
         System.out.println();
 
         // 8. List<Object> 混合类型
@@ -562,15 +634,15 @@ public class FunctionTest {
         list8.add(true);
         list8.add(null);
         System.out.println("// List<Object> 混合");
-        System.out.println(JSONUtils.toJSONStr(list8));
+        System.out.println(JSONUtils.BeanToJson(list8));
     }
 
     @Test
     public void testSingleNonCustomizeClazzJSONUtils(){
         Integer i = 1;
         Long l = 2L;
-        System.out.println(JSONUtils.toJSONStr(i));
-        System.out.println(JSONUtils.toJSONStr(l));
+        System.out.println(JSONUtils.BeanToJson(i));
+        System.out.println(JSONUtils.BeanToJson(l));
     }
 
     @Test
@@ -581,7 +653,7 @@ public class FunctionTest {
         map1.put("test2", "test2");
         map1.put("test3", "test3");
         System.out.println("// Map<String,String>");
-        System.out.println(JSONUtils.toJSONStr(map1));
+        System.out.println(JSONUtils.BeanToJson(map1));
         System.out.println();
 
         // 2. String -> Integer
@@ -590,7 +662,7 @@ public class FunctionTest {
         map2.put("age", 25);
         map2.put("code", 8888);
         System.out.println("// Map<String,Integer>");
-        System.out.println(JSONUtils.toJSONStr(map2));
+        System.out.println(JSONUtils.BeanToJson(map2));
         System.out.println();
 
         // 3. String -> Boolean
@@ -599,7 +671,7 @@ public class FunctionTest {
         map3.put("deleted", false);
         map3.put("enabled", true);
         System.out.println("// Map<String,Boolean>");
-        System.out.println(JSONUtils.toJSONStr(map3));
+        System.out.println(JSONUtils.BeanToJson(map3));
         System.out.println();
 
         // 4. String -> Long
@@ -608,7 +680,7 @@ public class FunctionTest {
         map4.put("orderId", 987654321L);
         map4.put("money", 100000L);
         System.out.println("// Map<String,Long>");
-        System.out.println(JSONUtils.toJSONStr(map4));
+        System.out.println(JSONUtils.BeanToJson(map4));
         System.out.println();
 
         // 5. String -> Double
@@ -617,7 +689,7 @@ public class FunctionTest {
         map5.put("discount", 0.88);
         map5.put("total", 9999.99);
         System.out.println("// Map<String,Double>");
-        System.out.println(JSONUtils.toJSONStr(map5));
+        System.out.println(JSONUtils.BeanToJson(map5));
         System.out.println();
 
         // 6. 混合基础类型 Map<String,Object>
@@ -628,7 +700,7 @@ public class FunctionTest {
         map6.put("score", 95.5);
         map6.put("total", 10000L);
         System.out.println("// Map<String,Object> 混合基础类型");
-        System.out.println(JSONUtils.toJSONStr(map6));
+        System.out.println(JSONUtils.BeanToJson(map6));
         System.out.println();
 
         // 7. 包含 null 值
@@ -637,13 +709,13 @@ public class FunctionTest {
         map7.put("msg", "操作成功");
         map7.put("code", 200);
         System.out.println("// Map 包含 null");
-        System.out.println(JSONUtils.toJSONStr(map7));
+        System.out.println(JSONUtils.BeanToJson(map7));
         System.out.println();
 
         // 8. 空 Map
         Map<String, String> map8 = new HashMap<>();
         System.out.println("// 空 Map");
-        System.out.println(JSONUtils.toJSONStr(map8));
+        System.out.println(JSONUtils.BeanToJson(map8));
     }
 
     @Test
@@ -658,9 +730,9 @@ public class FunctionTest {
     public void testJSONUtils() {
         TestEntity testEntity = new TestEntity(1,"FX",20,"male",LocalDateTime.now());
         TestEntity testEntity2 = new TestEntity(2,null,21,"male",LocalDateTime.now());
-        String jsonString = JSONUtils.toJSONStr(testEntity);
+        String jsonString = JSONUtils.BeanToJson(testEntity);
         System.out.println(jsonString);
-        System.out.println(JSONUtils.toJSONStr(testEntity2));
+        System.out.println(JSONUtils.BeanToJson(testEntity2));
     }
 
     @Test
@@ -675,7 +747,7 @@ public class FunctionTest {
         list.add(true);
         list.add(null);
         TestEntity2 testEntity2 = new TestEntity2(10,"Su",22,testEntity,map,list);
-        String jsonString = JSONUtils.toJSONStr(testEntity2);
+        String jsonString = JSONUtils.BeanToJson(testEntity2);
         System.out.println(jsonString);
     }
 
