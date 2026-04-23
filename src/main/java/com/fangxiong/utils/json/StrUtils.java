@@ -2,6 +2,7 @@ package com.fangxiong.utils.json;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,17 +28,32 @@ public class StrUtils {
         }
     }
 
-    public static Map<String,String> getJSONKeysAndValuesWithPartlyMap(String s) {
+    public static Map<String,String> getKeysAndValuesMapWithJsonStr(String s) {
         Map<String,String> mapKeysAndValues = new LinkedHashMap<>();
         StringBuilder sbKeys = new StringBuilder();
         StringBuilder sbValues = new StringBuilder();
         char[] ca = s.toCharArray();
         int quotationMarksCount = 0;
-        boolean isReadingKey = false;boolean isReadingValue = false;boolean isEmptyEntity = false;int isEmptyEntityCount=0;
-        boolean readValueFinished=false;boolean readKeyFinished=false;boolean valueIsNotString=false;boolean isListOrMapValue = false;int tempListOrMapCount=0;
+        boolean isReadingKey = false;boolean isReadingValue = false;boolean isEmptyEntity = false;int isEmptyEntityCount=0;int noKeyListInt=0;boolean isListEntity=false;boolean isReadingListValue=false;
+        boolean readValueFinished=false;boolean readKeyFinished=false;boolean valueIsNotString=false;boolean isListOrMapValue = false;int tempListOrMapCount=0;int listDeepCount=0;
         for (int i = 0; i < ca.length; i++) {
-            if(!isListOrMapValue&&i<=ca.length-2&&ca[i+1]!='\"'&&ca[i+1]!='['&&ca[i+1]!='{'&&ca[i]==':') {
+            if(!isListOrMapValue&&i<=ca.length-2&&ca[i+1]!='\"'&&ca[i+1]!='['&&ca[i+1]!='{'&&ca[i]==':'&&!isReadingValue) {
                 isReadingValue=true;isReadingKey=false;readKeyFinished=true;valueIsNotString=true;
+            } else if (ca[0] == '[') {
+                isListEntity=true;
+                listDeepCount++;
+            } else if (isListEntity&&ca[i]=='[') {
+                listDeepCount++;
+            } else if (isListEntity&&ca[i]==']'&&listDeepCount!=1) {
+                listDeepCount--;
+            } else if (isListEntity&&ca[i] == '['&& listDeepCount==2) {
+                noKeyListInt++;
+            } else if (isListEntity&&ca[i]==','&&isReadingListValue) {
+                
+            } else if (isListEntity&&ca[i]==']'&&listDeepCount==1) {
+                mapKeysAndValues.put(String.valueOf(noKeyListInt),sbValues.toString());
+            } else if (isListEntity) {
+                sbValues.append(ca[i]);
             } else if (!isReadingValue&&i<=ca.length-2&&(ca[i+1]=='[' || ca[i+1]=='{')&&ca[i]==':') {
                 isListOrMapValue=true;isReadingKey=false;readKeyFinished=true;isReadingValue=true;
             } else if (isListOrMapValue && isReadingValue && (ca[i]=='['||ca[i]=='{')) {
@@ -95,6 +111,74 @@ public class StrUtils {
         return mapKeysAndValues;
     }
 
+//    public static Map<String,String> getKeysAndValuesMapWithJsonStr(String s) {
+//        Map<String,String> mapKeysAndValues = new LinkedHashMap<>();
+//        StringBuilder sbKeys = new StringBuilder();
+//        StringBuilder sbValues = new StringBuilder();
+//        char[] ca = s.toCharArray();
+//        int quotationMarksCount = 0;
+//        boolean isReadingKey = false;boolean isReadingValue = false;boolean isEmptyEntity = false;int isEmptyEntityCount=0;int noKeyListInt=0;boolean isList=false;
+//        boolean readValueFinished=false;boolean readKeyFinished=false;boolean valueIsNotString=false;boolean isListOrMapValue = false;int tempListOrMapCount=0;
+//        for (int i = 0; i < ca.length; i++) {
+//            if(!isListOrMapValue&&i<=ca.length-2&&ca[i+1]!='\"'&&ca[i+1]!='['&&ca[i+1]!='{'&&ca[i]==':'&&!isReadingValue) {
+//                isReadingValue=true;isReadingKey=false;readKeyFinished=true;valueIsNotString=true;
+//            } else if (!isReadingValue&&i<=ca.length-2&&(ca[i+1]=='[' || ca[i+1]=='{')&&ca[i]==':') {
+//                isListOrMapValue=true;isReadingKey=false;readKeyFinished=true;isReadingValue=true;
+//            } else if (isListOrMapValue && isReadingValue && (ca[i]=='['||ca[i]=='{')) {
+//                sbValues.append(ca[i]);tempListOrMapCount++;
+//            } else if (!isListOrMapValue&&i<=ca.length-2&&ca[i+1]=='\"'&&ca[i]==':'){
+//                isReadingValue=true;isReadingKey=false;readKeyFinished=true;
+//            } else if (isReadingValue&&isListOrMapValue&&i<=ca.length-2&&ca[i+1]=='\"'&&ca[i]==':') {
+//                isReadingKey=false;readKeyFinished=true;sbValues.append(ca[i]);
+//            } else if (i>=1 && ca[i-1]==':' && (ca[i]=='}' || ca[i] == ']')) {
+//                sbValues.append(ca[i]);isEmptyEntity=true;isEmptyEntityCount++;
+//            } else if (isEmptyEntity &&isEmptyEntityCount!=0 && ( ca[i]=='}' || ca[i] == ']')) {
+//                isReadingValue = false; readValueFinished = true;sbValues.append(ca[i]);isEmptyEntity = false;isEmptyEntityCount=0;
+//            } else if ( !isListOrMapValue&&i>=1 && ca[i]=='\"' && !isReadingKey && (ca[i-1]==':'||ca[i-1]=='{'||ca[i-1]==','||ca[i-1]=='[') && !valueIsNotString) {
+//                quotationMarksCount++;
+//            } else if (isListOrMapValue&&i>=1 && ca[i]=='\"' && !isReadingKey && (ca[i-1]==':'||ca[i-1]=='{'||ca[i-1]==','||ca[i-1]=='[') && !valueIsNotString) {
+//                quotationMarksCount++;sbValues.append(ca[i]);
+//            } else if (valueIsNotString && isReadingValue && (ca[i]==','||ca[i]=='}')) {
+//                readValueFinished=true;isReadingValue=false;valueIsNotString=false;i--;
+//            } else if (!isListOrMapValue&&ca[i]=='\"' && (isReadingKey||isReadingValue)) {
+//                quotationMarksCount--;
+//            } else if (isListOrMapValue&&ca[i]=='\"' && (isReadingKey||isReadingValue)) {
+//                quotationMarksCount--;sbValues.append(ca[i]);
+//            } else if (quotationMarksCount == 1 && !isReadingKey && !isReadingValue) {
+//                sbKeys.append(ca[i]);
+//                isReadingKey = true;
+//            } else if (tempListOrMapCount!=0&&isListOrMapValue && (ca[i]==']'||ca[i]=='}')) {
+//                tempListOrMapCount--;
+//                sbValues.append(ca[i]);
+//            } else if (isListOrMapValue&&tempListOrMapCount==0) {
+//                mapKeysAndValues.put(sbKeys.toString(),sbValues.toString());
+//                sbKeys.setLength(0);sbValues.setLength(0);
+//                isReadingKey = false;isReadingValue = false;
+//                readKeyFinished = false;readValueFinished = false;
+//                valueIsNotString = false;isListOrMapValue = false;
+//            } else if (quotationMarksCount == 0 && readKeyFinished && readValueFinished) {
+//                mapKeysAndValues.put(sbKeys.toString(),sbValues.toString());
+//                sbKeys.setLength(0);sbValues.setLength(0);
+//                isReadingKey = false;isReadingValue = false;
+//                readKeyFinished = false;readValueFinished = false;
+//                valueIsNotString = false;isListOrMapValue = false;
+//                tempListOrMapCount=0;
+//            } else if (quotationMarksCount == 0 && isReadingKey) {
+//                isReadingKey = false;
+//                readKeyFinished = true;
+//            } else if (quotationMarksCount == 0 && isReadingValue && !valueIsNotString && !isListOrMapValue) {
+//                isReadingValue = false;
+//                readValueFinished = true;
+//                i--;
+//            } else if (isReadingKey) {
+//                sbKeys.append(ca[i]);
+//            } else if (isReadingValue) {
+//                sbValues.append(ca[i]);
+//            }
+//        }
+//        return mapKeysAndValues;
+//    }
+
     public static String getSplitMainJsonToPartly(String json){
         StringBuilder sb = new StringBuilder();
         StringBuilder sbMain = new StringBuilder();
@@ -116,7 +200,7 @@ public class StrUtils {
         Map<String,String> tempPartMap = new LinkedHashMap<>();
         char[] ca = json.toCharArray();
         int tempPointer=1;int tempLeftPointer=0;int tempPartLeftPointer=0;boolean isNotFirst=false;
-        int firstCharCounter=0;int noFieldNameInt=1;boolean isReadPart =false;boolean isMultiPart = false;
+        int firstCharCounter=0;int noFieldNameInt=1;boolean isReadPart =false;
         StringBuilder sbPart = new StringBuilder();String tempFiledName = "";String tempSplitOut;
         for(int i=0;i<ca.length;i++){
             if(isReadPart){

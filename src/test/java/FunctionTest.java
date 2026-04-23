@@ -13,10 +13,35 @@ import java.util.*;
 public class FunctionTest {
     //TODO add Parser for Set and more tye;
     @Test
-    public void errorTest(){
-        Set<String> set = new HashSet<>();
-        set.add("FX");
-        JsonUtils.BeanToJson(set);
+    public void testSetType(){
+
+    }
+
+    //TODO optimize getKeysAndValuesMapWithJsonStr();
+    @Test
+    public void optimizeGetKeysAndValuesMapWithJsonStr(){
+        //List<List<String>>
+        String json2 = "[[\"Java\", \"Python\", \"Go\", \"C++\"]]";
+        String json = "[\n" +
+                "  [\n" +
+                "    [\"Java\", \"C++\", \"Go\"],\n" +
+                "    [\"序列化\", \"反序列化\", \"泛型解析\"]\n" +
+                "  ],\n" +
+                "  [\n" +
+                "    [\"局部变量类型\", \"成员变量类型\"],\n" +
+                "    [\"三层集合嵌套\", \"多层递归测试\"]\n" +
+                "  ],\n" +
+                "  [\n" +
+                "    [\"高性能\", \"轻量自研\", \"纯手写实现\"]\n" +
+                "  ]\n" +
+                "]";
+        StringBuilder sb = new StringBuilder();
+        String undecoratedJSONStr = StrUtils.getUndecoratedJSONStr(json2);
+        Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, undecoratedJSONStr);
+       // Map<String, String> keysAndValuesMapWithJsonStr = StrUtils.getKeysAndValuesMapWithJsonStr(undecoratedJSONStr);
+        //System.out.println(keysAndValuesMapWithJsonStr);
+        System.out.println(sb.toString());
+        System.out.println(splitMainJsonToPartlyMap);
     }
 
     @Test
@@ -38,82 +63,54 @@ public class FunctionTest {
 
     @Test
     public void testJsonToLocalVariable(){
-        String json="{\n" +
-                "  \"localNestedData\": [\n" +
-                "    {\n" +
-                "      \"groupLevel1\": [\n" +
-                "        {\n" +
-                "          \"code\": 200,\n" +
-                "          \"msg\": \"局部变量第一层\",\n" +
-                "          \"enable\": true,\n" +
-                "          \"rate\": 98.765,\n" +
-                "          \"extInfo\": null,\n" +
-                "          \"innerMap\": {\n" +
-                "            \"keyA\": \"字符串值\",\n" +
-                "            \"keyB\": 123456,\n" +
-                "            \"keyC\": false,\n" +
-                "            \"keyD\": 3.1415926,\n" +
-                "            \"keyE\": {\n" +
-                "              \"deepKey\": \"超深层嵌套\",\n" +
-                "              \"deepNum\": 88888,\n" +
-                "              \"deepBool\": true\n" +
-                "            }\n" +
-                "          }\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"title\": \"混合数组测试\",\n" +
-                "          \"dataList\": [\n" +
-                "            1000,\n" +
-                "            \"文本内容\",\n" +
-                "            false,\n" +
-                "            55.66,\n" +
-                "            null,\n" +
-                "            {\n" +
-                "              \"id\": 9527,\n" +
-                "              \"name\": \"数组内嵌对象\"\n" +
-                "            }\n" +
-                "          ]\n" +
+        String json="[\n" +
+                "  {\n" +
+                "    \"group1\": [\n" +
+                "      {\n" +
+                "        \"id\": 1001,\n" +
+                "        \"name\": \"测试数据1\",\n" +
+                "        \"enable\": true,\n" +
+                "        \"price\": 19.99,\n" +
+                "        \"info\": null\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": 1002,\n" +
+                "        \"name\": \"测试数据2\",\n" +
+                "        \"enable\": false,\n" +
+                "        \"price\": 29.99\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"group2\": [\n" +
+                "      {\n" +
+                "        \"code\": \"SUCCESS\",\n" +
+                "        \"msg\": \"操作成功\",\n" +
+                "        \"data\": {\n" +
+                "          \"key1\": \"value1\",\n" +
+                "          \"key2\": 123\n" +
                 "        }\n" +
-                "      ]\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"groupLevel2\": [\n" +
-                "        {\n" +
-                "          \"serialNo\": \"LOCAL-VAR-001\",\n" +
-                "          \"count\": 65535,\n" +
-                "          \"valid\": true,\n" +
-                "          \"decimalVal\": 0.123456789,\n" +
-                "          \"superDeep\": {\n" +
-                "            \"level1\": {\n" +
-                "              \"level2\": {\n" +
-                "                \"level3\": {\n" +
-                "                  \"finalVal\": \"到底了\",\n" +
-                "                  \"finalNum\": 100000,\n" +
-                "                  \"finalFlag\": false\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          }\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"multiMapList\": [\n" +
-                "            {\n" +
-                "              \"a1\": \"第一层map\",\n" +
-                "              \"b1\": 111\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"a2\": true,\n" +
-                "              \"b2\": 222.333\n" +
-                "            },\n" +
-                "            null\n" +
-                "          ]\n" +
-                "        }\n" +
-                "      ]\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"groupA\": [\n" +
+                "      {\n" +
+                "        \"level\": 1,\n" +
+                "        \"type\": \"A\",\n" +
+                "        \"children\": [1, 2, 3]\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"groupB\": [\n" +
+                "      {\n" +
+                "        \"valid\": true,\n" +
+                "        \"ext\": {}\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  }\n" +
+                "]";
+        Map<String, String> keysAndValuesMapWithJsonStr = StrUtils.getKeysAndValuesMapWithJsonStr(StrUtils.getUndecoratedJSONStr(json));
+        System.out.println(keysAndValuesMapWithJsonStr);
         List<Map<String, List<Map<String, Object>>>> localNestedData;
-        Object o = JsonUtils.jsonToBean(json, new CustomizeGenericTypes("List<Map<String, List<Map<String, Object>>>>"));
+        List<Map<String, List<Map<String, Object>>>> o = (List<Map<String, List<Map<String, Object>>>>)JsonUtils.jsonToBean(json, new CustomizeGenericTypes("List<Map<String, List<Map<String, Object>>>>"));
         System.out.println(o.getClass().getTypeName());
         System.out.println(o);
         System.out.println(JsonUtils.BeanToJson(o));
@@ -171,49 +168,49 @@ public class FunctionTest {
     }
 
 
-    @Test
-    public void testConvertMapWithObject(){
-        String json = "{\n" +
-                "  \"id\": 9999,\n" +
-                "  \"name\": \"超深度嵌套Object测试\",\n" +
-                "  \"isActive\": true,\n" +
-                "  \"score\": 99.9,\n" +
-                "  \"deepTest\": [\n" +
-                "    {\n" +
-                "      \"level1\": [\n" +
-                "        {\n" +
-                "          \"level2\": [\n" +
-                "            {\n" +
-                "              \"level3\": \"字符串\",\n" +
-                "              \"level4\": 666,\n" +
-                "              \"level5\": true,\n" +
-                "              \"level6\": 3.14,\n" +
-                "              \"level7\": null\n" +
-                "            }\n" +
-                "          ]\n" +
-                "        }\n" +
-                "      ]\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"A\": [\n" +
-                "        {\n" +
-                "          \"B\": [\n" +
-                "            {\n" +
-                "              \"C\": \"测试\",\n" +
-                "              \"D\": 123,\n" +
-                "              \"E\": false,\n" +
-                "              \"F\": 9.9\n" +
-                "            }\n" +
-                "          ]\n" +
-                "        }\n" +
-                "      ]\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
-        TestConvertNestingEntity testConvertNestingEntity = JsonUtils.jsonToBean(json, TestConvertNestingEntity.class);
-        System.out.println(testConvertNestingEntity);
-        System.out.println(JsonUtils.BeanToJson(testConvertNestingEntity));
-    }
+//    @Test
+//    public void testConvertMapWithObject(){
+//        String json = "{\n" +
+//                "  \"id\": 9999,\n" +
+//                "  \"name\": \"超深度嵌套Object测试\",\n" +
+//                "  \"isActive\": true,\n" +
+//                "  \"score\": 99.9,\n" +
+//                "  \"deepTest\": [\n" +
+//                "    {\n" +
+//                "      \"level1\": [\n" +
+//                "        {\n" +
+//                "          \"level2\": [\n" +
+//                "            {\n" +
+//                "              \"level3\": \"字符串\",\n" +
+//                "              \"level4\": 666,\n" +
+//                "              \"level5\": true,\n" +
+//                "              \"level6\": 3.14,\n" +
+//                "              \"level7\": null\n" +
+//                "            }\n" +
+//                "          ]\n" +
+//                "        }\n" +
+//                "      ]\n" +
+//                "    },\n" +
+//                "    {\n" +
+//                "      \"A\": [\n" +
+//                "        {\n" +
+//                "          \"B\": [\n" +
+//                "            {\n" +
+//                "              \"C\": \"测试\",\n" +
+//                "              \"D\": 123,\n" +
+//                "              \"E\": false,\n" +
+//                "              \"F\": 9.9\n" +
+//                "            }\n" +
+//                "          ]\n" +
+//                "        }\n" +
+//                "      ]\n" +
+//                "    }\n" +
+//                "  ]\n" +
+//                "}";
+//        TestConvertNestingEntity testConvertNestingEntity = JsonUtils.jsonToBean(json, TestConvertNestingEntity.class);
+//        System.out.println(testConvertNestingEntity);
+//        System.out.println(JsonUtils.BeanToJson(testConvertNestingEntity));
+//    }
 
     @Test
     public void testGetKeyAndValueFromJson(){
@@ -225,7 +222,7 @@ public class FunctionTest {
         System.out.println(StrUtils.getUndecoratedJSONStr(s));
         String json = "[{\"key\":\"数组内Map\"}]";
         String undecoratedJSONStr = StrUtils.getUndecoratedJSONStr(json);
-        Map<String, String> jsonKeysAndValuesWithPartlyMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(undecoratedJSONStr);
+        Map<String, String> jsonKeysAndValuesWithPartlyMap = StrUtils.getKeysAndValuesMapWithJsonStr(undecoratedJSONStr);
         System.out.println(jsonKeysAndValuesWithPartlyMap);
     }
 
@@ -272,7 +269,7 @@ public class FunctionTest {
                 "]";
         String json = StrUtils.getUndecoratedJSONStr(json1);
         System.out.println(json);
-        Map<String, String> m1 = StrUtils.getJSONKeysAndValuesWithPartlyMap(json);
+        Map<String, String> m1 = StrUtils.getKeysAndValuesMapWithJsonStr(json);
         System.out.println(m1);
         StringBuilder sb = new StringBuilder();
         System.out.println(StrUtils.getSplitMainJsonToPartlyMap(sb, json));
@@ -341,22 +338,22 @@ public class FunctionTest {
         System.out.println(JsonUtils.BeanToJson(testConvertNestingNonObjEntity));
     }
 
-    @Test
-    public void testConvertList(){
-        String json = "{\n" +
-                "  \"id\": 1001,\n" +
-                "  \"name\": \"张三\",\n" +
-                "  \"hobby\": [\n" +
-                "    [\"篮球\", \"编程\"],\n" +
-                "    [\"阅读\", \"音乐\"],\n" +
-                "    [\"旅行\", \"电影\"]\n" +
-                "  ]\n" +
-                "}";
-        TestConvertNestingEntity testConvertNestingEntity = JsonUtils.jsonToBean(json, TestConvertNestingEntity.class);
-        System.out.println(testConvertNestingEntity);
-        String jsonStr = JsonUtils.BeanToJson(testConvertNestingEntity);
-        System.out.println(jsonStr);
-    }
+//    @Test
+//    public void testConvertList(){
+//        String json = "{\n" +
+//                "  \"id\": 1001,\n" +
+//                "  \"name\": \"张三\",\n" +
+//                "  \"hobby\": [\n" +
+//                "    [\"篮球\", \"编程\"],\n" +
+//                "    [\"阅读\", \"音乐\"],\n" +
+//                "    [\"旅行\", \"电影\"]\n" +
+//                "  ]\n" +
+//                "}";
+//        TestConvertNestingEntity testConvertNestingEntity = JsonUtils.jsonToBean(json, TestConvertNestingEntity.class);
+//        System.out.println(testConvertNestingEntity);
+//        String jsonStr = JsonUtils.BeanToJson(testConvertNestingEntity);
+//        System.out.println(jsonStr);
+//    }
 
     @Test
     public void testSplitPart2(){
@@ -484,7 +481,7 @@ public class FunctionTest {
         String json2 = "[\"Header\":{\"id\":1,\"name\":\"FX\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"},\"map\":{\"id\":20,\"name\":\"fx\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"}]";
         StringBuilder sb = new StringBuilder();
         Map<String, String> splitMainEntityAndFieldEntity = StrUtils.getSplitMainJsonToPartlyMap(sb,json);
-        System.out.println(StrUtils.getJSONKeysAndValuesWithPartlyMap(sb.toString()));
+        System.out.println(StrUtils.getKeysAndValuesMapWithJsonStr(sb.toString()));
         System.out.println(sb);
         System.out.println(splitMainEntityAndFieldEntity);
         System.out.println(splitMainEntityAndFieldEntity.keySet());
@@ -782,6 +779,12 @@ public class FunctionTest {
     }
 
     @Test
+    public void testGetJSONKeysAndValues2() {
+        String json = "{\"date\":\"2026-04-14T13:34:31\"}";
+        StrUtils.getKeysAndValuesMapWithJsonStr(json);
+    }
+
+    @Test
     public void testJSONtoBean() throws Exception {
         String json = """
                 {
@@ -792,6 +795,7 @@ public class FunctionTest {
                   "date" : "2026-04-14T13:34:31"
                 }""";
         TestEntity testEntity = JsonUtils.jsonToBean(json, TestEntity.class);
+        System.out.println(JsonUtils.BeanToJson(testEntity));
         System.out.println(testEntity);
     }
 

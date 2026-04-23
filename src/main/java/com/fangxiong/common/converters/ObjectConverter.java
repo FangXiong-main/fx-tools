@@ -66,7 +66,7 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
                 return String.class;
             }
         } else if (objectValueStr.charAt(0)=='{') {
-            Map<String, String> partlyMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(objectValueStr);
+            Map<String, String> partlyMap = StrUtils.getKeysAndValuesMapWithJsonStr(objectValueStr);
             if(!partlyMap.isEmpty()){
                 return new CustomizeGenericTypes(Map.class,Object.class);
             }else {
@@ -81,7 +81,7 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
         Field[] df = clazz.getDeclaredFields();
         Map<String,String> cacheFiledValueMap = new HashMap<>();
         Map<String,String> cacheMapOrListValueMap = StrUtils.getSplitMainJsonToPartlyMap(sbMain,json);
-        Map<String,String> cacheFieldValueMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(sbMain.toString());
+        Map<String,String> cacheFieldValueMap = StrUtils.getKeysAndValuesMapWithJsonStr(sbMain.toString());
         for (Field f:df){
             cacheFiledValueMap.put(f.getName(),cacheFieldValueMap.get(f.getName()));
         }

@@ -15,7 +15,7 @@ public class MapConverter implements GenericTypeJsonConverter {
         Map<Object,Object> convertedMap = new HashMap<>();
         if(type instanceof ParameterizedType pt){
             if(pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1] instanceof ParameterizedType pt2){
-                Map<String, String> partlyMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(json);
+                Map<String, String> partlyMap = StrUtils.getKeysAndValuesMapWithJsonStr(json);
                 for(String key : partlyMap.keySet()){
                     convertedMap.put(key, GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt2.getRawType()).convert(partlyMap.get(key),pt2));
                 }
@@ -25,7 +25,7 @@ public class MapConverter implements GenericTypeJsonConverter {
                 return GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) ptTemp.getRawType()).convert(json,tempClazz);
             }
         }else {
-            Map<String, String> partlyMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(json);
+            Map<String, String> partlyMap = StrUtils.getKeysAndValuesMapWithJsonStr(json);
             if(type == Object.class){
                 for(String key : partlyMap.keySet()){
                     Type tempType = ObjectConverter.detectObjectType(partlyMap.get(key));
