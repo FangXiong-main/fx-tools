@@ -1,4 +1,4 @@
-package com.fangxiong.redis;
+package com.fangxiong.utils.redis;
 
 import java.time.LocalDateTime;
 

@@ -1,12 +1,9 @@
 package com.fangxiong.common;
 
-import com.fangxiong.common.converters.ListConverter;
 import com.fangxiong.common.converters.LocalDateTimeConverter;
 import com.fangxiong.common.converters.ObjectConverter;
-import com.fangxiong.common.parsers.ListParser;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,11 +36,6 @@ public class NonGenericTypeConverterFactory {
         }
         return converterMap.get(clazz);
     }
-
-    public static String getUndecoratedJSONStr(String json){
-        return json.replaceAll("\\s+","");
-    }
-
 
 
     public static String concatMapValuesToStr(Map<String,String> map){

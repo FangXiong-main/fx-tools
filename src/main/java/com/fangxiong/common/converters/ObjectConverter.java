@@ -2,6 +2,7 @@ package com.fangxiong.common.converters;
 
 import com.fangxiong.common.CustomizeGenericTypes;
 import com.fangxiong.common.*;
+import com.fangxiong.utils.json.StrUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -11,7 +12,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.fangxiong.redis.SystemConstants.SET;
+import static com.fangxiong.utils.redis.SystemConstants.SET;
 
 public class ObjectConverter implements NonGenericTypeJsonConverter {
 
@@ -46,7 +47,7 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
     public static Type detectObjectType(String objectValueStr){
         if (objectValueStr.isEmpty()){
             return String.class;
-        }else if (Character.isDigit(objectValueStr.charAt(0))){
+        }else if (Character.isDigit(objectValueStr.charAt(0))&&objectValueStr.length()<=9){
             Matcher intergerMatcher = isIntegerPattern.matcher(objectValueStr);
             Matcher dicimalMatcher = isDicimalPattern.matcher(objectValueStr);
             if(intergerMatcher.matches()){
@@ -79,15 +80,15 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
         StringBuilder sbMain = new StringBuilder();
         Field[] df = clazz.getDeclaredFields();
         Map<String,String> cacheFiledValueMap = new HashMap<>();
-        Map<String,String> cacheMapOrListValueMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(json);
-        Map<String,String> cacheFieldValueMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(json);
+        Map<String,String> cacheMapOrListValueMap = StrUtils.getSplitMainJsonToPartlyMap(sbMain,json);
+        Map<String,String> cacheFieldValueMap = StrUtils.getJSONKeysAndValuesWithPartlyMap(sbMain.toString());
         for (Field f:df){
             cacheFiledValueMap.put(f.getName(),cacheFieldValueMap.get(f.getName()));
         }
-//        for (String key : cacheMapOrListValueMap.keySet()){
-//            cacheFiledValueMap.remove(key);
-//            cacheFiledValueMap.put(key.substring(1,key.length()-1),cacheMapOrListValueMap.get(key));
-//        }
+        for (String key : cacheMapOrListValueMap.keySet()){
+            cacheFiledValueMap.remove(key);
+            cacheFiledValueMap.put(key.substring(1,key.length()-1),cacheMapOrListValueMap.get(key));
+        }
         return cacheFiledValueMap;
     }
 
@@ -112,13 +113,14 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
     private static Map<String,Method> cacheAllSetMethod(Class<?> clazz) throws NoSuchMethodException {
         Field[] df = clazz.getDeclaredFields();
         Map<String,Method> cacheMap = new HashMap<>();
-        String methodName ="";
+        String methodName;
         for(Field f : df){
+            char upperCase = Character.toUpperCase(f.getName().charAt(0));
             if(f.getName().length()==1){
-                methodName = SET+Character.toUpperCase(f.getName().charAt(0));
+                methodName = SET+ upperCase;
                 cacheMap.put(f.getName(),clazz.getDeclaredMethod(methodName,f.getType()));
             }else{
-                methodName = SET+Character.toUpperCase(f.getName().charAt(0))+f.getName().substring(1);
+                methodName = SET+ upperCase +f.getName().substring(1);
                 cacheMap.put(f.getName(), clazz.getDeclaredMethod(methodName,f.getType()));
             }
         }

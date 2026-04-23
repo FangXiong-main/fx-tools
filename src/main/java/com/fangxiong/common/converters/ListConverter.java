@@ -3,7 +3,7 @@ package com.fangxiong.common.converters;
 import com.fangxiong.common.GenericTypeConverterFactory;
 import com.fangxiong.common.GenericTypeJsonConverter;
 import com.fangxiong.common.NonGenericTypeConverterFactory;
-import com.fangxiong.common.StrUtils;
+import com.fangxiong.utils.json.StrUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

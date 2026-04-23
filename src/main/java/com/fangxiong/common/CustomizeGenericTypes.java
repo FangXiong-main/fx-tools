@@ -1,10 +1,12 @@
 package com.fangxiong.common;
 
+import com.fangxiong.utils.json.StrUtils;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 public class CustomizeGenericTypes implements ParameterizedType {
+
     private final Type rawType;
     private final Type[] actualTypes;
 
@@ -13,39 +15,46 @@ public class CustomizeGenericTypes implements ParameterizedType {
         this.actualTypes = actualTypes;
     }
 
-    //Map<String,List<Object>>  //Map<String,Map<String,Map<String,String>>> //List<Map<String,String>>  //List<String>
+    //Map<String,List<Object>>  //Map<String,Map<String,Map<String,String>>> //List<Map<String,String>>  //List<Map<String,List<Map<String,Object>>>>
     public CustomizeGenericTypes(String typeParams){
+        typeParams = StrUtils.getUndecoratedJSONStr(typeParams);
         Type tempRawType =null;
         ArrayList<Type> identifiedAcTypes = new ArrayList<>();
         StringBuilder sbRaw = new StringBuilder();
         StringBuilder sbActual = new StringBuilder();
         char[] ca = typeParams.toCharArray();
-        int leftSignCount=0;
+        int leftSignCount=0;int nestedLeftSignCount=0;
         boolean isReadingActualType = false;boolean hasMultipleGeneric = false;boolean isNestingGenericType =false;
         for(int i=0;i<ca.length;i++){
-            if(ca[i]=='<' && !hasMultipleGeneric && !isNestingGenericType){
+            if (ca[i]=='<' && leftSignCount==1 ) {
+                nestedLeftSignCount++;
+                isNestingGenericType = true;
+                sbRaw.setLength(0);
+                sbRaw.append(sbActual);
+                sbActual.setLength(0);
+                leftSignCount++;
+            } else if(ca[i]=='<' && !hasMultipleGeneric && !isNestingGenericType){
                 leftSignCount++;
                 tempRawType=CustomizeClazzDetector.getClazzWithStr(sbRaw.toString());
                 sbRaw.setLength(0);
-                isReadingActualType=true;
-            } else if (ca[i]=='<' && leftSignCount==1 ) {
-                isNestingGenericType = true;
-                isReadingActualType = true;
-                leftSignCount++;
-            } else if (ca[i]=='>' && isNestingGenericType) {
+                isReadingActualType= true;
+            } else if (ca[i]=='<' && isNestingGenericType) {
+                nestedLeftSignCount++;sbActual.append(ca[i]);
+            } else if (ca[i]=='>'&&isNestingGenericType && nestedLeftSignCount==1) {
                 identifiedAcTypes.add(new CustomizeGenericTypes(sbRaw +"<"+ sbActual +">"));
                 sbRaw.setLength(0);sbActual.setLength(0);
                 break;
+            } else if (ca[i]=='>' && isNestingGenericType) {
+                nestedLeftSignCount--;sbActual.append(ca[i]);
             } else if (ca[i]=='>' && hasMultipleGeneric) {
-                identifiedAcTypes.add(CustomizeClazzDetector.getClazzWithStr(sbRaw.toString()));
+                identifiedAcTypes.add(CustomizeClazzDetector.getClazzWithStr(sbActual.toString()));
                 sbActual.setLength(0);
             } else if (ca[i]=='>' && !hasMultipleGeneric && !isNestingGenericType) {
                 identifiedAcTypes.add(CustomizeClazzDetector.getClazzWithStr(sbActual.toString()));
                 sbActual.setLength(0);
-            } else if (!isNestingGenericType && isReadingActualType && ca[i]==',') {
+            }else if (!isNestingGenericType && isReadingActualType && ca[i]==',') {
                 identifiedAcTypes.add(CustomizeClazzDetector.getClazzWithStr(sbActual.toString()));
                 sbActual.setLength(0);
-                isReadingActualType = false;
                 hasMultipleGeneric = true;
             } else if (isReadingActualType) {
                 sbActual.append(ca[i]);

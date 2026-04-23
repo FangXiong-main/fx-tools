@@ -1,4 +1,4 @@
-package com.fangxiong.common;
+package com.fangxiong.utils.json;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class StrUtils {
     private static final Pattern isNotBlankPattern = Pattern.compile(".*\\S+.*");
-    private static final Pattern jsonIsNotBlankPattern = Pattern.compile("\\{.*\\S+.*\\}|\\[.*\\S+.*\\]");
+    private static final Pattern jsonIsNotBlankPattern = Pattern.compile("\\{.*\\S+.*}|\\[.*\\S+.*]");
     public static Boolean strIsNotBlank(String s){
         if (s == null){
             return false;
@@ -71,7 +71,7 @@ public class StrUtils {
                 sbKeys.setLength(0);sbValues.setLength(0);
                 isReadingKey = false;isReadingValue = false;
                 readKeyFinished = false;readValueFinished = false;
-                valueIsNotString = false;isListOrMapValue = false;;
+                valueIsNotString = false;isListOrMapValue = false;
             } else if (quotationMarksCount == 0 && readKeyFinished && readValueFinished) {
                 mapKeysAndValues.put(sbKeys.toString(),sbValues.toString());
                 sbKeys.setLength(0);sbValues.setLength(0);
@@ -117,7 +117,7 @@ public class StrUtils {
         char[] ca = json.toCharArray();
         int tempPointer=1;int tempLeftPointer=0;int tempPartLeftPointer=0;boolean isNotFirst=false;
         int firstCharCounter=0;int noFieldNameInt=1;boolean isReadPart =false;boolean isMultiPart = false;
-        StringBuilder sbPart = new StringBuilder();String tempFiledName = "";String tempSplitOut = "";
+        StringBuilder sbPart = new StringBuilder();String tempFiledName = "";String tempSplitOut;
         for(int i=0;i<ca.length;i++){
             if(isReadPart){
                 if(ca[i] == '{' || ca[i] == '['){
@@ -212,5 +212,9 @@ public class StrUtils {
             }
         }
         return cacheArr;
+    }
+
+    public static String getUndecoratedJSONStr(String json){
+        return json.replaceAll("\\s+","");
     }
 }
