@@ -28,11 +28,11 @@ public class MapConverter implements GenericTypeJsonConverter {
             Map<String, String> partlyMap = StrUtils.getKeysAndValuesMapWithJsonStr(json);
             if(partlyMap.isEmpty()){
                 if (json.equals("null")){
-                    convertedMap.put("null",null);
+                    convertedMap.put(null,null);
                 } else if (StrUtils.jsonIsBlankMap(json)) {
-                    convertedMap.put("null",new HashMap<>());
+                    convertedMap.put(null,new HashMap<>());
                 } else if (StrUtils.jsonIsBlankList(json)) {
-                    convertedMap.put("null",new ArrayList<>());
+                    convertedMap.put(null,new ArrayList<>());
                 }
             }else{
                 if(type == Object.class){

@@ -23,7 +23,7 @@ public class MapParser implements JSONParser {
         Set<?> keySet = map.keySet();
         sb.append("{");
         for (Object key : keySet) {
-            if(!(key.toString().equals("null"))){
+            if(key!=null){
                 sb.append("\"");
                 sb.append(key);
                 sb.append("\":");
