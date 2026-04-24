@@ -25,6 +25,8 @@
 
 ### 提供两个工具：jsonToBean 和 BeanToJson
 
+### 支持普通对象、集合、嵌套、LocalDateTime、空值、各种边界
+
 ### 支持List，Map,Set等基本类型（支持单双泛型的无限嵌套，其余类型会在后续更新中支持），以及自定义类型的序列化与反序列化
 
 ### 支持Json反序列化为局部变量（支持单，双泛型），需提供泛型对应的字符串即可，解析器会自动解析出对应的类型，列子：JsonUtils.jsonToBean(json, new CustomizeGenericTypes("Map<String, List<Map<String,Object>>>"))
