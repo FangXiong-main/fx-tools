@@ -199,23 +199,6 @@ public class StrUtils {
 //        return mapKeysAndValues;
 //    }
 
-    public static String getSplitMainJsonToPartly(String json){
-        StringBuilder sb = new StringBuilder();
-        StringBuilder sbMain = new StringBuilder();
-        Map<String, String> splitMainJsonToPartlyMap = getSplitMainJsonToPartlyMap(sbMain,json);
-        int totalCount = splitMainJsonToPartlyMap.size();int tempCount = 0;
-        sb.append("{");
-        for(String key : splitMainJsonToPartlyMap.keySet()){
-            sb.append(key).append(":").append(splitMainJsonToPartlyMap.get(key));
-            tempCount++;
-            if(tempCount<totalCount){
-                sb.append(",");
-            }
-        }
-        sb.append("}");
-        return sb.toString();
-    }
-
     public static Map<String,String> getSplitMainJsonToPartlyMap(StringBuilder sbMain,String json){
         Map<String,String> tempPartMap = new LinkedHashMap<>();
         char[] ca = json.toCharArray();
