@@ -15,7 +15,6 @@ public class CustomizeGenericTypes implements ParameterizedType {
         this.actualTypes = actualTypes;
     }
 
-    //Map<String,List<Object>>  //Map<String,Map<String,Map<String,String>>> //List<Map<String,String>>  //List<Map<String,List<Map<String,Object>>>>
     public CustomizeGenericTypes(String typeParams){
         typeParams = StrUtils.getUndecoratedJSONStr(typeParams);
         Type tempRawType =null;

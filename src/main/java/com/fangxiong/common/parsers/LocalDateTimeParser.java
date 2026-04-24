@@ -1,16 +1,16 @@
 package com.fangxiong.common.parsers;
 
 import com.fangxiong.annotations.TimeType;
-import com.fangxiong.common.JSONParser;
+import com.fangxiong.common.JsonParser;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class LocalDateTimeParser implements JSONParser {
+public class LocalDateTimeParser implements JsonParser {
     @Override
     public String parse(Object o, Field f) {
-        if(f.getAnnotation(TimeType.class)!=null){
+        if(f!=null&&f.getAnnotation(TimeType.class)!=null){
             TimeType timeType = f.getDeclaredAnnotation(TimeType.class);
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(timeType.value());
             return "\""+dateTimeFormatter.format((LocalDateTime)o)+"\"";

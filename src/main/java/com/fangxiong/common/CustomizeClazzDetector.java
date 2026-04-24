@@ -1,4 +1,5 @@
 package com.fangxiong.common;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
@@ -54,6 +55,7 @@ public class CustomizeClazzDetector {
         detClazzWithStr.put("Double",Double.class);
         detClazzWithStr.put("ArrayList",ArrayList.class);
         detClazzWithStr.put("List",List.class);
+        detClazzWithStr.put("Set",Set.class);
     }
 
     public static Class<?> getClazzWithStr(String str){
@@ -64,6 +66,16 @@ public class CustomizeClazzDetector {
         Class<?>[] interfaces = clazz.getInterfaces();
         for(Class<?> i : interfaces){
             if(genericClazzList.contains(i)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static Boolean isImplOfInterface(Class<?> implEntityClazz,Class<?> interfaceClazz){
+        Class<?>[] interfaces = implEntityClazz.getInterfaces();
+        for(Type t : interfaces){
+            if(t==interfaceClazz){
                 return true;
             }
         }

@@ -1,17 +1,12 @@
 package com.fangxiong.common.parsers;
 
-import com.fangxiong.common.CustomizeClazzDetector;
-import com.fangxiong.common.JSONParser;
+import com.fangxiong.common.JsonParser;
 import com.fangxiong.common.ParserFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Map;
 
-public class ObjectParser implements JSONParser {
+public class ObjectParser implements JsonParser {
 
     @Override
     public String parse(Object o, Field f) {

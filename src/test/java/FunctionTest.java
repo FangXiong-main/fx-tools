@@ -14,19 +14,9 @@ public class FunctionTest {
     //TODO add Parser for Set and more tye;
     @Test
     public void testSetType(){
-        String json = "{\n" +
-                "  \"emptyTest\": [\n" +
-                "    {},\n" +
-                "    [],\n" +
-                "    null,\n" +
-                "    {\n" +
-                "      \"key\": null,\n" +
-                "      \"value\": {}\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
-        Map<String, List<Map<String,Object>>> test;
-        Object o = JsonUtils.jsonToBean(json, new CustomizeGenericTypes("Map<String, List<Map<String,Object>>>"));
+        String json = "[\"java\", \"json\", \"java\", \"tool\", \"tool\", \"set\", \"list\"]";
+        Object o = JsonUtils.jsonToBean(json, new CustomizeGenericTypes("Set<String>"));
+        System.out.println(o.getClass());
         System.out.println(JsonUtils.BeanToJson(o));
     }
 

@@ -11,7 +11,6 @@ public class MapConverter implements GenericTypeJsonConverter {
 
     @Override
     public Object convert(String json, Type type) {
-        StringBuilder sbMain = new StringBuilder();
         Map<Object,Object> convertedMap = new HashMap<>();
         if(type instanceof ParameterizedType pt){
             if(pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1] instanceof ParameterizedType pt2){

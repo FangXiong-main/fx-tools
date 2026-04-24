@@ -4,23 +4,21 @@ import com.fangxiong.common.JsonParser;
 import com.fangxiong.common.ParserFactory;
 
 import java.lang.reflect.Field;
-import java.util.List;
+import java.util.Set;
 
-public class ListParser implements JsonParser {
-
-
+public class SetParser implements JsonParser {
     @Override
     public String parse(Object o, Field f) {
         StringBuilder sb = new StringBuilder();
-        List<?> l = (List<?>) o;
-        if(l==null){
+        Set<?> s = (Set<?>) o;
+        if(s==null){
             sb.append("null");
             return sb.toString();
         }
-        int totalCount = l.size();
+        int totalCount = s.size();
         int tempCount = 0;
         sb.append("[");
-        for(Object obj : l){
+        for(Object obj : s){
             if(obj == null){
                 sb.append("null");
             }else{

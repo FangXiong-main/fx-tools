@@ -1,19 +1,13 @@
 package com.fangxiong.common;
 
-import com.fangxiong.common.parsers.ListParser;
-import com.fangxiong.common.parsers.LocalDateTimeParser;
-import com.fangxiong.common.parsers.MapParser;
-import com.fangxiong.common.parsers.ObjectParser;
+import com.fangxiong.common.parsers.*;
 import com.fangxiong.utils.json.StrUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ParserFactory {
-    private static final Map<Class<?>, JSONParser> parserMap = new HashMap<>();
+    private static final Map<Class<?>, JsonParser> parserMap = new HashMap<>();
 
     static{
         parserMap.put(String.class,(o,f)->{
@@ -37,14 +31,16 @@ public class ParserFactory {
         parserMap.put(Float.class,(o,f)->o==null ? null : o.toString());
         parserMap.put(ArrayList.class,new ListParser());
         parserMap.put(List.class,new ListParser());
+        parserMap.put(Set.class,new SetParser());
+        parserMap.put(HashSet.class,new SetParser());
     }
 
-    private static JSONParser addParser(Class<?> clazz) {
+    private static JsonParser addParser(Class<?> clazz) {
         parserMap.put(clazz,new ObjectParser());
         return parserMap.get(clazz);
     }
 
-    public static JSONParser getParser(Class<?> clazz){
+    public static JsonParser getParser(Class<?> clazz){
         if (!parserMap.containsKey(clazz)){
             return addParser(clazz);
         }

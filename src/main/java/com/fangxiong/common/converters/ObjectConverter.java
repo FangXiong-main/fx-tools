@@ -79,10 +79,8 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
     }
 
     private static Map<String,String> cacheAllFieldValue(Class<?> clazz,String json){
-        StringBuilder sbMain = new StringBuilder();
         Field[] df = clazz.getDeclaredFields();
         Map<String,String> cacheFiledValueMap = new HashMap<>();
-        //Map<String,String> cacheMapOrListValueMap = StrUtils.getSplitMainJsonToPartlyMap(sbMain,json);
         Map<String,String> cacheFieldValueMap = StrUtils.getKeysAndValuesMapWithJsonStr(json);
         for (Field f:df){
             cacheFiledValueMap.put(f.getName(),cacheFieldValueMap.get(f.getName()));

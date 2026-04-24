@@ -1,14 +1,13 @@
 package com.fangxiong.common.parsers;
 
-import com.fangxiong.common.JSONParser;
+import com.fangxiong.common.JsonParser;
 import com.fangxiong.common.ParserFactory;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.TypeVariable;
 import java.util.Map;
 import java.util.Set;
 
-public class MapParser implements JSONParser {
+public class MapParser implements JsonParser {
 
     @Override
     public String parse(Object o, Field f) {
