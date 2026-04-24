@@ -1,26 +1,38 @@
 # fx-tools 通用工具包
 
-基于 SpringBoot 开发的 Redis等的增强工具库
+ Redis工具库,Json工具库。
 
-## 核心功能
+# 核心功能
 
-### 基础缓存操作
+## Redis工具库
+
+### Redis基础缓存操作
 
 - `setStringValue`：存储字符串数据
 - `getStringValue`：获取字符串数据
 
-### 高并发缓存解决方案
+### Redis高并发缓存解决方案
 
 - 缓存穿透（缓存空值）
 - 缓存击穿（互斥锁）
 - 逻辑过期（异步更新）
 
-### 全局随机ID生成器
+### 基于Redis的全局随机ID生成器
+
+## Json工具库
+
+### 完全自主开发的Json基本解析工具
+
+### 提供两个工具：jsonToBean 和 BeanToJson
+
+### 支持List，Map等基本类型（支持单双泛型的无限嵌套，Set会在后续更新中支持），以及自定义类型的序列化与反序列化
+
+### 支持Json反序列化为局部变量（支持单，双泛型），需提供泛型对应的字符串即可，解析器会自动解析出对应的类型，列子：JsonUtils.jsonToBean(json, new CustomizeGenericTypes("Map<String, List<Map<String,Object>>>"))
 
 ## 版本更新日志
 ### v1.0.0 完成基于缓存穿透、缓存击穿、逻辑过期等高并发查询的开发。
 ### v1.0.1 完成基于Redis自增的全局随机Id生成器的开发
-
+### v1.1.1 完成JsonUtil的开发，支持List，Map等基本类型（支持单双泛型的无限嵌套，Set会在后续更新中支持），以及自定义类型的序列化与反序列化，
 
 ## 快速开始
 
@@ -37,7 +49,7 @@
             <systemPath>${project.basedir}/lib/jar包文件名称.jar(例:fx-tools-1.0.jar)</systemPath>
     </dependency>
 
-### 配置 Redis 连接
+### 配置 Redis 连接(如要使用Redis工具必须配置，若只是用Json工具则无需配置)
 
 在 `application.yml` 中配置 Redis 信息
 
