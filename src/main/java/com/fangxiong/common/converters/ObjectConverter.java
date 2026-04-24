@@ -47,7 +47,9 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
     public static Type detectObjectType(String objectValueStr){
         if (objectValueStr.isEmpty()){
             return String.class;
-        }else if (Character.isDigit(objectValueStr.charAt(0))&&objectValueStr.length()<=9){
+        } else if (objectValueStr.equals("null")) {
+            return null;
+        } else if (Character.isDigit(objectValueStr.charAt(0))&&objectValueStr.length()<=9){
             Matcher intergerMatcher = isIntegerPattern.matcher(objectValueStr);
             Matcher dicimalMatcher = isDicimalPattern.matcher(objectValueStr);
             if(intergerMatcher.matches()){
@@ -63,14 +65,14 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
             if (!listToArr.isEmpty()){
                 return new CustomizeGenericTypes(List.class,Object.class);
             }else {
-                return String.class;
+                return null;
             }
         } else if (objectValueStr.charAt(0)=='{') {
             Map<String, String> partlyMap = StrUtils.getKeysAndValuesMapWithJsonStr(objectValueStr);
             if(!partlyMap.isEmpty()){
                 return new CustomizeGenericTypes(Map.class,Object.class);
             }else {
-                return String.class;
+                return null;
             }
         }
         return String.class;
@@ -80,14 +82,10 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
         StringBuilder sbMain = new StringBuilder();
         Field[] df = clazz.getDeclaredFields();
         Map<String,String> cacheFiledValueMap = new HashMap<>();
-        Map<String,String> cacheMapOrListValueMap = StrUtils.getSplitMainJsonToPartlyMap(sbMain,json);
-        Map<String,String> cacheFieldValueMap = StrUtils.getKeysAndValuesMapWithJsonStr(sbMain.toString());
+        //Map<String,String> cacheMapOrListValueMap = StrUtils.getSplitMainJsonToPartlyMap(sbMain,json);
+        Map<String,String> cacheFieldValueMap = StrUtils.getKeysAndValuesMapWithJsonStr(json);
         for (Field f:df){
             cacheFiledValueMap.put(f.getName(),cacheFieldValueMap.get(f.getName()));
-        }
-        for (String key : cacheMapOrListValueMap.keySet()){
-            cacheFiledValueMap.remove(key);
-            cacheFiledValueMap.put(key.substring(1,key.length()-1),cacheMapOrListValueMap.get(key));
         }
         return cacheFiledValueMap;
     }

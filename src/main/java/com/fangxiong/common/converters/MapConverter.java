@@ -26,18 +26,37 @@ public class MapConverter implements GenericTypeJsonConverter {
             }
         }else {
             Map<String, String> partlyMap = StrUtils.getKeysAndValuesMapWithJsonStr(json);
-            if(type == Object.class){
-                for(String key : partlyMap.keySet()){
-                    Type tempType = ObjectConverter.detectObjectType(partlyMap.get(key));
-                    if (tempType instanceof ParameterizedType pt){
-                        convertedMap.put(key,GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt.getRawType()).convert(partlyMap.get(key),pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1]));
-                    }else{
-                        convertedMap.put(key,NonGenericTypeConverterFactory.getConverter((Class<?>) tempType).convert(partlyMap.get(key),(Class<?>) tempType));
-                    }
+            if(partlyMap.isEmpty()){
+                if (json.equals("null")){
+                    convertedMap.put("null",null);
+                } else if (StrUtils.jsonIsBlankMap(json)) {
+                    convertedMap.put("null",new HashMap<>());
+                } else if (StrUtils.jsonIsBlankList(json)) {
+                    convertedMap.put("null",new ArrayList<>());
                 }
-            }else {
-                for(String key : partlyMap.keySet()){
-                    convertedMap.put(key,NonGenericTypeConverterFactory.getConverter((Class<?>) type).convert(partlyMap.get(key),(Class<?>) type));
+            }else{
+                if(type == Object.class){
+                    for(String key : partlyMap.keySet()){
+                        Type tempType = ObjectConverter.detectObjectType(partlyMap.get(key));
+                        if (tempType instanceof ParameterizedType pt){
+                            convertedMap.put(key,GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt.getRawType()).convert(partlyMap.get(key),pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1]));
+                        } else if (tempType==null) {
+                            String tempValue = partlyMap.get(key);
+                            if (StrUtils.jsonIsBlankMap(tempValue)){
+                                convertedMap.put(key,new HashMap<>());
+                            } else if (StrUtils.jsonIsBlankList(tempValue)) {
+                                convertedMap.put(key,new ArrayList<>());
+                            }else {
+                                convertedMap.put(key,null);
+                            }
+                        } else{
+                            convertedMap.put(key,NonGenericTypeConverterFactory.getConverter((Class<?>) tempType).convert(partlyMap.get(key),(Class<?>) tempType));
+                        }
+                    }
+                }else {
+                    for(String key : partlyMap.keySet()){
+                        convertedMap.put(key,NonGenericTypeConverterFactory.getConverter((Class<?>) type).convert(partlyMap.get(key),(Class<?>) type));
+                    }
                 }
             }
         }

@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 public class StrUtils {
     private static final Pattern isNotBlankPattern = Pattern.compile(".*\\S+.*");
     private static final Pattern jsonIsNotBlankPattern = Pattern.compile("\\{.*\\S+.*}|\\[.*\\S+.*]");
+    private static final Pattern jsonIsBlankMapPattern = Pattern.compile("\\{\\s*}");
+    private static final Pattern jsonIsBlankListPattern = Pattern.compile("\\[\\s*]");
     public static Boolean strIsNotBlank(String s){
         if (s == null){
             return false;
@@ -28,29 +30,47 @@ public class StrUtils {
         }
     }
 
+    public static Boolean jsonIsBlankMap(String s){
+        if(s == null){
+            return false;
+        }else {
+            Matcher matcher = jsonIsBlankMapPattern.matcher(s);
+            return matcher.matches();
+        }
+    }
+
+    public static Boolean jsonIsBlankList(String s){
+        if(s == null){
+            return false;
+        }else {
+            Matcher matcher = jsonIsBlankListPattern.matcher(s);
+            return matcher.matches();
+        }
+    }
+
     public static Map<String,String> getKeysAndValuesMapWithJsonStr(String s) {
         Map<String,String> mapKeysAndValues = new LinkedHashMap<>();
         StringBuilder sbKeys = new StringBuilder();
         StringBuilder sbValues = new StringBuilder();
         char[] ca = s.toCharArray();
         int quotationMarksCount = 0;
-        boolean isReadingKey = false;boolean isReadingValue = false;boolean isEmptyEntity = false;int isEmptyEntityCount=0;int noKeyListInt=0;boolean isListEntity=false;boolean isReadingListValue=false;
+        boolean isReadingKey = false;boolean isReadingValue = false;boolean isEmptyEntity = false;int isEmptyEntityCount=0;int noKeyListInt=1;boolean isListEntity=false;boolean isReadingListValue=false;
         boolean readValueFinished=false;boolean readKeyFinished=false;boolean valueIsNotString=false;boolean isListOrMapValue = false;int tempListOrMapCount=0;int listDeepCount=0;
         for (int i = 0; i < ca.length; i++) {
-            if(!isListOrMapValue&&i<=ca.length-2&&ca[i+1]!='\"'&&ca[i+1]!='['&&ca[i+1]!='{'&&ca[i]==':'&&!isReadingValue) {
+            if(!isListEntity&&!isListOrMapValue&&i<=ca.length-2&&ca[i+1]!='\"'&&ca[i+1]!='['&&ca[i+1]!='{'&&ca[i]==':'&&!isReadingValue) {
                 isReadingValue=true;isReadingKey=false;readKeyFinished=true;valueIsNotString=true;
-            } else if (ca[0] == '[') {
+            } else if (ca[0] == '[' && i==0) {
                 isListEntity=true;
                 listDeepCount++;
-            } else if (isListEntity&&ca[i]=='[') {
-                listDeepCount++;
-            } else if (isListEntity&&ca[i]==']'&&listDeepCount!=1) {
-                listDeepCount--;
-            } else if (isListEntity&&ca[i] == '['&& listDeepCount==2) {
-                noKeyListInt++;
-            } else if (isListEntity&&ca[i]==','&&isReadingListValue) {
-                
-            } else if (isListEntity&&ca[i]==']'&&listDeepCount==1) {
+            } else if (isListEntity&&(ca[i]=='['||ca[i]=='{')) {
+                listDeepCount++;sbValues.append(ca[i]);
+            } else if (isListEntity&&(ca[i]==']'||ca[i]=='}')&&listDeepCount!=1) {
+                listDeepCount--;sbValues.append(ca[i]);
+            } else if (isListEntity&&(ca[i] == '['||ca[i]=='{')&& listDeepCount==1) {
+                noKeyListInt++;sbValues.append(ca[i]);
+            } else if (isListEntity&&ca[i]==','&& listDeepCount==1) {
+                mapKeysAndValues.put(String.valueOf(noKeyListInt),sbValues.toString());noKeyListInt++;sbValues.setLength(0);
+            } else if (isListEntity&&(ca[i]==']'||ca[i]=='}')&&listDeepCount==1&&!sbValues.isEmpty()) {
                 mapKeysAndValues.put(String.valueOf(noKeyListInt),sbValues.toString());
             } else if (isListEntity) {
                 sbValues.append(ca[i]);

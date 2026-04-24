@@ -65,7 +65,7 @@ public class ParserFactory {
                 sb.append("\\").append("f");
             } else if (c == '\n') {
                 sb.append("\\").append("n");
-            } else if (c == 'r') {
+            } else if (c == '\r') {
                 sb.append("\\").append("r");
             } else if (c == '\t') {
                 sb.append("\\").append("t");

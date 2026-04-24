@@ -8,6 +8,7 @@ import com.fangxiong.utils.json.StrUtils;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,19 +30,37 @@ public class ListConverter implements GenericTypeJsonConverter {
             }
         }else{
             ArrayList<String> valueListToArr = StrUtils.getConvertJsonValueListToArr(json);
-            if (type == Object.class){
-                for (String values: valueListToArr){
-                    Type tempType = ObjectConverter.detectObjectType(values);
-                    if (tempType instanceof ParameterizedType pt){
-                        convertedList.add(GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt.getRawType()).convert(values,pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1]));
-                    }else {
-                        convertedList.add(NonGenericTypeConverterFactory.getConverter((Class<?>) tempType).convert(values,(Class<?>) tempType));
-                    }
+            if(valueListToArr.isEmpty()){
+                if (json.equals("null")){
+                    convertedList.add(null);
+                } else if (StrUtils.jsonIsBlankMap(json)) {
+                    convertedList.add(new HashMap<>());
+                } else if (StrUtils.jsonIsBlankList(json)) {
+                    convertedList.add(new ArrayList<>());
                 }
-            }else{
-                Class<?> tempClazz = (Class<?>) type;
-                for(String value : valueListToArr){
-                    convertedList.add(NonGenericTypeConverterFactory.getConverter(tempClazz).convert(value,tempClazz));
+            }else {
+                if (type == Object.class){
+                    for (String values: valueListToArr){
+                        Type tempType = ObjectConverter.detectObjectType(values);
+                        if (tempType instanceof ParameterizedType pt){
+                            convertedList.add(GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt.getRawType()).convert(values,pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1]));
+                        }else if (tempType==null) {
+                            if (StrUtils.jsonIsBlankMap(values)){
+                                convertedList.add(new HashMap<>());
+                            } else if (StrUtils.jsonIsBlankList(values)) {
+                                convertedList.add(new ArrayList<>());
+                            }else {
+                                convertedList.add(null);
+                            }
+                        }else {
+                            convertedList.add(NonGenericTypeConverterFactory.getConverter((Class<?>) tempType).convert(values,(Class<?>) tempType));
+                        }
+                    }
+                }else{
+                    Class<?> tempClazz = (Class<?>) type;
+                    for(String value : valueListToArr){
+                        convertedList.add(NonGenericTypeConverterFactory.getConverter(tempClazz).convert(value,tempClazz));
+                    }
                 }
             }
         }
