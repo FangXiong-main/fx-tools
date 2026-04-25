@@ -23,6 +23,15 @@ public class FunctionTest {
     //TODO optimize getKeysAndValuesMapWithJsonStr();
 
     @Test
+    public void testJsonSyntaxChecker(){
+        String json = "{\n" +
+                "  \"id\": 666,\n" +
+                "  \"title\": \"错误数据\",\n" +
+                "}";
+        StrUtils.jsonSyntaxChecker(json);
+    }
+
+    @Test
     public void optimizeGetKeysAndValuesMapWithJsonStrConvert(){
         String json ="{\n" +
                 "  \"id\": 9999999,\n" +
