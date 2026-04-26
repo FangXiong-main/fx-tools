@@ -1,4 +1,5 @@
 import com.fangxiong.common.*;
+import com.fangxiong.enums.SafetyLevel;
 import com.fangxiong.utils.json.JsonUtils;
 import com.fangxiong.utils.json.StrUtils;
 import org.junit.jupiter.api.Test;
@@ -25,8 +26,8 @@ public class FunctionTest {
     @Test
     public void testJsonSyntaxChecker(){
         String json = "{\n" +
-                "  \"id\": 666,\n" +
-                "  \"title\": \"错误数据\",\n" +
+                "  \"data\":\"我的\",\n" +
+                "  \"error\": \"ok\"\n" +
                 "}";
         StrUtils.jsonSyntaxChecker(json);
     }

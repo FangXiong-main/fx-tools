@@ -1,16 +1,23 @@
 package com.fangxiong.utils.json;
 
 import com.fangxiong.common.exceptions.JsonSyntaxError;
+import com.fangxiong.enums.SafetyLevel;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StrUtils {
+
     private static final Pattern isNotBlankPattern = Pattern.compile(".*\\S+.*");
     private static final Pattern jsonIsNotBlankPattern = Pattern.compile("\\{.*\\S+.*}|\\[.*\\S+.*]");
     private static final Pattern jsonIsBlankMapPattern = Pattern.compile("\\{\\s*}");
     private static final Pattern jsonIsBlankListPattern = Pattern.compile("\\[\\s*]");
+    private static final Pattern jsonStringValuePattern = Pattern.compile("\"\\s*\"");
+    private static final Pattern jsonIntegerValuePattern = Pattern.compile("-?(\\d+)");
+    private static final Pattern jsonDicimalValuePattern = Pattern.compile("-?(\\d+\\.\\d+)");
+    private static final Pattern jsonInvalidCharPattern = Pattern.compile(".*[\\\\\\x00-\\x1F@#$%&<>'].*");
     public static Boolean strIsNotBlank(String s){
         if (s == null){
             return false;
@@ -47,69 +54,118 @@ public class StrUtils {
         }
     }
 
-    public static void jsonSyntaxChecker(String json){
+    public static void checkValueValidation(String str,StringBuilder errorSb){
+
+    }
+
+    public static void jsonInvalidCharacterChecker(String str){
+        String tempStr = getUndecoratedJSONStr(str);
+        System.out.println(tempStr);
+        if(jsonInvalidCharPattern.matcher(tempStr).matches()){
+            throw new JsonSyntaxError("Invalid character find in json.");
+        }
+    }
+
+    public static void jsonBracketMatchChecker(String str){
         Deque<Character> parenthesesAndBracketDeque = new ArrayDeque<>();
-        StringBuilder sb = new StringBuilder();StringBuilder tempPointer = new StringBuilder();
-        char[] ca = json.toCharArray();
-        int columPointer = 0;int linePointer = 1;int quotationCount=0;boolean isReadValueInQuotation=false;
-        int parenthesesCount = 0;int bracketCount =0;int commaCount =0;char previousChar = ' ' ;boolean keyNoQuotation=true;
+        StringBuilder convertInfo = new StringBuilder();convertInfo.append(".\nEnd of the error json str:\n");
+        char[] ca = getUndecoratedJSONStr(str).toCharArray();
         for(int i=0;i<ca.length;i++){
-            if(ca[i]=='\n'){
-                linePointer++;
-                columPointer=0;
-                sb.append(ca[i]);
-                continue;
-            } else if (ca[i]=='"') {
-                quotationCount++;
-            } else{
-                columPointer++;
-            }
-            tempPointer.append(" Error at [Line:").append(linePointer).append(",Colum:").append(columPointer).append("]:\n").append(sb);
-            if (ca[i]==':' && quotationCount%2!=0) {
-                throw new JsonSyntaxError("Unclosed quotation '\"'"+tempPointer);
-            } else if (ca[i]==':' &&quotationCount==0) {
-                throw new JsonSyntaxError("Key don't have '\" \"'"+tempPointer);
-            } else if (ca[i]=='"'&&previousChar=='"') {
-                throw new JsonSyntaxError("Unexpected Syntax: Two values or Key and Value,Should be seperated by ',' or ':'"+tempPointer);
-            } else if ((ca[i] == '{'||ca[i]=='[')&& (previousChar == '}' || previousChar==']')) {
-                throw new JsonSyntaxError("Unexpected Syntax: '"+previousChar+ca[i]+"'"+"Do you mean: '"+previousChar+","+ca[i]+"' ?"+tempPointer);
-            } else if (i==ca.length-1&&previousChar==',') {
-                throw new JsonSyntaxError("Redundant ',' at the end."+tempPointer);
-            } else if (ca[i] == '[' && i!=ca.length-1) {
+            if (ca[i] == '[' && i!=ca.length-1) {
                 parenthesesAndBracketDeque.push(ca[i]);
             } else if (ca[i] == ']') {
                 if(parenthesesAndBracketDeque.isEmpty()){
-                    throw new JsonSyntaxError("Unmatched Syntax:  find ']',but no matched '['"+tempPointer);
+                    throw new JsonSyntaxError("Unmatched Syntax:  find ']',but no matched '['");
                 } else {
                     Character c1 = parenthesesAndBracketDeque.pop();
                     if (c1!='['){
-                        throw new JsonSyntaxError("Unmatched Syntax:  find ']',but the matched is"+"'"+c1+"'"+tempPointer);
+                        throw new JsonSyntaxError("Unmatched Syntax:  find ']',but the matched is"+"'"+c1+"'");
                     }
                 }
             } else if (ca[i] == '{' && i!=ca.length-1) {
                 parenthesesAndBracketDeque.push(ca[i]);
             } else if (ca[i] == '}') {
                 if(parenthesesAndBracketDeque.isEmpty()){
-                    throw new JsonSyntaxError("Unmatched Syntax:  find '}',but no matched '{'"+tempPointer);
+                    throw new JsonSyntaxError("Unmatched Syntax:  find '}',but no matched '{'");
                 } else {
                     Character c2 = parenthesesAndBracketDeque.pop();
                     if (c2!='{'){
-                        throw new JsonSyntaxError("Unmatched Syntax:  find '}',but the matched is"+"'"+c2+"'"+tempPointer);
+                        throw new JsonSyntaxError("Unmatched Syntax:  find '}',but the matched is"+"'"+c2+"'");
                     }
                 }
-            } else if (i==ca.length-1&&!parenthesesAndBracketDeque.isEmpty()) {
-                throw new JsonSyntaxError("Parentheses ot bracketDeque not matched!"+tempPointer);
-            }else if (ca[i]<=31) {
-                throw new JsonSyntaxError("Character is not valid!"+tempPointer);
+            }else if (i==ca.length-1&&!parenthesesAndBracketDeque.isEmpty()) {
+                throw new JsonSyntaxError("Parentheses ot bracketDeque not matched!"+convertInfo);
             }
-
-            if (ca[i]!=' '&&ca[i]!='\n') {
-                previousChar=ca[i];
-            }
-            sb.append(ca[i]);
-            tempPointer.setLength(0);
+            convertInfo.append(ca[i]);
         }
     }
+
+    public static void jsonSyntaxChecker(String str){
+        StringBuilder convertInfo = new StringBuilder();convertInfo.append(".\nEnd of the error json str:\n");
+        StringBuilder tempValue = new StringBuilder();
+        char[] ca = getUndecoratedJSONStr(str).toCharArray();
+        boolean isMapEntity = false;boolean isListEntity = false;boolean isReadValue=false;
+        int quotationCount =0;
+        for(int i=0;i<ca.length;i++){
+             if(ca[i]=='{'){
+                 isMapEntity=true;
+             } else if (ca[i]=='}') {
+                 isMapEntity=false;
+             } else if (ca[i]=='[') {
+                 isListEntity=true;
+             } else if (ca[i]==']') {
+                 isMapEntity=false;
+             } else if (isMapEntity) {
+                 if (ca[i]=='"') {
+                     quotationCount++;
+                 }
+                 if (ca[i]==':'&&quotationCount!=2) {
+                     throw new JsonSyntaxError("Key name should be covered with '\"  \"'");
+                 } else if (ca[i]==':') {
+                     isReadValue=true;
+                 } else if (ca[i]==',') {
+                     quotationCount=0;
+                     isReadValue=false;
+                 } else if (ca[i]!='"'&&quotationCount==0) {
+                     throw new JsonSyntaxError("Key name should start with double-quotation '\"'"+convertInfo);
+                 } else if ((ca[i]!='"'&&quotationCount==2)||(ca[i]=='"'&&quotationCount==3)) {
+                     throw new JsonSyntaxError("Key and value should split by ':'"+convertInfo);
+                 } else if (isReadValue) {
+                     tempValue.append(ca[i]);
+                 }
+             } else if (isListEntity) {
+
+             }
+            convertInfo.append(ca[i]);
+        }
+    }
+
+
+//    } else if (ca[i] == '[' && i!=ca.length-1) {
+//        parenthesesAndBracketDeque.push(ca[i]);
+//    } else if (ca[i] == ']') {
+//        if(parenthesesAndBracketDeque.isEmpty()){
+//            throw new JsonSyntaxError("Unmatched Syntax:  find ']',but no matched '['"+tempPointer);
+//        } else {
+//            Character c1 = parenthesesAndBracketDeque.pop();
+//            if (c1!='['){
+//                throw new JsonSyntaxError("Unmatched Syntax:  find ']',but the matched is"+"'"+c1+"'"+tempPointer);
+//            }
+//        }
+//    } else if (ca[i] == '{' && i!=ca.length-1) {
+//        parenthesesAndBracketDeque.push(ca[i]);
+//    } else if (ca[i] == '}') {
+//        if(parenthesesAndBracketDeque.isEmpty()){
+//            throw new JsonSyntaxError("Unmatched Syntax:  find '}',but no matched '{'"+tempPointer);
+//        } else {
+//            Character c2 = parenthesesAndBracketDeque.pop();
+//            if (c2!='{'){
+//                throw new JsonSyntaxError("Unmatched Syntax:  find '}',but the matched is"+"'"+c2+"'"+tempPointer);
+//            }
+//        }
+//    } else if (i==ca.length-1&&!parenthesesAndBracketDeque.isEmpty()) {
+//        throw new JsonSyntaxError("Parentheses ot bracketDeque not matched!"+tempPointer);
+//    }
 
     public static Map<String,String> getKeysAndValuesMapWithJsonStr(String s) {
         Map<String,String> mapKeysAndValues = new LinkedHashMap<>();
