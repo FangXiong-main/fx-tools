@@ -13,16 +13,16 @@ public class NonGenericTypeConverterFactory {
 
     static {
         converterMap.put(LocalDateTime.class,new LocalDateTimeConverter());
-        converterMap.put(Integer.class,(s,f)-> Integer.parseInt(s));
-        converterMap.put(Long.class,(s,f)-> Long.parseLong(s));
+        converterMap.put(Integer.class,(s,f)-> s == null ?null:Integer.parseInt(s));
+        converterMap.put(Long.class,(s,f)-> s == null?null:Long.parseLong(s));
         converterMap.put(String.class,(s,f)-> s);
-        converterMap.put(int.class, (s,f)-> Integer.parseInt(s));
-        converterMap.put(long.class,(s,f)-> Long.parseLong(s));
-        converterMap.put(Boolean.class,(s,f)-> Boolean.parseBoolean(s));
-        converterMap.put(Double.class,(s,f)-> Double.parseDouble(s));
-        converterMap.put(Float.class,(s,f)-> Float.parseFloat(s));
-        converterMap.put(double.class,(s,f)-> Double.parseDouble(s));
-        converterMap.put(float.class,(s,f)-> Float.parseFloat(s));
+        converterMap.put(int.class, (s,f)->s==null? null:Integer.parseInt(s));
+        converterMap.put(long.class,(s,f)-> s==null?null:Long.parseLong(s));
+        converterMap.put(Boolean.class,(s,f)-> s==null?null:Boolean.parseBoolean(s));
+        converterMap.put(Double.class,(s,f)-> s==null?null:Double.parseDouble(s));
+        converterMap.put(Float.class,(s,f)-> s==null?null:Float.parseFloat(s));
+        converterMap.put(double.class,(s,f)-> s==null?null:Double.parseDouble(s));
+        converterMap.put(float.class,(s,f)-> s==null?null:Float.parseFloat(s));
     }
 
     private static NonGenericTypeJsonConverter addConverter(Class<?> clazz) {

@@ -10,6 +10,9 @@ import java.time.format.DateTimeFormatter;
 public class LocalDateTimeParser implements JsonParser {
     @Override
     public String parse(Object o, Field f) {
+        if(o==null){
+            return null;
+        }
         if(f!=null&&f.getAnnotation(TimeType.class)!=null){
             TimeType timeType = f.getDeclaredAnnotation(TimeType.class);
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(timeType.value());

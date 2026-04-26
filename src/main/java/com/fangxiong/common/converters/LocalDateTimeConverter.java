@@ -12,6 +12,9 @@ public class LocalDateTimeConverter implements NonGenericTypeJsonConverter {
     @Override
     public Object convert(String s, Class<?> clazz) {
         Field[] declaredFields = clazz.getDeclaredFields();
+        if (s==null){
+            return null;
+        }
         for (Field f:declaredFields){
             if(f.getAnnotation(TimeType.class)!=null){
                 TimeType timeType = f.getAnnotation(TimeType.class);

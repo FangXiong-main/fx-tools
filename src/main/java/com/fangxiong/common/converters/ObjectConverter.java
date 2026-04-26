@@ -28,7 +28,11 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
                 Map<String, String> allFieldValueCache = cacheAllFieldValue(clazz, s);
                 Object convertedObj = clazz.getDeclaredConstructor().newInstance();
                 for(Field f : clazz.getDeclaredFields()){
-                    setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(allFieldValueCache.get(f.getName()),partTypeCache.get(f.getName())));
+                    if(allFieldValueCache.get(f.getName())!=null){
+                        setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(allFieldValueCache.get(f.getName()),partTypeCache.get(f.getName())));
+                    }else {
+                        setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(null,partTypeCache.get(f.getName())));
+                    }
                 }
                 return convertedObj;
             } catch (Exception e) {

@@ -20,7 +20,12 @@ public class ObjectParser implements JsonParser {
             for(Field fd : df){
                 Method dm = clazz.getDeclaredMethod("get" + Character.toUpperCase(fd.getName().charAt(0)) + fd.getName().substring(1));
                 sb.append("\"").append(fd.getName()).append("\":");
-                String parsed = ParserFactory.getParser(fd.getType()).parse(dm.invoke(o), fd);
+                String parsed;
+                if(dm.invoke(o)!=null){
+                    parsed = ParserFactory.getParser(fd.getType()).parse(dm.invoke(o), fd);
+                }else {
+                    parsed = null;
+                }
                 sb.append(parsed);
                 tempCount++;
                 if(tempCount<totalCount){

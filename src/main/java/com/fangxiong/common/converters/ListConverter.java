@@ -13,6 +13,9 @@ import java.util.*;
 public class ListConverter implements GenericTypeJsonConverter {
     @Override
     public Object convert(String json, Type type) {
+        if(json==null){
+            return null;
+        }
         List<Object> convertedList = new ArrayList<>();
         if (type instanceof ParameterizedType pt){
             if(pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1] instanceof ParameterizedType pt2){
