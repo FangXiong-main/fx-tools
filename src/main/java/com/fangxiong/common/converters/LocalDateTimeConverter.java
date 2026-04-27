@@ -2,6 +2,7 @@ package com.fangxiong.common.converters;
 
 import com.fangxiong.annotations.TimeType;
 import com.fangxiong.common.NonGenericTypeJsonConverter;
+import com.fangxiong.common.exceptions.JsonConvertFailureError;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
@@ -21,6 +22,12 @@ public class LocalDateTimeConverter implements NonGenericTypeJsonConverter {
                 return LocalDateTime.parse(s,DateTimeFormatter.ofPattern(timeType.value()));
             }
         }
-        return LocalDateTime.parse(s);
+        LocalDateTime parse = null;
+        try {
+            parse = LocalDateTime.parse(s);
+        } catch (Exception e) {
+            throw new JsonConvertFailureError("Convert '"+s+"'"+" to LocalDateTime failure,the format can't be identified",e);
+        }
+        return parse;
     }
 }

@@ -2,6 +2,7 @@ package com.fangxiong.common;
 
 import com.fangxiong.common.converters.LocalDateTimeConverter;
 import com.fangxiong.common.converters.ObjectConverter;
+import com.fangxiong.utils.json.StrUtils;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -13,16 +14,70 @@ public class NonGenericTypeConverterFactory {
 
     static {
         converterMap.put(LocalDateTime.class,new LocalDateTimeConverter());
-        converterMap.put(Integer.class,(s,f)-> s == null ?null:Integer.parseInt(s));
-        converterMap.put(Long.class,(s,f)-> s == null?null:Long.parseLong(s));
+        converterMap.put(Integer.class,(s,f)-> {
+            if (s == null) {
+                return null;
+            }
+            StrUtils.jsonValueValidationChecker(s,Integer.class);
+            return Integer.parseInt(s);
+        });
+        converterMap.put(Long.class,(s,f)->{
+            if(s==null){
+                return null;
+            }
+            StrUtils.jsonValueValidationChecker(s,Long.class);
+            return Long.parseLong(s);
+        });
         converterMap.put(String.class,(s,f)-> s);
-        converterMap.put(int.class, (s,f)->s==null? null:Integer.parseInt(s));
-        converterMap.put(long.class,(s,f)-> s==null?null:Long.parseLong(s));
-        converterMap.put(Boolean.class,(s,f)-> s==null?null:Boolean.parseBoolean(s));
-        converterMap.put(Double.class,(s,f)-> s==null?null:Double.parseDouble(s));
-        converterMap.put(Float.class,(s,f)-> s==null?null:Float.parseFloat(s));
-        converterMap.put(double.class,(s,f)-> s==null?null:Double.parseDouble(s));
-        converterMap.put(float.class,(s,f)-> s==null?null:Float.parseFloat(s));
+        converterMap.put(int.class, (s,f)->{
+            if (s==null){
+                return null;
+            }
+            StrUtils.jsonValueValidationChecker(s,int.class);
+            return Integer.parseInt(s);
+        });
+        converterMap.put(long.class,(s,f)-> {
+            if(s==null){
+                return null;
+            }
+            StrUtils.jsonValueValidationChecker(s,long.class);
+            return Long.parseLong(s);
+        });
+        converterMap.put(Boolean.class,(s,f)-> {
+            if(s==null){
+                return null;
+            }
+            StrUtils.jsonValueValidationChecker(s,Boolean.class);
+            return Boolean.parseBoolean(s);
+        });
+        converterMap.put(Double.class,(s,f)-> {
+            if (s==null){
+                return null;
+            }
+            StrUtils.jsonValueValidationChecker(s,Double.class);
+            return Double.parseDouble(s);
+        });
+        converterMap.put(Float.class,(s,f)-> {
+            if(s==null){
+                return null;
+            }
+            StrUtils.jsonValueValidationChecker(s,Float.class);
+            return Float.parseFloat(s);
+        });
+        converterMap.put(double.class,(s,f)-> {
+            if (s == null) {
+                return null;
+            }
+            StrUtils.jsonValueValidationChecker(s,double.class);
+            return Double.parseDouble(s);
+        });
+        converterMap.put(float.class,(s,f)-> {
+            if (s == null) {
+                return null;
+            }
+            StrUtils.jsonValueValidationChecker(s,float.class);
+            return Float.parseFloat(s);
+        });
     }
 
     private static NonGenericTypeJsonConverter addConverter(Class<?> clazz) {

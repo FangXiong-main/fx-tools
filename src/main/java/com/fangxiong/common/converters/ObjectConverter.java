@@ -1,7 +1,10 @@
 package com.fangxiong.common.converters;
 
+import com.fangxiong.annotations.NotNullField;
 import com.fangxiong.common.CustomizeGenericTypes;
 import com.fangxiong.common.*;
+import com.fangxiong.common.exceptions.JsonConvertFailureError;
+import com.fangxiong.enums.SafetyLevel;
 import com.fangxiong.utils.json.StrUtils;
 
 import java.lang.reflect.Field;
@@ -21,6 +24,7 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
 
     @Override
     public Object convert(String s, Class<?> clazz) {
+        String tempFiledName="";String tempValue="";String tempFiledType="";
         if(CustomizeClazzDetector.isCustomizeClazz(clazz)){
             try {
                 Map<String,Method> setMethodCache = cacheAllSetMethod(clazz);
@@ -28,15 +32,18 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
                 Map<String, String> allFieldValueCache = cacheAllFieldValue(clazz, s);
                 Object convertedObj = clazz.getDeclaredConstructor().newInstance();
                 for(Field f : clazz.getDeclaredFields()){
+                    tempFiledType=f.getType().getTypeName();tempFiledName = f.getName();tempValue=allFieldValueCache.get(f.getName());
                     if(allFieldValueCache.get(f.getName())!=null){
                         setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(allFieldValueCache.get(f.getName()),partTypeCache.get(f.getName())));
-                    }else {
+                    } else if (allFieldValueCache.get(f.getName())==null&&f.getAnnotation(NotNullField.class) != null) {
+                        throw new JsonConvertFailureError("Detected field '"+tempFiledName+"'"+" with @NotNullFiled annotation,but the value ready to convert is null.Caused by Json syntax error.");
+                    } else {
                         setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(null,partTypeCache.get(f.getName())));
                     }
                 }
                 return convertedObj;
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new JsonConvertFailureError("Convert fieldType: '"+tempFiledType+"',fieldName: '"+tempFiledName+"' with"+" value: '"+tempValue+"' failed.",e);
             }
         }else {
             Type type = detectObjectType(s);
@@ -85,9 +92,9 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
     private static Map<String,String> cacheAllFieldValue(Class<?> clazz,String json){
         Field[] df = clazz.getDeclaredFields();
         Map<String,String> cacheFiledValueMap = new HashMap<>();
-        Map<String,String> cacheFieldValueMap = StrUtils.getKeysAndValuesMapWithJsonStr(json);
+        Map<String,String> tempFieldValueMap = StrUtils.getKeysAndValuesMapWithJsonStr(json);
         for (Field f:df){
-            cacheFiledValueMap.put(f.getName(),cacheFieldValueMap.get(f.getName()));
+            cacheFiledValueMap.put(f.getName(),tempFieldValueMap.get(f.getName()));
         }
         return cacheFiledValueMap;
     }

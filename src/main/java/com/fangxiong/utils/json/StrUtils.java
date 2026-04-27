@@ -1,5 +1,6 @@
 package com.fangxiong.utils.json;
 
+import com.fangxiong.common.exceptions.JsonInvalidValueError;
 import com.fangxiong.common.exceptions.JsonSyntaxError;
 import com.fangxiong.enums.SafetyLevel;
 
@@ -14,7 +15,6 @@ public class StrUtils {
     private static final Pattern jsonIsNotBlankPattern = Pattern.compile("\\{.*\\S+.*}|\\[.*\\S+.*]");
     private static final Pattern jsonIsBlankMapPattern = Pattern.compile("\\{\\s*}");
     private static final Pattern jsonIsBlankListPattern = Pattern.compile("\\[\\s*]");
-    private static final Pattern jsonStringValuePattern = Pattern.compile("\"\\s*\"");
     private static final Pattern jsonIntegerValuePattern = Pattern.compile("-?(\\d+)");
     private static final Pattern jsonDicimalValuePattern = Pattern.compile("-?(\\d+\\.\\d+)");
     private static final Pattern jsonInvalidCharPattern = Pattern.compile(".*[\\\\\\x00-\\x1F@#$%&<>'].*");
@@ -54,15 +54,30 @@ public class StrUtils {
         }
     }
 
-    public static void checkValueValidation(String str,StringBuilder errorSb){
-
-    }
-
     public static void jsonInvalidCharacterChecker(String str){
         String tempStr = getUndecoratedJSONStr(str);
-        System.out.println(tempStr);
         if(jsonInvalidCharPattern.matcher(tempStr).matches()){
             throw new JsonSyntaxError("Invalid character find in json.");
+        }
+    }
+
+    public static void jsonValueValidationChecker(String valueStr,Class<?> valueType){
+        if(valueType==Integer.class||valueType==int.class){
+            if(!jsonIntegerValuePattern.matcher(valueStr).matches()){
+                throw new JsonInvalidValueError("Invalid integer value:"+valueStr);
+            }
+        } else if (valueType== Float.class||valueType==float.class) {
+            if(!jsonDicimalValuePattern.matcher(valueStr).matches()){
+                throw new JsonInvalidValueError("Invalid float value:"+valueStr);
+            }
+        } else if (valueType== Double.class||valueType==double.class) {
+            if(!jsonDicimalValuePattern.matcher(valueStr).matches()){
+                throw new JsonInvalidValueError("Invalid double value:"+valueStr);
+            }
+        } else if (valueType == Boolean.class || valueType == boolean.class) {
+            if(!(valueStr.equals("false")||valueStr.equals("true"))){
+                throw new JsonInvalidValueError("Invalid boolean value: '"+valueStr+"'");
+            }
         }
     }
 
@@ -78,6 +93,9 @@ public class StrUtils {
                     throw new JsonSyntaxError("Unmatched Syntax:  find ']',but no matched '['");
                 } else {
                     Character c1 = parenthesesAndBracketDeque.pop();
+                    if (i==ca.length-1&&!parenthesesAndBracketDeque.isEmpty()) {
+                        throw new JsonSyntaxError("Parentheses ot bracketDeque not matched!"+convertInfo);
+                    }
                     if (c1!='['){
                         throw new JsonSyntaxError("Unmatched Syntax:  find ']',but the matched is"+"'"+c1+"'");
                     }
@@ -89,83 +107,19 @@ public class StrUtils {
                     throw new JsonSyntaxError("Unmatched Syntax:  find '}',but no matched '{'");
                 } else {
                     Character c2 = parenthesesAndBracketDeque.pop();
+                    if (i==ca.length-1&&!parenthesesAndBracketDeque.isEmpty()) {
+                        throw new JsonSyntaxError("Parentheses ot bracketDeque not matched!"+convertInfo);
+                    }
                     if (c2!='{'){
                         throw new JsonSyntaxError("Unmatched Syntax:  find '}',but the matched is"+"'"+c2+"'");
                     }
                 }
-            }else if (i==ca.length-1&&!parenthesesAndBracketDeque.isEmpty()) {
-                throw new JsonSyntaxError("Parentheses ot bracketDeque not matched!"+convertInfo);
             }
             convertInfo.append(ca[i]);
         }
     }
 
-    public static void jsonSyntaxChecker(String str){
-        StringBuilder convertInfo = new StringBuilder();convertInfo.append(".\nEnd of the error json str:\n");
-        StringBuilder tempValue = new StringBuilder();
-        char[] ca = getUndecoratedJSONStr(str).toCharArray();
-        boolean isMapEntity = false;boolean isListEntity = false;boolean isReadValue=false;
-        int quotationCount =0;
-        for(int i=0;i<ca.length;i++){
-             if(ca[i]=='{'){
-                 isMapEntity=true;
-             } else if (ca[i]=='}') {
-                 isMapEntity=false;
-             } else if (ca[i]=='[') {
-                 isListEntity=true;
-             } else if (ca[i]==']') {
-                 isMapEntity=false;
-             } else if (isMapEntity) {
-                 if (ca[i]=='"') {
-                     quotationCount++;
-                 }
-                 if (ca[i]==':'&&quotationCount!=2) {
-                     throw new JsonSyntaxError("Key name should be covered with '\"  \"'");
-                 } else if (ca[i]==':') {
-                     isReadValue=true;
-                 } else if (ca[i]==',') {
-                     quotationCount=0;
-                     isReadValue=false;
-                 } else if (ca[i]!='"'&&quotationCount==0) {
-                     throw new JsonSyntaxError("Key name should start with double-quotation '\"'"+convertInfo);
-                 } else if ((ca[i]!='"'&&quotationCount==2)||(ca[i]=='"'&&quotationCount==3)) {
-                     throw new JsonSyntaxError("Key and value should split by ':'"+convertInfo);
-                 } else if (isReadValue) {
-                     tempValue.append(ca[i]);
-                 }
-             } else if (isListEntity) {
 
-             }
-            convertInfo.append(ca[i]);
-        }
-    }
-
-
-//    } else if (ca[i] == '[' && i!=ca.length-1) {
-//        parenthesesAndBracketDeque.push(ca[i]);
-//    } else if (ca[i] == ']') {
-//        if(parenthesesAndBracketDeque.isEmpty()){
-//            throw new JsonSyntaxError("Unmatched Syntax:  find ']',but no matched '['"+tempPointer);
-//        } else {
-//            Character c1 = parenthesesAndBracketDeque.pop();
-//            if (c1!='['){
-//                throw new JsonSyntaxError("Unmatched Syntax:  find ']',but the matched is"+"'"+c1+"'"+tempPointer);
-//            }
-//        }
-//    } else if (ca[i] == '{' && i!=ca.length-1) {
-//        parenthesesAndBracketDeque.push(ca[i]);
-//    } else if (ca[i] == '}') {
-//        if(parenthesesAndBracketDeque.isEmpty()){
-//            throw new JsonSyntaxError("Unmatched Syntax:  find '}',but no matched '{'"+tempPointer);
-//        } else {
-//            Character c2 = parenthesesAndBracketDeque.pop();
-//            if (c2!='{'){
-//                throw new JsonSyntaxError("Unmatched Syntax:  find '}',but the matched is"+"'"+c2+"'"+tempPointer);
-//            }
-//        }
-//    } else if (i==ca.length-1&&!parenthesesAndBracketDeque.isEmpty()) {
-//        throw new JsonSyntaxError("Parentheses ot bracketDeque not matched!"+tempPointer);
-//    }
 
     public static Map<String,String> getKeysAndValuesMapWithJsonStr(String s) {
         Map<String,String> mapKeysAndValues = new LinkedHashMap<>();
@@ -222,13 +176,17 @@ public class StrUtils {
                 tempListOrMapCount--;
                 sbValues.append(ca[i]);
             } else if (isListOrMapValue&&tempListOrMapCount==0) {
-                mapKeysAndValues.put(sbKeys.toString(),sbValues.toString());
+                if (StrUtils.strIsNotBlank(sbKeys.toString())){
+                    mapKeysAndValues.put(sbKeys.toString(),sbValues.toString());
+                }
                 sbKeys.setLength(0);sbValues.setLength(0);
                 isReadingKey = false;isReadingValue = false;
                 readKeyFinished = false;readValueFinished = false;
                 valueIsNotString = false;isListOrMapValue = false;
             } else if (quotationMarksCount == 0 && readKeyFinished && readValueFinished) {
-                mapKeysAndValues.put(sbKeys.toString(),sbValues.toString());
+                if (StrUtils.strIsNotBlank(sbKeys.toString())){
+                    mapKeysAndValues.put(sbKeys.toString(),sbValues.toString());
+                }
                 sbKeys.setLength(0);sbValues.setLength(0);
                 isReadingKey = false;isReadingValue = false;
                 readKeyFinished = false;readValueFinished = false;

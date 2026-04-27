@@ -24,12 +24,29 @@ public class FunctionTest {
     //TODO optimize getKeysAndValuesMapWithJsonStr();
 
     @Test
+    public void testString(){}
+
+    @Test
     public void testJsonSyntaxChecker(){
-        String json = "{\n" +
-                "  \"data\":\"我的\",\n" +
-                "  \"error\": \"ok\"\n" +
+        String json ="{\n" +
+                "    \"id\": 208,\n" +
+                "    \"name\": \"test\\\"abc,\n" +
+                "    \"isActive\": true\n" +
                 "}";
-        StrUtils.jsonSyntaxChecker(json);
+        TestConvertNestingEntity testConvertNestingEntity = JsonUtils.jsonToBean(json, TestConvertNestingEntity.class);
+        System.out.println(testConvertNestingEntity);
+    }
+
+    @Test
+    public void testChecker(){
+        String json = "{\n" +
+                "    \"id\": 9090,\n" +
+                "    \"name\": 混合测试\",\n" +
+                "    \"isActive\": true,\n" +
+                "    \"score\": 88.8\n" +
+                "}";
+        TestConvertNestingEntity testConvertNestingEntity = JsonUtils.jsonToBean(json, TestConvertNestingEntity.class);
+        System.out.println(testConvertNestingEntity);
     }
 
     @Test

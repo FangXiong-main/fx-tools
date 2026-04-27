@@ -12,7 +12,10 @@ public class JsonUtils {
         return ParserFactory.decorateJSONStr(ParserFactory.getParser(c).parse(o, null));
     }
     public static <T> T jsonToBean(String jsonString, Class<T> clazz) {
-        return (T) NonGenericTypeConverterFactory.getConverter(clazz).convert(StrUtils.getUndecoratedJSONStr(jsonString), clazz);
+        String undecoratedJSONStr = StrUtils.getUndecoratedJSONStr(jsonString);
+        StrUtils.jsonBracketMatchChecker(undecoratedJSONStr);
+        StrUtils.jsonInvalidCharacterChecker(undecoratedJSONStr);
+        return (T) NonGenericTypeConverterFactory.getConverter(clazz).convert(undecoratedJSONStr, clazz);
     }
 
     public static Object jsonToBean(String jsonString, CustomizeGenericTypes typeParams){
