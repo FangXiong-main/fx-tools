@@ -19,7 +19,10 @@ public class JsonUtils {
     }
 
     public static Object jsonToBean(String jsonString, CustomizeGenericTypes typeParams){
-        return GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) typeParams.getRawType()).convert(StrUtils.getUndecoratedJSONStr(jsonString),typeParams);
+        String undecoratedJSONStr = StrUtils.getUndecoratedJSONStr(jsonString);
+        StrUtils.jsonBracketMatchChecker(undecoratedJSONStr);
+        StrUtils.jsonInvalidCharacterChecker(undecoratedJSONStr);
+        return GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) typeParams.getRawType()).convert(undecoratedJSONStr,typeParams);
     }
 
 }
