@@ -1,5 +1,6 @@
 package com.fangxiong.common.converters;
 
+import com.fangxiong.annotations.NotNullClass;
 import com.fangxiong.annotations.NotNullField;
 import com.fangxiong.common.CustomizeGenericTypes;
 import com.fangxiong.common.*;
@@ -23,7 +24,7 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
 
     @Override
     public Object convert(String s, Class<?> clazz) {
-        String tempFiledName="";String tempValue="";String tempFiledType="";
+        String tempFiledName=null;String tempValue=null;String tempFiledType=null;
         if(CustomizeClazzDetector.isCustomizeClazz(clazz)){
             try {
                 Map<String,Method> setMethodCache = cacheAllSetMethod(clazz);
@@ -32,10 +33,16 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
                 Object convertedObj = clazz.getDeclaredConstructor().newInstance();
                 for(Field f : clazz.getDeclaredFields()){
                     tempFiledType=f.getType().getTypeName();tempFiledName = f.getName();tempValue=allFieldValueCache.get(f.getName());
-                    if(allFieldValueCache.get(f.getName())!=null){
+                    if(tempValue!=null&&!tempValue.equals("null")){
                         setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(allFieldValueCache.get(f.getName()),partTypeCache.get(f.getName())));
-                    } else if (allFieldValueCache.get(f.getName())==null&&f.getAnnotation(NotNullField.class) != null) {
+                    } else if (clazz.getAnnotation(NotNullClass.class)!=null&&tempValue==null) {
+                        throw new JsonConvertFailureError("Detected class:'"+clazz.getName()+"' with @NotNullClass annotation,current converting field is:'"+tempFiledName+"'"+",but the value ready to convert is null.Caused by Json syntax error.");
+                    } else if (clazz.getAnnotation(NotNullClass.class)!=null&& Objects.equals(tempValue, "null")) {
+                        throw new JsonConvertFailureError("Detected class:'"+clazz.getName()+"' with @NotNullClass annotation,current converting field is:'"+tempFiledName+"'"+",but the value ready to convert is null.Caused by custom restrict error.");
+                    } else if (f.getAnnotation(NotNullField.class) != null&&tempValue==null) {
                         throw new JsonConvertFailureError("Detected field '"+tempFiledName+"'"+" with @NotNullFiled annotation,but the value ready to convert is null.Caused by Json syntax error.");
+                    } else if (f.getAnnotation(NotNullField.class) != null&&Objects.equals(tempValue, "null")) {
+                        throw new JsonConvertFailureError("Detected field '"+tempFiledName+"'"+" with @NotNullFiled annotation,but the value ready to convert is null.Caused by custom restrict error.");
                     } else {
                         setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(null,partTypeCache.get(f.getName())));
                     }

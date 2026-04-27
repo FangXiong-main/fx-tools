@@ -1,3 +1,4 @@
+import com.fangxiong.annotations.NotNullClass;
 import com.fangxiong.annotations.NotNullField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,17 +11,12 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@NotNullClass
 public class TestConvertNestingEntity {
-    @NotNullField
     private Integer id;
-    @NotNullField
     private String name;
-    @NotNullField
     private Boolean isActive;
-    @NotNullField
     private Double score;
-    @NotNullField
     private LocalDateTime createTime;
-    @NotNullField
     private List<Map<String, List<Map<String, Integer>>>> ultimateTest;
 }

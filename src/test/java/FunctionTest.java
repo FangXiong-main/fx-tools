@@ -20,6 +20,28 @@ public class FunctionTest {
         System.out.println(JsonUtils.BeanToJson(o));
     }
 
+    @Test
+    public void testNotNull(){
+        String json = "{\n" +
+                "  \"id\": 1001,\n" +
+                "  \"name\": \"fx\",\n" +
+                "  \"isActive\": true,\n" +
+                "  \"score\": 98.5,\n" +
+                "  \"createTime\": \"2025-01-01T12:00:00\",\n" +
+                "  \"ultimateTest\": [\n" +
+                "    {\n" +
+                "      \"level1\": [\n" +
+                "        {\n" +
+                "          \"level2\": 100\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+        TestConvertNestingEntity testConvertNestingEntity = JsonUtils.jsonToBean(json, TestConvertNestingEntity.class);
+        System.out.println(JsonUtils.BeanToJson(testConvertNestingEntity));
+    }
+
 
 
     @Test
@@ -799,20 +821,6 @@ public class FunctionTest {
         StrUtils.getKeysAndValuesMapWithJsonStr(json);
     }
 
-    @Test
-    public void testJSONtoBean() throws Exception {
-        String json = """
-                {
-                  "id" : "1",
-                  "name" : "FX",
-                  "age" : "20",
-                  "gender" : "male",
-                  "date" : "2026-04-14T13:34:31"
-                }""";
-        TestEntity testEntity = JsonUtils.jsonToBean(json, TestEntity.class);
-        System.out.println(JsonUtils.BeanToJson(testEntity));
-        System.out.println(testEntity);
-    }
 
     @Test
     public void testStrUtils(){

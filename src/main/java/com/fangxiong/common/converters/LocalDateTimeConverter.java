@@ -23,10 +23,11 @@ public class LocalDateTimeConverter implements NonGenericTypeJsonConverter {
             }
         }
         LocalDateTime parse = null;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         try {
-            parse = LocalDateTime.parse(s);
+            parse = LocalDateTime.parse(s,formatter);
         } catch (Exception e) {
-            throw new JsonConvertFailureError("Convert '"+s+"'"+" to LocalDateTime failure,the format can't be identified",e);
+            throw new JsonConvertFailureError("Convert '"+s+"'"+" to LocalDateTime failure,the format can't be identified or parsed with default patter:yyyy-MM-dd HH:mm:ss",e);
         }
         return parse;
     }
