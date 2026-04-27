@@ -91,9 +91,6 @@ public class StrUtils {
                     throw new JsonSyntaxError("Unmatched Syntax:  find ']',but no matched '['");
                 } else {
                     Character c1 = parenthesesAndBracketDeque.pop();
-                    if (i==ca.length-1&&!parenthesesAndBracketDeque.isEmpty()) {
-                        throw new JsonSyntaxError("Parentheses ot bracketDeque not matched!"+convertInfo);
-                    }
                     if (c1!='['){
                         throw new JsonSyntaxError("Unmatched Syntax:  find ']',but the matched is"+"'"+c1+"'");
                     }
@@ -105,15 +102,15 @@ public class StrUtils {
                     throw new JsonSyntaxError("Unmatched Syntax:  find '}',but no matched '{'");
                 } else {
                     Character c2 = parenthesesAndBracketDeque.pop();
-                    if (i==ca.length-1&&!parenthesesAndBracketDeque.isEmpty()) {
-                        throw new JsonSyntaxError("Parentheses ot bracketDeque not matched!"+convertInfo);
-                    }
                     if (c2!='{'){
                         throw new JsonSyntaxError("Unmatched Syntax:  find '}',but the matched is"+"'"+c2+"'");
                     }
                 }
             }
             convertInfo.append(ca[i]);
+        }
+        if(!parenthesesAndBracketDeque.isEmpty()){
+            throw new JsonSyntaxError("Parentheses ot bracketDeque not matched!"+convertInfo);
         }
     }
 
