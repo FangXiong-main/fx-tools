@@ -2,9 +2,7 @@ package com.fangxiong.utils.json;
 
 import com.fangxiong.common.exceptions.JsonInvalidValueError;
 import com.fangxiong.common.exceptions.JsonSyntaxError;
-import com.fangxiong.enums.SafetyLevel;
 
-import java.math.BigInteger;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

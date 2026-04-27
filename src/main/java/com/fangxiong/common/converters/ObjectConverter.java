@@ -4,7 +4,6 @@ import com.fangxiong.annotations.NotNullField;
 import com.fangxiong.common.CustomizeGenericTypes;
 import com.fangxiong.common.*;
 import com.fangxiong.common.exceptions.JsonConvertFailureError;
-import com.fangxiong.enums.SafetyLevel;
 import com.fangxiong.utils.json.StrUtils;
 
 import java.lang.reflect.Field;
