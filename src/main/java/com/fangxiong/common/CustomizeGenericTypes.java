@@ -1,5 +1,6 @@
 package com.fangxiong.common;
 
+import com.fangxiong.common.exceptions.CustomizeGenericError;
 import com.fangxiong.utils.json.StrUtils;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -60,6 +61,9 @@ public class CustomizeGenericTypes implements ParameterizedType {
             } else{
                 sbRaw.append(ca[i]);
             }
+        }
+        if(tempRawType==null||identifiedAcTypes.isEmpty()){
+            throw new CustomizeGenericError("Converting '"+typeParams+"'"+" failed,Caused by syntax error");
         }
         this.rawType = tempRawType;
         this.actualTypes = identifiedAcTypes.toArray(new Type[]{});

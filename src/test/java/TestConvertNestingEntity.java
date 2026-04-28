@@ -1,3 +1,4 @@
+import com.fangxiong.annotations.IgnoredField;
 import com.fangxiong.annotations.NotNullClass;
 import com.fangxiong.annotations.NotNullField;
 import lombok.AllArgsConstructor;

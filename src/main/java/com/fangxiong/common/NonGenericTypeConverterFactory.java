@@ -4,6 +4,7 @@ import com.fangxiong.common.converters.LocalDateTimeConverter;
 import com.fangxiong.common.converters.ObjectConverter;
 import com.fangxiong.utils.json.StrUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
@@ -48,7 +49,23 @@ public class NonGenericTypeConverterFactory {
                 return null;
             }
             StrUtils.jsonValueValidationChecker(s,Boolean.class);
+            if(s.equals("0")){
+                return false;
+            } else if (s.equals("1")) {
+                return true;
+            }
             return Boolean.parseBoolean(s);
+        });
+        converterMap.put(boolean.class,(s,f)-> {
+            if(s==null){
+                return null;
+            }
+            StrUtils.jsonValueValidationChecker(s,Boolean.class);
+            if(s.equals("0")||s.equals("false")){
+                return false;
+            } else{
+                return true;
+            }
         });
         converterMap.put(Double.class,(s,f)-> {
             if (s==null){
@@ -77,6 +94,13 @@ public class NonGenericTypeConverterFactory {
             }
             StrUtils.jsonValueValidationChecker(s,float.class);
             return Float.parseFloat(s);
+        });
+        converterMap.put(BigDecimal.class,(s,f)->{
+            if (s == null) {
+                return null;
+            }
+            StrUtils.jsonValueValidationChecker(s, BigDecimal.class);
+            return BigDecimal.valueOf(Double.parseDouble(s));
         });
     }
 

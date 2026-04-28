@@ -18,7 +18,7 @@ public class LocalDateTimeParser implements JsonParser {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(timeType.value());
             return "\""+dateTimeFormatter.format((LocalDateTime)o)+"\"";
         }
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         return "\""+dateTimeFormatter.format((LocalDateTime)o)+"\"";
     }
 }

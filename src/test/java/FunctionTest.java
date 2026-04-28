@@ -20,6 +20,7 @@ public class FunctionTest {
         System.out.println(JsonUtils.BeanToJson(o));
     }
 
+
     @Test
     public void testNotNull(){
         String json = "{\n" +

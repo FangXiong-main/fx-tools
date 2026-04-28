@@ -1,5 +1,6 @@
 package com.fangxiong.common.converters;
 
+import com.fangxiong.annotations.IgnoredField;
 import com.fangxiong.annotations.NotNullClass;
 import com.fangxiong.annotations.NotNullField;
 import com.fangxiong.common.CustomizeGenericTypes;
@@ -33,7 +34,9 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
                 Object convertedObj = clazz.getDeclaredConstructor().newInstance();
                 for(Field f : clazz.getDeclaredFields()){
                     tempFiledType=f.getType().getTypeName();tempFiledName = f.getName();tempValue=allFieldValueCache.get(f.getName());
-                    if(tempValue!=null&&!tempValue.equals("null")){
+                    if(f.getAnnotation(IgnoredField.class)!=null){
+                        setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(null,partTypeCache.get(f.getName())));
+                    } else if(tempValue!=null&&!tempValue.equals("null")){
                         setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(allFieldValueCache.get(f.getName()),partTypeCache.get(f.getName())));
                     } else if (clazz.getAnnotation(NotNullClass.class)!=null&&tempValue==null) {
                         throw new JsonConvertFailureError("Detected class:'"+clazz.getName()+"' with @NotNullClass annotation,current converting field is:'"+tempFiledName+"'"+",but the value ready to convert is null.Caused by Json syntax error.");

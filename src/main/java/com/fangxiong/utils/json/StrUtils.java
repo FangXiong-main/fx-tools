@@ -3,6 +3,7 @@ package com.fangxiong.utils.json;
 import com.fangxiong.common.exceptions.JsonInvalidValueError;
 import com.fangxiong.common.exceptions.JsonSyntaxError;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -73,8 +74,12 @@ public class StrUtils {
                 throw new JsonInvalidValueError("Invalid double value:"+valueStr);
             }
         } else if (valueType == Boolean.class || valueType == boolean.class) {
-            if(!(valueStr.equals("false")||valueStr.equals("true"))){
+            if(!(valueStr.equals("false")||valueStr.equals("true"))&&!(valueStr.equals("0")||valueStr.equals("1"))){
                 throw new JsonInvalidValueError("Invalid boolean value: '"+valueStr+"'");
+            }
+        } else if (valueType == BigDecimal.class) {
+            if(!jsonDicimalValuePattern.matcher(valueStr).matches()&&!jsonIntegerValuePattern.matcher(valueStr).matches()){
+                throw new JsonInvalidValueError("Invalid BigDecimal value: '"+valueStr+"'");
             }
         }
     }
