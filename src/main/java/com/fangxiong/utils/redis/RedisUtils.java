@@ -1,7 +1,7 @@
 package com.fangxiong.utils.redis;
 
 import com.fangxiong.utils.json.JsonUtils;
-import com.fangxiong.utils.json.StrUtils;
+import com.fangxiong.jsonUtilsCore.JsonOperationFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.time.LocalDateTime;
@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-import static com.fangxiong.utils.redis.SystemConstants.*;
+import static com.fangxiong.SystemConstants.*;
 
 public class RedisUtils {
     private final StringRedisTemplate stringRedisTemplate;
@@ -56,7 +56,7 @@ public class RedisUtils {
      */
     public <R> R getStringValue(String key,Class<R> clazz) {
         String jsonStr = stringRedisTemplate.opsForValue().get(key);
-        if(StrUtils.strIsNotBlank(jsonStr)){
+        if(JsonOperationFactory.strIsNotBlank(jsonStr)){
             return JsonUtils.jsonToBean(jsonStr, clazz);
         }
         return null;
@@ -76,7 +76,7 @@ public class RedisUtils {
         R r;
         String fullKey = key+":"+dbQueryId;
         String shopJson = stringRedisTemplate.opsForValue().get(fullKey);
-        if (StrUtils.strIsNotBlank(shopJson)) {
+        if (JsonOperationFactory.strIsNotBlank(shopJson)) {
             return JsonUtils.jsonToBean(shopJson, clazz);
         }
         if(shopJson!=null){
@@ -106,7 +106,7 @@ public class RedisUtils {
         String fullKey = key+":"+dbQueryId;
         do {
             String shopJson = stringRedisTemplate.opsForValue().get(fullKey);
-            if (StrUtils.strIsNotBlank(shopJson)) {
+            if (JsonOperationFactory.strIsNotBlank(shopJson)) {
                 return JsonUtils.jsonToBean(shopJson, clazz);
             }
             if(shopJson!=null){
@@ -117,7 +117,7 @@ public class RedisUtils {
                     continue;
                 }
                 shopJson = stringRedisTemplate.opsForValue().get(fullKey);
-                if (StrUtils.strIsNotBlank(shopJson)) {
+                if (JsonOperationFactory.strIsNotBlank(shopJson)) {
                     return JsonUtils.jsonToBean(shopJson, clazz);
                 }
                 r = dbQueryFunction.apply(dbQueryId);
@@ -151,7 +151,7 @@ public class RedisUtils {
         R r;
         String fullKey = key+":"+dbQueryId;
         String shopJson = stringRedisTemplate.opsForValue().get(fullKey);
-        if (StrUtils.strIsNotBlank(shopJson)) {
+        if (JsonOperationFactory.strIsNotBlank(shopJson)) {
             return null;
         }
         RedisData redisData = JsonUtils.jsonToBean(shopJson, RedisData.class);

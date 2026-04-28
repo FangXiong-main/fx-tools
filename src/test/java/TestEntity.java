@@ -1,4 +1,4 @@
-import com.fangxiong.annotations.TimeType;
+import com.fangxiong.jsonUtilsCore.annotations.TimeType;
 
 import java.time.LocalDateTime;
 

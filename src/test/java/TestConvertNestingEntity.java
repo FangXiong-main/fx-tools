@@ -1,6 +1,4 @@
-import com.fangxiong.annotations.IgnoredField;
-import com.fangxiong.annotations.NotNullClass;
-import com.fangxiong.annotations.NotNullField;
+import com.fangxiong.jsonUtilsCore.annotations.NotNullClass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

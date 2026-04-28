@@ -1,6 +1,8 @@
-import com.fangxiong.common.*;
+import com.fangxiong.jsonUtilsCore.customize.CustomizeClazzDetector;
+import com.fangxiong.jsonUtilsCore.customize.CustomizeGenericTypes;
+import com.fangxiong.jsonUtilsCore.parsers.ParserFactory;
 import com.fangxiong.utils.json.JsonUtils;
-import com.fangxiong.utils.json.StrUtils;
+import com.fangxiong.jsonUtilsCore.JsonOperationFactory;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -73,10 +75,10 @@ public class FunctionTest {
                 "  ]\n" +
                 "]";
         StringBuilder sb = new StringBuilder();
-        String undecoratedJSONStr = StrUtils.getUndecoratedJSONStr(json2);
+        String undecoratedJSONStr = JsonOperationFactory.getUndecoratedJSONStr(json2);
         System.out.println(undecoratedJSONStr);
-        Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, undecoratedJSONStr);
-        Map<String, String> keysAndValuesMapWithJsonStr = StrUtils.getKeysAndValuesMapWithJsonStr(undecoratedJSONStr);
+        Map<String, String> splitMainJsonToPartlyMap = JsonOperationFactory.getSplitMainJsonToPartlyMap(sb, undecoratedJSONStr);
+        Map<String, String> keysAndValuesMapWithJsonStr = JsonOperationFactory.getKeysAndValuesMapWithJsonStr(undecoratedJSONStr);
         System.out.println(keysAndValuesMapWithJsonStr);
         System.out.println(sb.toString());
         System.out.println(splitMainJsonToPartlyMap);
@@ -145,7 +147,7 @@ public class FunctionTest {
                 "    ]\n" +
                 "  }\n" +
                 "]";
-        Map<String, String> keysAndValuesMapWithJsonStr = StrUtils.getKeysAndValuesMapWithJsonStr(StrUtils.getUndecoratedJSONStr(json));
+        Map<String, String> keysAndValuesMapWithJsonStr = JsonOperationFactory.getKeysAndValuesMapWithJsonStr(JsonOperationFactory.getUndecoratedJSONStr(json));
         System.out.println(keysAndValuesMapWithJsonStr);
         List<Map<String, List<Map<String, Object>>>> localNestedData;
         List<Map<String, List<Map<String, Object>>>> o = (List<Map<String, List<Map<String, Object>>>>)JsonUtils.jsonToBean(json, new CustomizeGenericTypes("List<Map<String, List<Map<String, Object>>>>"));
@@ -257,10 +259,10 @@ public class FunctionTest {
                 "              \"key\": \"数组内Map\"\n" +
                 "            }\n" +
                 "          ]";
-        System.out.println(StrUtils.getUndecoratedJSONStr(s));
+        System.out.println(JsonOperationFactory.getUndecoratedJSONStr(s));
         String json = "[{\"key\":\"数组内Map\"}]";
-        String undecoratedJSONStr = StrUtils.getUndecoratedJSONStr(json);
-        Map<String, String> jsonKeysAndValuesWithPartlyMap = StrUtils.getKeysAndValuesMapWithJsonStr(undecoratedJSONStr);
+        String undecoratedJSONStr = JsonOperationFactory.getUndecoratedJSONStr(json);
+        Map<String, String> jsonKeysAndValuesWithPartlyMap = JsonOperationFactory.getKeysAndValuesMapWithJsonStr(undecoratedJSONStr);
         System.out.println(jsonKeysAndValuesWithPartlyMap);
     }
 
@@ -305,12 +307,12 @@ public class FunctionTest {
                 "    }\n" +
                 "  ]\n" +
                 "]";
-        String json = StrUtils.getUndecoratedJSONStr(json1);
+        String json = JsonOperationFactory.getUndecoratedJSONStr(json1);
         System.out.println(json);
-        Map<String, String> m1 = StrUtils.getKeysAndValuesMapWithJsonStr(json);
+        Map<String, String> m1 = JsonOperationFactory.getKeysAndValuesMapWithJsonStr(json);
         System.out.println(m1);
         StringBuilder sb = new StringBuilder();
-        System.out.println(StrUtils.getSplitMainJsonToPartlyMap(sb, json));
+        System.out.println(JsonOperationFactory.getSplitMainJsonToPartlyMap(sb, json));
 
     }
 
@@ -325,7 +327,7 @@ public class FunctionTest {
                 "              \"key\": \"数组内对象\"\n" +
                 "            }\n" +
                 "          ]";
-        ArrayList<String> convertJsonValueListToArr = StrUtils.getConvertJsonValueListToArr(StrUtils.getUndecoratedJSONStr(json));
+        ArrayList<String> convertJsonValueListToArr = JsonOperationFactory.getConvertJsonValueListToArr(JsonOperationFactory.getUndecoratedJSONStr(json));
         System.out.println(convertJsonValueListToArr.size());
         System.out.println(convertJsonValueListToArr);
     }
@@ -338,8 +340,8 @@ public class FunctionTest {
                 "  [\"电影\", \"音乐\", \"阅读\"]\n" +
                 "]";
         StringBuilder sb = new StringBuilder();
-        String undecoratedJSONStr = StrUtils.getUndecoratedJSONStr(json);
-        Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, undecoratedJSONStr);
+        String undecoratedJSONStr = JsonOperationFactory.getUndecoratedJSONStr(json);
+        Map<String, String> splitMainJsonToPartlyMap = JsonOperationFactory.getSplitMainJsonToPartlyMap(sb, undecoratedJSONStr);
         System.out.println(splitMainJsonToPartlyMap);
     }
 
@@ -402,7 +404,7 @@ public class FunctionTest {
                 "  ]\n" +
                 "}";
         StringBuilder sb = new StringBuilder();
-        Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, StrUtils.getUndecoratedJSONStr(json));
+        Map<String, String> splitMainJsonToPartlyMap = JsonOperationFactory.getSplitMainJsonToPartlyMap(sb, JsonOperationFactory.getUndecoratedJSONStr(json));
         System.out.println(sb);
         System.out.println(splitMainJsonToPartlyMap);
     }
@@ -422,7 +424,7 @@ public class FunctionTest {
                 "  }\n" +
                 "}";
         StringBuilder sb = new StringBuilder();
-        Map<String, String> splitMainJsonToPartlyMap = StrUtils.getSplitMainJsonToPartlyMap(sb, StrUtils.getUndecoratedJSONStr(json));
+        Map<String, String> splitMainJsonToPartlyMap = JsonOperationFactory.getSplitMainJsonToPartlyMap(sb, JsonOperationFactory.getUndecoratedJSONStr(json));
         System.out.println(sb);
         System.out.println(splitMainJsonToPartlyMap);
     }
@@ -518,8 +520,8 @@ public class FunctionTest {
         String json ="{\"id\":10,\"name\":\"Su\",\"age\":22,\"Header\":{\"id\":1,\"name\":\"FX\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"},\"map\":{\"Test1\":{\"id\":20,\"name\":\"fx\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"}},\"list\":[\"测试\",100,99.9,true,null]}";
         String json2 = "[\"Header\":{\"id\":1,\"name\":\"FX\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"},\"map\":{\"id\":20,\"name\":\"fx\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"}]";
         StringBuilder sb = new StringBuilder();
-        Map<String, String> splitMainEntityAndFieldEntity = StrUtils.getSplitMainJsonToPartlyMap(sb,json);
-        System.out.println(StrUtils.getKeysAndValuesMapWithJsonStr(sb.toString()));
+        Map<String, String> splitMainEntityAndFieldEntity = JsonOperationFactory.getSplitMainJsonToPartlyMap(sb,json);
+        System.out.println(JsonOperationFactory.getKeysAndValuesMapWithJsonStr(sb.toString()));
         System.out.println(sb);
         System.out.println(splitMainEntityAndFieldEntity);
         System.out.println(splitMainEntityAndFieldEntity.keySet());
@@ -557,7 +559,7 @@ public class FunctionTest {
                     null
                   ]
                 }""";
-        System.out.println(StrUtils.getUndecoratedJSONStr(test));
+        System.out.println(JsonOperationFactory.getUndecoratedJSONStr(test));
     }
 
     @Test
@@ -787,7 +789,7 @@ public class FunctionTest {
     public void testIsCustomizeClazz(){
         TestEntity testEntity = new TestEntity();
         Integer id = 1;
-        assertEquals(true,CustomizeClazzDetector.isCustomizeClazz(testEntity.getClass()));
+        assertEquals(true, CustomizeClazzDetector.isCustomizeClazz(testEntity.getClass()));
         assertEquals(false,CustomizeClazzDetector.isCustomizeClazz(id.getClass()));
     }
 
@@ -819,7 +821,7 @@ public class FunctionTest {
     @Test
     public void testGetJSONKeysAndValues2() {
         String json = "{\"date\":\"2026-04-14T13:34:31\"}";
-        StrUtils.getKeysAndValuesMapWithJsonStr(json);
+        JsonOperationFactory.getKeysAndValuesMapWithJsonStr(json);
     }
 
 
@@ -843,22 +845,22 @@ public class FunctionTest {
         String s16 = "~!@#$%^&*()";
         String s17 = "   ~   ";
 
-        assertEquals(false, StrUtils.strIsNotBlank(s1));
-        assertEquals(true, StrUtils.strIsNotBlank(s2));
-        assertEquals(true, StrUtils.strIsNotBlank(s3));
-        assertEquals(false, StrUtils.strIsNotBlank(s4));
-        assertEquals(true, StrUtils.strIsNotBlank(s5));
-        assertEquals(false, StrUtils.strIsNotBlank(s6));
-        assertEquals(false, StrUtils.strIsNotBlank(s7));
-        assertEquals(false, StrUtils.strIsNotBlank(s8));
-        assertEquals(false, StrUtils.strIsNotBlank(s9));
-        assertEquals(false, StrUtils.strIsNotBlank(s10));
-        assertEquals(true, StrUtils.strIsNotBlank(s11));
-        assertEquals(true, StrUtils.strIsNotBlank(s12));
-        assertEquals(true, StrUtils.strIsNotBlank(s13));
-        assertEquals(true, StrUtils.strIsNotBlank(s14));
-        assertEquals(true, StrUtils.strIsNotBlank(s15));
-        assertEquals(true, StrUtils.strIsNotBlank(s16));
-        assertEquals(true, StrUtils.strIsNotBlank(s17));
+        assertEquals(false, JsonOperationFactory.strIsNotBlank(s1));
+        assertEquals(true, JsonOperationFactory.strIsNotBlank(s2));
+        assertEquals(true, JsonOperationFactory.strIsNotBlank(s3));
+        assertEquals(false, JsonOperationFactory.strIsNotBlank(s4));
+        assertEquals(true, JsonOperationFactory.strIsNotBlank(s5));
+        assertEquals(false, JsonOperationFactory.strIsNotBlank(s6));
+        assertEquals(false, JsonOperationFactory.strIsNotBlank(s7));
+        assertEquals(false, JsonOperationFactory.strIsNotBlank(s8));
+        assertEquals(false, JsonOperationFactory.strIsNotBlank(s9));
+        assertEquals(false, JsonOperationFactory.strIsNotBlank(s10));
+        assertEquals(true, JsonOperationFactory.strIsNotBlank(s11));
+        assertEquals(true, JsonOperationFactory.strIsNotBlank(s12));
+        assertEquals(true, JsonOperationFactory.strIsNotBlank(s13));
+        assertEquals(true, JsonOperationFactory.strIsNotBlank(s14));
+        assertEquals(true, JsonOperationFactory.strIsNotBlank(s15));
+        assertEquals(true, JsonOperationFactory.strIsNotBlank(s16));
+        assertEquals(true, JsonOperationFactory.strIsNotBlank(s17));
     }
 }
