@@ -1,4 +1,4 @@
-package com.fangxiong.jsonUtilsCore;
+package com.fangxiong.jsonUtilsCore.converters;
 
 import com.fangxiong.jsonUtilsCore.exceptions.JsonInvalidValueError;
 import com.fangxiong.jsonUtilsCore.exceptions.JsonSyntaxError;

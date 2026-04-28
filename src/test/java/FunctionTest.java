@@ -2,7 +2,7 @@ import com.fangxiong.jsonUtilsCore.customize.CustomizeClazzDetector;
 import com.fangxiong.jsonUtilsCore.customize.CustomizeGenericTypes;
 import com.fangxiong.jsonUtilsCore.parsers.ParserFactory;
 import com.fangxiong.utils.json.JsonUtils;
-import com.fangxiong.jsonUtilsCore.JsonOperationFactory;
+import com.fangxiong.jsonUtilsCore.converters.JsonOperationFactory;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
