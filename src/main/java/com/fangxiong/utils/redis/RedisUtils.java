@@ -1,7 +1,7 @@
 package com.fangxiong.utils.redis;
 
 import com.fangxiong.utils.json.JsonUtils;
-import com.fangxiong.jsonUtilsCore.converters.JsonOperationFactory;
+import com.fangxiong.jsonUtilsCore.basicJsonOperation.JsonOperationFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.time.LocalDateTime;

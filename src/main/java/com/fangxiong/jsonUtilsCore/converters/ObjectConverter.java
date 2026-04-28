@@ -6,6 +6,7 @@ import com.fangxiong.jsonUtilsCore.annotations.NotNullField;
 import com.fangxiong.jsonUtilsCore.customize.CustomizeClazzDetector;
 import com.fangxiong.jsonUtilsCore.customize.CustomizeGenericTypes;
 import com.fangxiong.jsonUtilsCore.exceptions.JsonConvertFailureError;
+import com.fangxiong.jsonUtilsCore.basicJsonOperation.JsonOperationFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

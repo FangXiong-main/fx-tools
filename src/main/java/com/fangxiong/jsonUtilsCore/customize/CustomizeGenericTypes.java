@@ -1,7 +1,7 @@
 package com.fangxiong.jsonUtilsCore.customize;
 
 import com.fangxiong.jsonUtilsCore.exceptions.CustomizeGenericError;
-import com.fangxiong.jsonUtilsCore.converters.JsonOperationFactory;
+import com.fangxiong.jsonUtilsCore.basicJsonOperation.JsonOperationFactory;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
