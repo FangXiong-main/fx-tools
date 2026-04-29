@@ -1,6 +1,6 @@
 package com.fangxiong.jsonUtilsCore.converters;
 
-import com.fangxiong.jsonUtilsCore.basicJsonOperation.JsonOperationFactory;
+import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -15,7 +15,7 @@ public class ListConverter implements GenericTypeJsonConverter {
         List<Object> convertedList = new ArrayList<>();
         if (type instanceof ParameterizedType pt){
             if(pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1] instanceof ParameterizedType pt2){
-                Map<String, String> partlyMap = JsonOperationFactory.getKeysAndValuesMapWithJsonStr(json);
+                Map<String, String> partlyMap = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(json);
                 for (String key : partlyMap.keySet()){
                     convertedList.add(GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt2.getRawType()).convert(partlyMap.get(key),pt2));
                 }
@@ -25,13 +25,13 @@ public class ListConverter implements GenericTypeJsonConverter {
                 return GenericTypeConverterFactory.getGenericTypeJsonConverter(rawClazz).convert(json,ptTemp.getActualTypeArguments()[pt.getActualTypeArguments().length-1]);
             }
         }else{
-            ArrayList<String> valueListToArr = JsonOperationFactory.getConvertJsonValueListToArr(json);
+            ArrayList<String> valueListToArr = JsonOperationUtil.getConvertJsonValueListToArr(json);
             if(valueListToArr.isEmpty()){
                 if (json.equals("null")){
                     convertedList.add(null);
-                } else if (JsonOperationFactory.jsonIsBlankMap(json)) {
+                } else if (JsonOperationUtil.jsonIsBlankMap(json)) {
                     convertedList.add(new HashMap<>());
-                } else if (JsonOperationFactory.jsonIsBlankList(json)) {
+                } else if (JsonOperationUtil.jsonIsBlankList(json)) {
                     convertedList.add(new ArrayList<>());
                 }
             }else {
@@ -41,9 +41,9 @@ public class ListConverter implements GenericTypeJsonConverter {
                         if (tempType instanceof ParameterizedType pt){
                             convertedList.add(GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt.getRawType()).convert(values,pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1]));
                         }else if (tempType==null) {
-                            if (JsonOperationFactory.jsonIsBlankMap(values)){
+                            if (JsonOperationUtil.jsonIsBlankMap(values)){
                                 convertedList.add(new HashMap<>());
-                            } else if (JsonOperationFactory.jsonIsBlankList(values)) {
+                            } else if (JsonOperationUtil.jsonIsBlankList(values)) {
                                 convertedList.add(new ArrayList<>());
                             }else {
                                 convertedList.add(null);

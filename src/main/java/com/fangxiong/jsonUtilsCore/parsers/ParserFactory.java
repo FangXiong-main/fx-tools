@@ -1,6 +1,6 @@
 package com.fangxiong.jsonUtilsCore.parsers;
 
-import com.fangxiong.jsonUtilsCore.basicJsonOperation.JsonOperationFactory;
+import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -12,7 +12,7 @@ public class ParserFactory {
         parserMap.put(String.class,(o,f)->{
             if(o==null || o.equals("null")) {
                 return null;
-            } else if (JsonOperationFactory.strIsNotBlank(o.toString())) {
+            } else if (JsonOperationUtil.strIsNotBlank(o.toString())) {
                 return "\""+ParserFactory.convertEscapeCharacterToStr(o.toString())+"\"";
             }else {
                 return "\"\"";

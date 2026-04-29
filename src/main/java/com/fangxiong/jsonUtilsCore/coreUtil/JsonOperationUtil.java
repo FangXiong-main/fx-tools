@@ -1,4 +1,4 @@
-package com.fangxiong.jsonUtilsCore.basicJsonOperation;
+package com.fangxiong.jsonUtilsCore.coreUtil;
 
 import com.fangxiong.jsonUtilsCore.exceptions.JsonInvalidValueError;
 import com.fangxiong.jsonUtilsCore.exceptions.JsonSyntaxError;
@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class JsonOperationFactory {
+public class JsonOperationUtil {
 
     private static final Pattern isNotBlankPattern = Pattern.compile(".*\\S+.*");
     private static final Pattern jsonIsNotBlankPattern = Pattern.compile("\\{.*\\S+.*}|\\[.*\\S+.*]");
@@ -16,7 +16,8 @@ public class JsonOperationFactory {
     private static final Pattern jsonIsBlankListPattern = Pattern.compile("\\[\\s*]");
     private static final Pattern jsonIntegerValuePattern = Pattern.compile("-?(\\d+)");
     private static final Pattern jsonDicimalValuePattern = Pattern.compile("-?(\\d+\\.\\d+)");
-    private static final Pattern jsonInvalidCharPattern = Pattern.compile(".*[\\\\\\x00-\\x1F@#$%&<>'].*");
+    private static final Pattern jsonInvalidCharPattern = Pattern.compile(".*([\\\\\\x00-\\x1F@#$%&<>']).*");
+
     public static Boolean strIsNotBlank(String s){
         if (s == null){
             return false;
@@ -55,8 +56,9 @@ public class JsonOperationFactory {
 
     public static void jsonInvalidCharacterChecker(String str){
         String tempStr = getUndecoratedJSONStr(str);
-        if(jsonInvalidCharPattern.matcher(tempStr).matches()){
-            throw new JsonSyntaxError("Invalid character find in json.");
+        Matcher matcher = jsonInvalidCharPattern.matcher(tempStr);
+        if(matcher.matches()){
+            throw new JsonSyntaxError("Invalid character '"+matcher.group(1)+"' find in json.");
         }
     }
 
@@ -176,7 +178,7 @@ public class JsonOperationFactory {
                 tempListOrMapCount--;
                 sbValues.append(ca[i]);
             } else if (isListOrMapValue&&tempListOrMapCount==0) {
-                if (JsonOperationFactory.strIsNotBlank(sbKeys.toString())){
+                if (JsonOperationUtil.strIsNotBlank(sbKeys.toString())){
                     mapKeysAndValues.put(sbKeys.toString(),sbValues.toString());
                 }
                 sbKeys.setLength(0);sbValues.setLength(0);
@@ -184,7 +186,7 @@ public class JsonOperationFactory {
                 readKeyFinished = false;readValueFinished = false;
                 valueIsNotString = false;isListOrMapValue = false;
             } else if (quotationMarksCount == 0 && readKeyFinished && readValueFinished) {
-                if (JsonOperationFactory.strIsNotBlank(sbKeys.toString())){
+                if (JsonOperationUtil.strIsNotBlank(sbKeys.toString())){
                     mapKeysAndValues.put(sbKeys.toString(),sbValues.toString());
                 }
                 sbKeys.setLength(0);sbValues.setLength(0);

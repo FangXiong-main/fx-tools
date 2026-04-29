@@ -1,7 +1,7 @@
 package com.fangxiong.utils.redis;
 
 import com.fangxiong.utils.json.JsonUtils;
-import com.fangxiong.jsonUtilsCore.basicJsonOperation.JsonOperationFactory;
+import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.time.LocalDateTime;
@@ -40,7 +40,7 @@ public class RedisUtils {
      * @param l 过期时间
      */
     public void setStringValue(String key,Object o,Long l){
-        String jsonStr = JsonUtils.BeanToJson(o);
+        String jsonStr = JsonUtils.beanToJson(o);
         if(l==0L){
             stringRedisTemplate.opsForValue().set(key,jsonStr);
         }else{
@@ -56,7 +56,7 @@ public class RedisUtils {
      */
     public <R> R getStringValue(String key,Class<R> clazz) {
         String jsonStr = stringRedisTemplate.opsForValue().get(key);
-        if(JsonOperationFactory.strIsNotBlank(jsonStr)){
+        if(JsonOperationUtil.strIsNotBlank(jsonStr)){
             return JsonUtils.jsonToBean(jsonStr, clazz);
         }
         return null;
@@ -76,7 +76,7 @@ public class RedisUtils {
         R r;
         String fullKey = key+":"+dbQueryId;
         String shopJson = stringRedisTemplate.opsForValue().get(fullKey);
-        if (JsonOperationFactory.strIsNotBlank(shopJson)) {
+        if (JsonOperationUtil.strIsNotBlank(shopJson)) {
             return JsonUtils.jsonToBean(shopJson, clazz);
         }
         if(shopJson!=null){
@@ -87,7 +87,7 @@ public class RedisUtils {
             stringRedisTemplate.opsForValue().set(fullKey,"",ttl, timeUnit);
             return null;
         }
-        stringRedisTemplate.opsForValue().set(fullKey, JsonUtils.BeanToJson(r),ttl, timeUnit);
+        stringRedisTemplate.opsForValue().set(fullKey, JsonUtils.beanToJson(r),ttl, timeUnit);
         return r;
     }
 
@@ -106,7 +106,7 @@ public class RedisUtils {
         String fullKey = key+":"+dbQueryId;
         do {
             String shopJson = stringRedisTemplate.opsForValue().get(fullKey);
-            if (JsonOperationFactory.strIsNotBlank(shopJson)) {
+            if (JsonOperationUtil.strIsNotBlank(shopJson)) {
                 return JsonUtils.jsonToBean(shopJson, clazz);
             }
             if(shopJson!=null){
@@ -117,7 +117,7 @@ public class RedisUtils {
                     continue;
                 }
                 shopJson = stringRedisTemplate.opsForValue().get(fullKey);
-                if (JsonOperationFactory.strIsNotBlank(shopJson)) {
+                if (JsonOperationUtil.strIsNotBlank(shopJson)) {
                     return JsonUtils.jsonToBean(shopJson, clazz);
                 }
                 r = dbQueryFunction.apply(dbQueryId);
@@ -125,7 +125,7 @@ public class RedisUtils {
                     stringRedisTemplate.opsForValue().set(fullKey,"",ttl, timeUnit);
                     return null;
                 }
-                stringRedisTemplate.opsForValue().set(fullKey, JsonUtils.BeanToJson(r),ttl, timeUnit);
+                stringRedisTemplate.opsForValue().set(fullKey, JsonUtils.beanToJson(r),ttl, timeUnit);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             } finally {
@@ -151,7 +151,7 @@ public class RedisUtils {
         R r;
         String fullKey = key+":"+dbQueryId;
         String shopJson = stringRedisTemplate.opsForValue().get(fullKey);
-        if (JsonOperationFactory.strIsNotBlank(shopJson)) {
+        if (JsonOperationUtil.strIsNotBlank(shopJson)) {
             return null;
         }
         RedisData redisData = JsonUtils.jsonToBean(shopJson, RedisData.class);
@@ -240,7 +240,7 @@ public class RedisUtils {
         redisData.setData(r);
         LocalDateTime localDateTime = LocalDateTime.now();
         redisData.setExpireTime(calculateExpireTime(localDateTime,logicalTTL,timeUnit));
-        stringRedisTemplate.opsForValue().set(fullKey,JsonUtils.BeanToJson(redisData));
+        stringRedisTemplate.opsForValue().set(fullKey,JsonUtils.beanToJson(redisData));
     }
 
     /**

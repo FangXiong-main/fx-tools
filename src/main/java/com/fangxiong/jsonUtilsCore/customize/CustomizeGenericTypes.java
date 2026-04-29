@@ -1,7 +1,7 @@
 package com.fangxiong.jsonUtilsCore.customize;
 
 import com.fangxiong.jsonUtilsCore.exceptions.CustomizeGenericError;
-import com.fangxiong.jsonUtilsCore.basicJsonOperation.JsonOperationFactory;
+import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public class CustomizeGenericTypes implements ParameterizedType {
     }
 
     public CustomizeGenericTypes(String typeParams){
-        typeParams = JsonOperationFactory.getUndecoratedJSONStr(typeParams);
+        typeParams = JsonOperationUtil.getUndecoratedJSONStr(typeParams);
         Type tempRawType =null;
         ArrayList<Type> identifiedAcTypes = new ArrayList<>();
         StringBuilder sbRaw = new StringBuilder();
@@ -65,11 +65,21 @@ public class CustomizeGenericTypes implements ParameterizedType {
                 sbRaw.append(ca[i]);
             }
         }
-        if(tempRawType==null||identifiedAcTypes.isEmpty()){
-            throw new CustomizeGenericError("Converting '"+typeParams+"'"+" failed,Caused by syntax error");
+        if (identifiedAcTypes.size()==2){
+            if(tempRawType != null && identifiedAcTypes.get(0) != null && identifiedAcTypes.get(1) != null){
+                this.rawType = tempRawType;
+                this.actualTypes = identifiedAcTypes.toArray(new Type[]{});
+            }else {
+                throw new CustomizeGenericError("Converting '"+typeParams+"'"+" failed,Caused by syntax error");
+            }
+        }else{
+            if(tempRawType != null && !identifiedAcTypes.isEmpty() && identifiedAcTypes.get(0) != null){
+                this.rawType = tempRawType;
+                this.actualTypes = identifiedAcTypes.toArray(new Type[]{});
+            }else {
+                throw new CustomizeGenericError("Converting '"+typeParams+"'"+" failed,Caused by syntax error");
+            }
         }
-        this.rawType = tempRawType;
-        this.actualTypes = identifiedAcTypes.toArray(new Type[]{});
     }
 
     @Override

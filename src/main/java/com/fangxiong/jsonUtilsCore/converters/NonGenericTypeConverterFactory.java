@@ -1,6 +1,6 @@
 package com.fangxiong.jsonUtilsCore.converters;
 
-import com.fangxiong.jsonUtilsCore.basicJsonOperation.JsonOperationFactory;
+import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,14 +17,14 @@ public class NonGenericTypeConverterFactory {
             if (s == null) {
                 return null;
             }
-            JsonOperationFactory.jsonValueValidationChecker(s,Integer.class);
+            JsonOperationUtil.jsonValueValidationChecker(s,Integer.class);
             return Integer.parseInt(s);
         });
         converterMap.put(Long.class,(s,f)->{
             if(s==null){
                 return null;
             }
-            JsonOperationFactory.jsonValueValidationChecker(s,Long.class);
+            JsonOperationUtil.jsonValueValidationChecker(s,Long.class);
             return Long.parseLong(s);
         });
         converterMap.put(String.class,(s,f)-> s);
@@ -32,21 +32,21 @@ public class NonGenericTypeConverterFactory {
             if (s==null){
                 return null;
             }
-            JsonOperationFactory.jsonValueValidationChecker(s,int.class);
+            JsonOperationUtil.jsonValueValidationChecker(s,int.class);
             return Integer.parseInt(s);
         });
         converterMap.put(long.class,(s,f)-> {
             if(s==null){
                 return null;
             }
-            JsonOperationFactory.jsonValueValidationChecker(s,long.class);
+            JsonOperationUtil.jsonValueValidationChecker(s,long.class);
             return Long.parseLong(s);
         });
         converterMap.put(Boolean.class,(s,f)-> {
             if(s==null){
                 return null;
             }
-            JsonOperationFactory.jsonValueValidationChecker(s,Boolean.class);
+            JsonOperationUtil.jsonValueValidationChecker(s,Boolean.class);
             if(s.equals("0")){
                 return false;
             } else if (s.equals("1")) {
@@ -58,7 +58,7 @@ public class NonGenericTypeConverterFactory {
             if(s==null){
                 return null;
             }
-            JsonOperationFactory.jsonValueValidationChecker(s,Boolean.class);
+            JsonOperationUtil.jsonValueValidationChecker(s,Boolean.class);
             if(s.equals("0")||s.equals("false")){
                 return false;
             } else{
@@ -69,35 +69,35 @@ public class NonGenericTypeConverterFactory {
             if (s==null){
                 return null;
             }
-            JsonOperationFactory.jsonValueValidationChecker(s,Double.class);
+            JsonOperationUtil.jsonValueValidationChecker(s,Double.class);
             return Double.parseDouble(s);
         });
         converterMap.put(Float.class,(s,f)-> {
             if(s==null){
                 return null;
             }
-            JsonOperationFactory.jsonValueValidationChecker(s,Float.class);
+            JsonOperationUtil.jsonValueValidationChecker(s,Float.class);
             return Float.parseFloat(s);
         });
         converterMap.put(double.class,(s,f)-> {
             if (s == null) {
                 return null;
             }
-            JsonOperationFactory.jsonValueValidationChecker(s,double.class);
+            JsonOperationUtil.jsonValueValidationChecker(s,double.class);
             return Double.parseDouble(s);
         });
         converterMap.put(float.class,(s,f)-> {
             if (s == null) {
                 return null;
             }
-            JsonOperationFactory.jsonValueValidationChecker(s,float.class);
+            JsonOperationUtil.jsonValueValidationChecker(s,float.class);
             return Float.parseFloat(s);
         });
         converterMap.put(BigDecimal.class,(s,f)->{
             if (s == null) {
                 return null;
             }
-            JsonOperationFactory.jsonValueValidationChecker(s, BigDecimal.class);
+            JsonOperationUtil.jsonValueValidationChecker(s, BigDecimal.class);
             return BigDecimal.valueOf(Double.parseDouble(s));
         });
     }

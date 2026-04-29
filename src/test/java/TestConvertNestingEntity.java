@@ -18,4 +18,5 @@ public class TestConvertNestingEntity {
     private Double score;
     private LocalDateTime createTime;
     private List<Map<String, List<Map<String, Integer>>>> ultimateTest;
+
 }
