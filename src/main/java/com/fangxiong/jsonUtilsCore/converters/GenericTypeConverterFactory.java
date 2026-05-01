@@ -15,6 +15,12 @@ public class GenericTypeConverterFactory {
     }
 
     public static GenericTypeJsonConverter getGenericTypeJsonConverter(Class<?> clazz){
+        Class<?>[] interfaces = clazz.getInterfaces();
+        for(Class<?> i : interfaces){
+            if(genericTypeConverter.containsKey(i)){
+                return genericTypeConverter.get(i);
+            }
+        }
         return genericTypeConverter.get(clazz);
     }
 
