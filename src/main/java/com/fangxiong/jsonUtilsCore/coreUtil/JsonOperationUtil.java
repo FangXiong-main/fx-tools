@@ -66,6 +66,12 @@ public class JsonOperationUtil {
         if(valueType==Integer.class||valueType==int.class){
             if(!jsonIntegerValuePattern.matcher(valueStr).matches()){
                 throw new JsonInvalidValueError("Invalid integer value:"+valueStr);
+            } else {
+                try {
+                    Integer.parseInt(valueStr);
+                } catch (Exception e) {
+                    throw new JsonInvalidValueError("Invalid integer value:"+valueStr+",out of range!",e);
+                }
             }
         } else if (valueType== Float.class||valueType==float.class) {
             if(!jsonDicimalValuePattern.matcher(valueStr).matches()){
@@ -128,7 +134,7 @@ public class JsonOperationUtil {
         StringBuilder sbValues = new StringBuilder();
         char[] ca = s.toCharArray();
         int quotationMarksCount = 0;
-        boolean isReadingKey = false;boolean isReadingValue = false;boolean isEmptyEntity = false;int isEmptyEntityCount=0;int noKeyListInt=1;boolean isListEntity=false;boolean isReadingListValue=false;
+        boolean isReadingKey = false;boolean isReadingValue = false;boolean isEmptyEntity = false;int isEmptyEntityCount=0;int noKeyListInt=1;boolean isListEntity=false;
         boolean readValueFinished=false;boolean readKeyFinished=false;boolean valueIsNotString=false;boolean isListOrMapValue = false;int tempListOrMapCount=0;int listDeepCount=0;
         for (int i = 0; i < ca.length; i++) {
             if(!isListEntity&&!isListOrMapValue&&i<=ca.length-2&&ca[i+1]!='\"'&&ca[i+1]!='['&&ca[i+1]!='{'&&ca[i]==':'&&!isReadingValue) {

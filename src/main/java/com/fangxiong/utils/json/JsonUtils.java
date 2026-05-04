@@ -41,6 +41,7 @@ public class JsonUtils {
         return (T) NonGenericTypeConverterFactory.getConverter(clazz).convert(undecoratedJSONStr, clazz);
     }
 
+
     public static Object jsonToBean(String jsonString, CustomizeGenericTypes typeParams){
         String undecoratedJSONStr = JsonOperationUtil.getUndecoratedJSONStr(jsonString);
         JsonOperationUtil.jsonBracketMatchChecker(undecoratedJSONStr);
