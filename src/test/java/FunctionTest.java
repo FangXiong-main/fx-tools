@@ -348,9 +348,8 @@ public class FunctionTest {
 
     @Test
     public void nestingGenericConvertTest(){
-        System.out.println(Integer.MAX_VALUE);
         String json = "{\n" +
-                "  \"id\": 999999999,\n" +
+                "  \"id\": 88888,\n" +
                 "  \"name\": \"强类型终极测试\",\n" +
                 "  \"isStudent\": true,\n" +
                 "  \"score\": 98.5,\n" +
@@ -377,7 +376,7 @@ public class FunctionTest {
                 "}";
         TestConvertNestingNonObjEntity testConvertNestingNonObjEntity = JsonUtils.jsonToBean(json, TestConvertNestingNonObjEntity.class);
         System.out.println(testConvertNestingNonObjEntity);
-        System.out.println(JsonUtils.beanToJson(testConvertNestingNonObjEntity,DecorateJson.YES));
+        System.out.println(JsonUtils.beanToJson(testConvertNestingNonObjEntity));
     }
 
 //    @Test

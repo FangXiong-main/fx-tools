@@ -1,4 +1,5 @@
 import com.fangxiong.jsonUtilsCore.annotations.NotNullClass;
+import com.fangxiong.jsonUtilsCore.annotations.NotNullField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import java.util.Map;
 @NoArgsConstructor
 @NotNullClass
 public class TestConvertNestingEntity {
+    @NotNullField
     private Integer id;
     private String name;
     private Boolean isActive;
