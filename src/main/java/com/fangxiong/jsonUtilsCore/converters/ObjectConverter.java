@@ -1,5 +1,6 @@
 package com.fangxiong.jsonUtilsCore.converters;
 
+import com.fangxiong.globalUtils.GlobalConverterCacheLib;
 import com.fangxiong.jsonUtilsCore.annotations.IgnoredField;
 import com.fangxiong.jsonUtilsCore.annotations.NotNullClass;
 import com.fangxiong.jsonUtilsCore.annotations.NotNullField;
@@ -16,31 +17,26 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.fangxiong.SystemConstants.SET;
-
 public class ObjectConverter implements NonGenericTypeJsonConverter {
 
     private static final Pattern isIntegerPattern = Pattern.compile("-?(\\d+)");
     private static final Pattern isDicimalPattern = Pattern.compile("-?(\\d+\\.\\d+)");
-    private static final Map<Class<?>,Field[]> converterFieldCache = new HashMap<>();
-    private static final Map<Class<?>,Map<String,Method>> converterSetMethodCache = new HashMap<>();
-    private static final Map<Class<?>,Map<String,Type>> converterPartTypeCache = new HashMap<>();
     @Override
     public Object convert(String s, Class<?> clazz) {
         String tempFiledName=null;String tempValue=null;String tempFiledType=null;
         if(CustomizeClazzDetector.isCustomizeClazz(clazz)){
             try {
-                Field[] df = converterFieldCache.get(clazz) !=null ? converterFieldCache.get(clazz) : cacheAllField(clazz);
-                Map<String,Method> setMethodCache = converterSetMethodCache.get(clazz) != null ? converterSetMethodCache.get(clazz) : cacheAllSetMethod(clazz);
-                Map<String,Type> partTypeCache = converterPartTypeCache.get(clazz) != null ? converterPartTypeCache.get(clazz) : cacheAllFieldType(clazz);
-                Map<String, String> allFieldValueCache = cacheAllFieldValue(df, s);
+                Field[] df = GlobalConverterCacheLib.getConverterFieldCache(clazz);
+                Map<String,Method> setMethodCache = GlobalConverterCacheLib.getConverterSetMethodCache(clazz);
+                Map<String,Type> partTypeCache = GlobalConverterCacheLib.getConverterPartTypeCache(clazz);
+                Map<String, String> allFieldValue = getAllFieldValue(df, s);
                 Object convertedObj = clazz.getDeclaredConstructor().newInstance();
                 for(Field f : df){
-                    tempFiledType=f.getType().getTypeName();tempFiledName = f.getName();tempValue=allFieldValueCache.get(f.getName());
+                    tempFiledType=f.getType().getTypeName();tempFiledName = f.getName();tempValue=allFieldValue.get(f.getName());
                     if(f.getAnnotation(IgnoredField.class)!=null){
                         setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(null,partTypeCache.get(f.getName())));
                     } else if(tempValue!=null&&!tempValue.equals("null")){
-                        setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(allFieldValueCache.get(f.getName()),partTypeCache.get(f.getName())));
+                        setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(allFieldValue.get(f.getName()),partTypeCache.get(f.getName())));
                     } else if (clazz.getAnnotation(NotNullClass.class)!=null&&tempValue==null) {
                         throw new JsonConvertFailureError("Detected class:'"+clazz.getName()+"' with @NotNullClass annotation,current converting field is:'"+tempFiledName+"'"+",but the value ready to convert is null.Caused by Json syntax error.");
                     } else if (clazz.getAnnotation(NotNullClass.class)!=null&& Objects.equals(tempValue, "null")) {
@@ -101,7 +97,7 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
         return String.class;
     }
 
-    private static Map<String,String> cacheAllFieldValue(Field[] df,String json){
+    private static Map<String,String> getAllFieldValue(Field[] df, String json){
         Map<String,String> cacheFiledValueMap = new HashMap<>();
         Map<String,String> tempFieldValueMap = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(json);
         for (Field f:df){
@@ -110,22 +106,22 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
         return cacheFiledValueMap;
     }
 
-    public static Field[] cacheAllField(Class<?> clazz){
-        Field[] df = clazz.getDeclaredFields();
-        converterFieldCache.put(clazz,df);
-        return df;
-    }
+//    public static Field[] cacheAllField(Class<?> clazz){
+//        Field[] df = clazz.getDeclaredFields();
+//        converterFieldCache.put(clazz,df);
+//        return df;
+//    }
 
 
-    private static Map<String,Type> cacheAllFieldType(Class<?> clazz){
-        Field[] df = clazz.getDeclaredFields();
-        Map<String,Type> cacheMap = new HashMap<>();
-        for(Field f : df){
-            cacheMap.put(f.getName(),f.getGenericType());
-        }
-        converterPartTypeCache.put(clazz,cacheMap);
-        return cacheMap;
-    }
+//    private static Map<String,Type> cacheAllFieldType(Class<?> clazz){
+//        Field[] df = clazz.getDeclaredFields();
+//        Map<String,Type> cacheMap = new HashMap<>();
+//        for(Field f : df){
+//            cacheMap.put(f.getName(),f.getGenericType());
+//        }
+//        converterPartTypeCache.put(clazz,cacheMap);
+//        return cacheMap;
+//    }
 
     private static Object convertFiled(String s,Type type){
         if (type instanceof ParameterizedType pt){
@@ -135,26 +131,27 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
         }
     }
 
-    private static Map<String,Method> cacheAllSetMethod(Class<?> clazz)  {
-        Map<String,Method> cacheMap = null;
-        String methodName = null;
-        try {
-            Field[] df = clazz.getDeclaredFields();
-            cacheMap = new HashMap<>();
-            for(Field f : df){
-                char upperCase = Character.toUpperCase(f.getName().charAt(0));
-                if(f.getName().length()==1){
-                    methodName = SET+ upperCase;
-                    cacheMap.put(f.getName(),clazz.getDeclaredMethod(methodName,f.getType()));
-                }else{
-                    methodName = SET+ upperCase +f.getName().substring(1);
-                    cacheMap.put(f.getName(), clazz.getDeclaredMethod(methodName,f.getType()));
-                }
-            }
-        } catch (NoSuchMethodException e) {
-            throw new JsonConvertFailureError("Cannot find method named '"+methodName+"' in class "+clazz.getName(),e);
-        }
-        converterSetMethodCache.put(clazz,cacheMap);
-        return cacheMap;
-    }
+//    private static Map<String,Method> cacheAllSetMethod(Class<?> clazz)  {
+//        Map<String,Method> cacheMap = null;
+//        String methodName = null;
+//        try {
+//            Field[] df = clazz.getDeclaredFields();
+//            cacheMap = new HashMap<>();
+//            for(Field f : df){
+//                char upperCase = Character.toUpperCase(f.getName().charAt(0));
+//                if(f.getName().length()==1){
+//                    methodName = SET+ upperCase;
+//                    cacheMap.put(f.getName(),clazz.getDeclaredMethod(methodName,f.getType()));
+//                }else{
+//                    methodName = SET+ upperCase +f.getName().substring(1);
+//                    cacheMap.put(f.getName(), clazz.getDeclaredMethod(methodName,f.getType()));
+//                }
+//            }
+//        } catch (NoSuchMethodException e) {
+//            throw new JsonConvertFailureError("Cannot find method named '"+methodName+"' in class "+clazz.getName(),e);
+//        }
+//        converterSetMethodCache.put(clazz,cacheMap);
+//        return cacheMap;
+//    }
+
 }
