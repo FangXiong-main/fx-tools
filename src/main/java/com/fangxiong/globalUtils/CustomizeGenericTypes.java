@@ -1,4 +1,4 @@
-package com.fangxiong.jsonUtilsCore.customize;
+package com.fangxiong.globalUtils;
 
 import com.fangxiong.jsonUtilsCore.exceptions.CustomizeGenericError;
 import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
@@ -38,7 +38,7 @@ public class CustomizeGenericTypes implements ParameterizedType {
                 leftSignCount++;
             } else if(ca[i]=='<' && !hasMultipleGeneric && !isNestingGenericType){
                 leftSignCount++;
-                tempRawType=CustomizeClazzDetector.getClazzWithStr(sbRaw.toString());
+                tempRawType= CustomizeClazzDetector.getClazzWithStr(sbRaw.toString());
                 sbRaw.setLength(0);
                 isReadingActualType= true;
             } else if (ca[i]=='<' && isNestingGenericType) {

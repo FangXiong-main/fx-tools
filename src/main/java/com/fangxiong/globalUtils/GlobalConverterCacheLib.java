@@ -1,10 +1,12 @@
 package com.fangxiong.globalUtils;
 
 import com.fangxiong.globalExceptions.GlobalConverterCacheLibError;
+import com.fangxiong.mysqlUtilsCore.EnableUnderscoreToCamelCase;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +16,7 @@ public class GlobalConverterCacheLib {
     private static final Map<Class<?>, Field[]> converterFieldCache = new HashMap<>();
     private static final Map<Class<?>,Map<String, Method>> converterSetMethodCache = new HashMap<>();
     private static final Map<Class<?>,Map<String, Type>> converterPartTypeCache = new HashMap<>();
+    private static final Map<Class<?>, ArrayList<String>> converterFiledNameCache = new HashMap<>();
 
     public static Field[] getConverterFieldCache(Class<?> clazz){
         Field[] fields = converterFieldCache.get(clazz);

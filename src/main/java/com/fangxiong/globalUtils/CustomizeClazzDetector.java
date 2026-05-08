@@ -1,4 +1,4 @@
-package com.fangxiong.jsonUtilsCore.customize;
+package com.fangxiong.globalUtils;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;

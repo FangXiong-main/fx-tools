@@ -4,8 +4,8 @@ import com.fangxiong.globalUtils.GlobalConverterCacheLib;
 import com.fangxiong.jsonUtilsCore.annotations.IgnoredField;
 import com.fangxiong.jsonUtilsCore.annotations.NotNullClass;
 import com.fangxiong.jsonUtilsCore.annotations.NotNullField;
-import com.fangxiong.jsonUtilsCore.customize.CustomizeClazzDetector;
-import com.fangxiong.jsonUtilsCore.customize.CustomizeGenericTypes;
+import com.fangxiong.globalUtils.CustomizeClazzDetector;
+import com.fangxiong.globalUtils.CustomizeGenericTypes;
 import com.fangxiong.jsonUtilsCore.exceptions.JsonConvertFailureError;
 import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
 
@@ -106,23 +106,6 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
         return cacheFiledValueMap;
     }
 
-//    public static Field[] cacheAllField(Class<?> clazz){
-//        Field[] df = clazz.getDeclaredFields();
-//        converterFieldCache.put(clazz,df);
-//        return df;
-//    }
-
-
-//    private static Map<String,Type> cacheAllFieldType(Class<?> clazz){
-//        Field[] df = clazz.getDeclaredFields();
-//        Map<String,Type> cacheMap = new HashMap<>();
-//        for(Field f : df){
-//            cacheMap.put(f.getName(),f.getGenericType());
-//        }
-//        converterPartTypeCache.put(clazz,cacheMap);
-//        return cacheMap;
-//    }
-
     private static Object convertFiled(String s,Type type){
         if (type instanceof ParameterizedType pt){
             return GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt.getRawType()).convert(s,pt);
@@ -130,28 +113,5 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
             return NonGenericTypeConverterFactory.getConverter((Class<?>) type).convert(s,(Class<?>) type);
         }
     }
-
-//    private static Map<String,Method> cacheAllSetMethod(Class<?> clazz)  {
-//        Map<String,Method> cacheMap = null;
-//        String methodName = null;
-//        try {
-//            Field[] df = clazz.getDeclaredFields();
-//            cacheMap = new HashMap<>();
-//            for(Field f : df){
-//                char upperCase = Character.toUpperCase(f.getName().charAt(0));
-//                if(f.getName().length()==1){
-//                    methodName = SET+ upperCase;
-//                    cacheMap.put(f.getName(),clazz.getDeclaredMethod(methodName,f.getType()));
-//                }else{
-//                    methodName = SET+ upperCase +f.getName().substring(1);
-//                    cacheMap.put(f.getName(), clazz.getDeclaredMethod(methodName,f.getType()));
-//                }
-//            }
-//        } catch (NoSuchMethodException e) {
-//            throw new JsonConvertFailureError("Cannot find method named '"+methodName+"' in class "+clazz.getName(),e);
-//        }
-//        converterSetMethodCache.put(clazz,cacheMap);
-//        return cacheMap;
-//    }
 
 }

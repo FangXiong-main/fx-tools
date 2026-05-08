@@ -1,5 +1,5 @@
-import com.fangxiong.jsonUtilsCore.customize.CustomizeClazzDetector;
-import com.fangxiong.jsonUtilsCore.customize.CustomizeGenericTypes;
+import com.fangxiong.globalUtils.CustomizeClazzDetector;
+import com.fangxiong.globalUtils.CustomizeGenericTypes;
 import com.fangxiong.jsonUtilsCore.enums.DecorateJson;
 import com.fangxiong.jsonUtilsCore.parsers.ParserFactory;
 import com.fangxiong.utils.json.JsonUtils;
@@ -12,6 +12,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FunctionTest {
     //TODO add Parser for Set and more tye;
@@ -21,6 +23,13 @@ public class FunctionTest {
         Object o = JsonUtils.jsonToBean(json, new CustomizeGenericTypes("Set<String>"));
         System.out.println(o.getClass());
         System.out.println(JsonUtils.beanToJson(o));
+    }
+
+    @Test
+    public void testMysqlSplit(){
+        String test = "t";
+        String substring = test.substring(1);
+        System.out.println(substring);
     }
 
 

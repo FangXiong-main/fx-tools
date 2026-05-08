@@ -2,7 +2,7 @@ package com.fangxiong.utils.json;
 
 
 import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
-import com.fangxiong.jsonUtilsCore.customize.CustomizeGenericTypes;
+import com.fangxiong.globalUtils.CustomizeGenericTypes;
 import com.fangxiong.jsonUtilsCore.converters.GenericTypeConverterFactory;
 import com.fangxiong.jsonUtilsCore.converters.NonGenericTypeConverterFactory;
 import com.fangxiong.jsonUtilsCore.enums.DecorateJson;
