@@ -27,9 +27,7 @@ public class FunctionTest {
 
     @Test
     public void testMysqlSplit(){
-        String test = "t";
-        String substring = test.substring(1);
-        System.out.println(substring);
+        System.out.println(int.class.getName());
     }
 
 

@@ -1,6 +1,5 @@
 package com.fangxiong.mysqlUtilsCore.converter;
 
-import com.fangxiong.globalExceptions.GlobalConverterCacheLibError;
 import com.fangxiong.globalUtils.CustomizeClazzDetector;
 import com.fangxiong.globalUtils.GlobalConverterCacheLib;
 import com.fangxiong.mysqlUtilsCore.EnableUnderscoreToCamelCase;
@@ -14,11 +13,11 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MysqlObjectConverter implements MysqlConverter{
+public class MysqlObjectNonGenericConverter implements MysqlNonGenericConverter {
     public static final Pattern camelToUnderscorePattern = Pattern.compile("(\\S+)([A-Z]\\S*)");
 
     @Override
-    public Object converter(ResultSet resultSet, Class<?> clazz) {
+    public Object converter(ResultSet resultSet, Class<?> clazz,String columName) {
         if(!CustomizeClazzDetector.isCustomizeClazz(clazz)){
             int tempCursor = 0;
             Field[] converterFieldCache = GlobalConverterCacheLib.getConverterFieldCache(clazz);
@@ -41,6 +40,7 @@ public class MysqlObjectConverter implements MysqlConverter{
         }
         return null;
     }
+
     private static ArrayList<String> convertAllFiledNameToUnderscore(Field[] fields){
         String tempName;
         ArrayList<String> nameList = new ArrayList<>();
