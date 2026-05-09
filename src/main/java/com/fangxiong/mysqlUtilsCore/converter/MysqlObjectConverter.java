@@ -2,49 +2,72 @@ package com.fangxiong.mysqlUtilsCore.converter;
 
 import com.fangxiong.globalUtils.CustomizeClazzDetector;
 import com.fangxiong.globalUtils.GlobalConverterCacheLib;
-import com.fangxiong.mysqlUtilsCore.EnableUnderscoreToCamelCase;
+import com.fangxiong.mysqlUtilsCore.enums.EnableCamelCaseToUnderscore;
 import com.fangxiong.mysqlUtilsCore.exceptions.MysqlConverterError;
 import com.fangxiong.utils.mysql.MysqlUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MysqlObjectNonGenericConverter implements MysqlNonGenericConverter {
+public class MysqlObjectConverter implements MysqlNonGenericConverter {
     public static final Pattern camelToUnderscorePattern = Pattern.compile("(\\S+)([A-Z]\\S*)");
 
     @Override
     public Object converter(ResultSet resultSet, Class<?> clazz,String columName) {
-        if(!CustomizeClazzDetector.isCustomizeClazz(clazz)){
+        Object convertedObj = null;
+        if(CustomizeClazzDetector.isCustomizeClazz(clazz)){
             int tempCursor = 0;
             Field[] converterFieldCache = GlobalConverterCacheLib.getConverterFieldCache(clazz);
-            ArrayList<String> converterFiledNameCache = convertAllFiledNameToUnderscore(converterFieldCache);
+            Map<Field, Method> converterSetMethodCache = GlobalConverterCacheLib.getConverterSetMethodCache(clazz);
+            Map<Field,String> converterFiledNameCache = convertAllFiledNameToUnderscore(converterFieldCache);
             try{
-                Object convertedObj = clazz.getDeclaredConstructor().newInstance();
+                convertedObj = clazz.getDeclaredConstructor().newInstance();
             }catch(Exception e){
                 throw new MysqlConverterError("Can't obtain the NoArgsConstructor from class : '"+clazz.getName()+"'.",e);
             }
             try {
                 while (resultSet.next()){
-                    String typeStr = converterFieldCache[tempCursor].getType().getName();
-                    //MysqlNonGenericConverterFactory.getValueWithType(resultSet)
+                    for(Field f : converterFieldCache){
+                        Object o = convertFiled(resultSet, clazz, f.getType(), f, converterFiledNameCache.get(f));
+                        try {
+                            converterSetMethodCache.get(f).invoke(convertedObj,o);
+                        } catch (Exception e) {
+                            throw new MysqlConverterError("Can't convert the value:'"+o+"',with method:"+converterSetMethodCache.get(f).getName()+".",e);
+                        }
+                    }
                 }
             } catch (SQLException e) {
                 throw new MysqlConverterError("Access database error!",e);
             }
         }else {
-
         }
-        return null;
+        return convertedObj;
     }
 
-    private static ArrayList<String> convertAllFiledNameToUnderscore(Field[] fields){
+    private static Object convertFiled(ResultSet resultSet,Class<?> clazz, Type type,Field field ,String columName){
+        try {
+            if(type instanceof ParameterizedType pt){
+                return MysqlGenericConverterFactory.getConverter((Class<?>) pt.getRawType()).converter(resultSet,pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1]);
+            }else{
+                return MysqlNonGenericConverterFactory.getConverter((Class<?>) type).converter(resultSet,clazz,columName);
+            }
+        } catch (SQLException e) {
+            throw new MysqlConverterError("Convert "+field.getName()+"failed,can't find the colum name:'"+columName+"',please check your field name's format or enable camelToUnderscore");
+        }
+    }
+
+    private static Map<Field,String> convertAllFiledNameToUnderscore(Field[] fields){
         String tempName;
-        ArrayList<String> nameList = new ArrayList<>();
-        if(MysqlUtils.underscoreToCamelCaseEnum()==EnableUnderscoreToCamelCase.ENABLE){
+        Map<Field,String> nameList = new HashMap<>();
+        if(MysqlUtils.camelCaseToUnderscoreEnum()== EnableCamelCaseToUnderscore.ENABLE){
             for(Field f : fields){
                 Matcher matcher = camelToUnderscorePattern.matcher(f.getName());
                 if(matcher.matches()){
@@ -52,11 +75,11 @@ public class MysqlObjectNonGenericConverter implements MysqlNonGenericConverter 
                 }else {
                     tempName = f.getName();
                 }
-                nameList.add(tempName);
+                nameList.put(f,tempName);
             }
         }else{
             for(Field f : fields){
-                nameList.add(f.getName());
+                nameList.put(f,f.getName());
             }
         }
         return nameList;

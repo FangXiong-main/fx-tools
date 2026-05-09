@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.fangxiong.SystemConstants.GET;
+import static com.fangxiong.constants.SystemConstants.GET;
 
 public class ObjectParser implements JsonParser {
     private static final Map<Class<?>,Field[]> fieldCache = new HashMap<>();

@@ -5,24 +5,14 @@ import java.util.List;
 import java.util.Map;
 
 public class MysqlGenericConverterFactory {
-    private static final Map<Class<?>, MysqlNonGenericConverter> mysqlGenericConverterMap = new HashMap<>();
+    private static final Map<Class<?>, MysqlGenericConverter> mysqlGenericConverterMap = new HashMap<>();
 
     static{
         mysqlGenericConverterMap.put(Map.class,null);
         mysqlGenericConverterMap.put(List.class,null);
     }
 
-    private static MysqlNonGenericConverter addConverter(Class<?> clazz){
-        MysqlNonGenericConverter mysqlNonGenericConverter = new MysqlObjectNonGenericConverter();
-        mysqlGenericConverterMap.put(clazz, mysqlNonGenericConverter);
-        return mysqlNonGenericConverter;
-    }
-
-    public static MysqlNonGenericConverter getConverter(Class<?> clazz){
-        MysqlNonGenericConverter mysqlNonGenericConverter = mysqlGenericConverterMap.get(clazz);
-        if(mysqlNonGenericConverter == null){
-            return addConverter(clazz);
-        }
-        return mysqlNonGenericConverter;
+    public static MysqlGenericConverter getConverter(Class<?> clazz){
+        return mysqlGenericConverterMap.get(clazz);
     }
 }

@@ -1,7 +1,6 @@
 package com.fangxiong.globalUtils;
 
 import com.fangxiong.globalExceptions.GlobalConverterCacheLibError;
-import com.fangxiong.mysqlUtilsCore.EnableUnderscoreToCamelCase;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -10,12 +9,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.fangxiong.SystemConstants.SET;
+import static com.fangxiong.constants.SystemConstants.SET;
 
 public class GlobalConverterCacheLib {
     private static final Map<Class<?>, Field[]> converterFieldCache = new HashMap<>();
-    private static final Map<Class<?>,Map<String, Method>> converterSetMethodCache = new HashMap<>();
-    private static final Map<Class<?>,Map<String, Type>> converterPartTypeCache = new HashMap<>();
+    private static final Map<Class<?>,Map<Field, Method>> converterSetMethodCache = new HashMap<>();
+    private static final Map<Class<?>,Map<Field, Type>> converterPartTypeCache = new HashMap<>();
     private static final Map<Class<?>, ArrayList<String>> converterFiledNameCache = new HashMap<>();
 
     public static Field[] getConverterFieldCache(Class<?> clazz){
@@ -26,16 +25,16 @@ public class GlobalConverterCacheLib {
         return fields;
     }
 
-    public static Map<String, Method> getConverterSetMethodCache(Class<?> clazz){
-        Map<String, Method> stringMethodMap = converterSetMethodCache.get(clazz);
+    public static Map<Field, Method> getConverterSetMethodCache(Class<?> clazz){
+        Map<Field, Method> stringMethodMap = converterSetMethodCache.get(clazz);
         if(stringMethodMap == null){
             return cacheAllSetMethod(clazz);
         }
         return stringMethodMap;
     }
 
-    public static Map<String, Type> getConverterPartTypeCache(Class<?> clazz){
-        Map<String, Type> stringTypeMap = converterPartTypeCache.get(clazz);
+    public static Map<Field, Type> getConverterPartTypeCache(Class<?> clazz){
+        Map<Field, Type> stringTypeMap = converterPartTypeCache.get(clazz);
         if(stringTypeMap == null){
             return cacheAllFieldType(clazz);
         }
@@ -48,18 +47,18 @@ public class GlobalConverterCacheLib {
         return df;
     }
 
-    private static Map<String,Type> cacheAllFieldType(Class<?> clazz){
+    private static Map<Field,Type> cacheAllFieldType(Class<?> clazz){
         Field[] df = clazz.getDeclaredFields();
-        Map<String,Type> cacheMap = new HashMap<>();
+        Map<Field,Type> cacheMap = new HashMap<>();
         for(Field f : df){
-            cacheMap.put(f.getName(),f.getGenericType());
+            cacheMap.put(f,f.getGenericType());
         }
         converterPartTypeCache.put(clazz,cacheMap);
         return cacheMap;
     }
 
-    private static Map<String,Method> cacheAllSetMethod(Class<?> clazz)  {
-        Map<String,Method> cacheMap;
+    private static Map<Field,Method> cacheAllSetMethod(Class<?> clazz)  {
+        Map<Field,Method> cacheMap;
         String methodName = null;
         try {
             Field[] df = clazz.getDeclaredFields();
@@ -68,10 +67,10 @@ public class GlobalConverterCacheLib {
                 char upperCase = Character.toUpperCase(f.getName().charAt(0));
                 if(f.getName().length()==1){
                     methodName = SET+ upperCase;
-                    cacheMap.put(f.getName(),clazz.getDeclaredMethod(methodName,f.getType()));
+                    cacheMap.put(f,clazz.getDeclaredMethod(methodName,f.getType()));
                 }else{
                     methodName = SET+ upperCase +f.getName().substring(1);
-                    cacheMap.put(f.getName(), clazz.getDeclaredMethod(methodName,f.getType()));
+                    cacheMap.put(f, clazz.getDeclaredMethod(methodName,f.getType()));
                 }
             }
         } catch (NoSuchMethodException e) {

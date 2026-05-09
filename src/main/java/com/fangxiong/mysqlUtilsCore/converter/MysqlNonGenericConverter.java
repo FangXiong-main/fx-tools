@@ -5,5 +5,5 @@ import java.sql.SQLException;
 
 @FunctionalInterface
 public interface MysqlNonGenericConverter {
-    Object converter (ResultSet resultSet,Class<?> clazz,String columName) throws Exception;
+    Object converter (ResultSet resultSet,Class<?> clazz,String columName) throws SQLException;
 }

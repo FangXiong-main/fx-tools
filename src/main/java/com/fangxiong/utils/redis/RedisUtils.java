@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-import static com.fangxiong.SystemConstants.*;
+import static com.fangxiong.constants.SystemConstants.*;
 
 public class RedisUtils {
     private final StringRedisTemplate stringRedisTemplate;

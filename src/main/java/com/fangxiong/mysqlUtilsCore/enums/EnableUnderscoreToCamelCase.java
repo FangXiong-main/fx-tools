@@ -1,4 +1,4 @@
-package com.fangxiong.mysqlUtilsCore;
+package com.fangxiong.mysqlUtilsCore.enums;
 
 public enum EnableUnderscoreToCamelCase {
     ENABLE,

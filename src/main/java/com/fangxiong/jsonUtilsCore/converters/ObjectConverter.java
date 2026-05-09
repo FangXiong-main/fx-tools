@@ -27,16 +27,16 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
         if(CustomizeClazzDetector.isCustomizeClazz(clazz)){
             try {
                 Field[] df = GlobalConverterCacheLib.getConverterFieldCache(clazz);
-                Map<String,Method> setMethodCache = GlobalConverterCacheLib.getConverterSetMethodCache(clazz);
-                Map<String,Type> partTypeCache = GlobalConverterCacheLib.getConverterPartTypeCache(clazz);
-                Map<String, String> allFieldValue = getAllFieldValue(df, s);
+                Map<Field,Method> setMethodCache = GlobalConverterCacheLib.getConverterSetMethodCache(clazz);
+                Map<Field,Type> partTypeCache = GlobalConverterCacheLib.getConverterPartTypeCache(clazz);
+                Map<Field, String> allFieldValue = getAllFieldValue(df, s);
                 Object convertedObj = clazz.getDeclaredConstructor().newInstance();
                 for(Field f : df){
-                    tempFiledType=f.getType().getTypeName();tempFiledName = f.getName();tempValue=allFieldValue.get(f.getName());
+                    tempFiledType=f.getType().getTypeName();tempFiledName = f.getName();tempValue=allFieldValue.get(f);
                     if(f.getAnnotation(IgnoredField.class)!=null){
-                        setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(null,partTypeCache.get(f.getName())));
+                        setMethodCache.get(f).invoke(convertedObj,convertFiled(null,partTypeCache.get(f)));
                     } else if(tempValue!=null&&!tempValue.equals("null")){
-                        setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(allFieldValue.get(f.getName()),partTypeCache.get(f.getName())));
+                        setMethodCache.get(f).invoke(convertedObj,convertFiled(allFieldValue.get(f),partTypeCache.get(f)));
                     } else if (clazz.getAnnotation(NotNullClass.class)!=null&&tempValue==null) {
                         throw new JsonConvertFailureError("Detected class:'"+clazz.getName()+"' with @NotNullClass annotation,current converting field is:'"+tempFiledName+"'"+",but the value ready to convert is null.Caused by Json syntax error.");
                     } else if (clazz.getAnnotation(NotNullClass.class)!=null&& Objects.equals(tempValue, "null")) {
@@ -46,7 +46,7 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
                     } else if (f.getAnnotation(NotNullField.class) != null&&Objects.equals(tempValue, "null")) {
                         throw new JsonConvertFailureError("Detected field '"+tempFiledName+"'"+" with @NotNullFiled annotation,but the value ready to convert is null.Caused by custom restrict error.");
                     } else {
-                        setMethodCache.get(f.getName()).invoke(convertedObj,convertFiled(null,partTypeCache.get(f.getName())));
+                        setMethodCache.get(f).invoke(convertedObj,convertFiled(null,partTypeCache.get(f)));
                     }
                 }
                 return convertedObj;
@@ -97,11 +97,11 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
         return String.class;
     }
 
-    private static Map<String,String> getAllFieldValue(Field[] df, String json){
-        Map<String,String> cacheFiledValueMap = new HashMap<>();
+    private static Map<Field,String> getAllFieldValue(Field[] df, String json){
+        Map<Field,String> cacheFiledValueMap = new HashMap<>();
         Map<String,String> tempFieldValueMap = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(json);
         for (Field f:df){
-            cacheFiledValueMap.put(f.getName(),tempFieldValueMap.get(f.getName()));
+            cacheFiledValueMap.put(f,tempFieldValueMap.get(f.getName()));
         }
         return cacheFiledValueMap;
     }

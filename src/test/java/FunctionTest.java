@@ -2,14 +2,17 @@ import com.fangxiong.globalUtils.CustomizeClazzDetector;
 import com.fangxiong.globalUtils.CustomizeGenericTypes;
 import com.fangxiong.jsonUtilsCore.enums.DecorateJson;
 import com.fangxiong.jsonUtilsCore.parsers.ParserFactory;
+import com.fangxiong.mysqlUtilsCore.enums.EnableCamelCaseToUnderscore;
 import com.fangxiong.utils.json.JsonUtils;
 import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
+import com.fangxiong.utils.mysql.MysqlUtils;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -23,6 +26,36 @@ public class FunctionTest {
         Object o = JsonUtils.jsonToBean(json, new CustomizeGenericTypes("Set<String>"));
         System.out.println(o.getClass());
         System.out.println(JsonUtils.beanToJson(o));
+    }
+
+    @Test
+    public void testMysqlConverter(){
+        // 连接信息
+        String url = "jdbc:mysql://localhost:3306/db1?serverTimezone=UTC&useSSL=false";
+        String user = "root";
+        String pwd = "abc200519P";
+
+        try {
+            // 1. 加载驱动
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            // 2. 获取连接
+            Connection conn = DriverManager.getConnection(url, user, pwd);
+            // 3. 创建Statement
+            Statement stmt = conn.createStatement();
+            // 4. 执行查询，直接拿到 ResultSet
+            String sql = "select id,name,age,score,favorite_subject from student";
+            ResultSet rs = stmt.executeQuery(sql);
+            MysqlConvertTestEntity entityFromResultSet = MysqlUtils.getEntityFromResultSet(rs, MysqlConvertTestEntity.class, EnableCamelCaseToUnderscore.ENABLE);
+            System.out.println(entityFromResultSet);
+            // 关闭资源
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test

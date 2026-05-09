@@ -1,4 +1,4 @@
-package com.fangxiong;
+package com.fangxiong.constants;
 
 public class SystemConstants {
     public static final String TEMP_LOCK_KEY = "temp:lock:";
