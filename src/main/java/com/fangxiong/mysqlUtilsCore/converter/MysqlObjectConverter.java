@@ -67,7 +67,7 @@ public class MysqlObjectConverter implements MysqlNonGenericConverter {
     private static Map<Field,String> convertAllFiledNameToUnderscore(Field[] fields){
         String tempName;
         Map<Field,String> nameList = new HashMap<>();
-        if(MysqlUtils.camelCaseToUnderscoreEnum()== EnableCamelCaseToUnderscore.ENABLE){
+        if(MysqlNonGenericConverterFactory.getCamelCaseToUnderscoreStatus() == EnableCamelCaseToUnderscore.ENABLE){
             for(Field f : fields){
                 Matcher matcher = camelToUnderscorePattern.matcher(f.getName());
                 if(matcher.matches()){

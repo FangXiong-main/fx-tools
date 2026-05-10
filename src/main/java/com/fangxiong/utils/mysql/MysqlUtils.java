@@ -10,8 +10,7 @@ import java.sql.SQLException;
 
 public class MysqlUtils {
 
-    private static EnableUnderscoreToCamelCase underscoreToCamelCaseEnum = EnableUnderscoreToCamelCase.DISABLE;
-    private static EnableCamelCaseToUnderscore camelCaseToUnderscoreEnum = EnableCamelCaseToUnderscore.DISABLE;
+
 
     public static <T> T getEntityFromResultSet(ResultSet resultSet,Class<T> clazz){
         try {
@@ -23,7 +22,7 @@ public class MysqlUtils {
 
     public static <T> T getEntityFromResultSet(ResultSet resultSet,Class<T> clazz,EnableCamelCaseToUnderscore enableCamelCaseToUnderscore){
         if(enableCamelCaseToUnderscore == EnableCamelCaseToUnderscore.ENABLE){
-            camelCaseToUnderscoreEnum = EnableCamelCaseToUnderscore.ENABLE;
+            MysqlNonGenericConverterFactory.setCamelCaseToUnderscoreEnumStatus(EnableCamelCaseToUnderscore.ENABLE);
         }
         try {
             return (T) MysqlNonGenericConverterFactory.getConverter(clazz).converter(resultSet,clazz,null);
@@ -32,11 +31,4 @@ public class MysqlUtils {
         }
     }
 
-    public static EnableUnderscoreToCamelCase underscoreToCamelCaseEnum(){
-        return underscoreToCamelCaseEnum;
-    }
-
-    public static EnableCamelCaseToUnderscore camelCaseToUnderscoreEnum(){
-        return camelCaseToUnderscoreEnum;
-    }
 }
