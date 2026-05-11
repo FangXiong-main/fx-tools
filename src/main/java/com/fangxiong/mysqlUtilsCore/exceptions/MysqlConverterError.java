@@ -1,6 +1,6 @@
 package com.fangxiong.mysqlUtilsCore.exceptions;
 
-public class MysqlConverterError extends RuntimeException {
+public class MysqlConverterError extends MysqlUtilsException {
     public MysqlConverterError(String message) {
         super(message);
     }

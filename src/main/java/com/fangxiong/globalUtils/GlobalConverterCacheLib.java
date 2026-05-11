@@ -4,6 +4,7 @@ import com.fangxiong.globalExceptions.GlobalConverterCacheLibError;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +17,24 @@ public class GlobalConverterCacheLib {
     private static final Map<Class<?>,Map<Field, Method>> converterSetMethodCache = new HashMap<>();
     private static final Map<Class<?>,Map<Field, Type>> converterPartTypeCache = new HashMap<>();
     private static final Map<Class<?>, ArrayList<String>> converterFiledNameCache = new HashMap<>();
+    private static final Map<Class<?>, Map<String,Method>> mysqlMapperMethodCache = new HashMap<>();
+    private static final Map<Method,Map<String,Integer>> mysqlParamIndexCache = new HashMap<>();
+
+    public static Map<String,Integer> getMysqlParamIndexCache(Method method){
+        Map<String, Integer> parameterIntegerMap = mysqlParamIndexCache.get(method);
+        if(parameterIntegerMap.isEmpty()){
+            return cacheAllMysqlParamIndex(method);
+        }
+        return parameterIntegerMap;
+    }
+
+    public static Map<String,Method> getMysqlMapperMethodCache(Class<?> clazz){
+        Map<String,Method> cacheMap = mysqlMapperMethodCache.get(clazz);
+        if (cacheMap.isEmpty()){
+            return cacheAllMysqlMapperMethod(clazz);
+        }
+        return cacheMap;
+    }
 
     public static Field[] getConverterFieldCache(Class<?> clazz){
         Field[] fields = converterFieldCache.get(clazz);
@@ -77,6 +96,28 @@ public class GlobalConverterCacheLib {
             throw new GlobalConverterCacheLibError("Cannot find method named '"+methodName+"' in class "+clazz.getName(),e);
         }
         converterSetMethodCache.put(clazz,cacheMap);
+        return cacheMap;
+    }
+
+    private static Map<String,Method> cacheAllMysqlMapperMethod(Class<?> clazz){
+        Method[] methods = clazz.getMethods();
+        Map<String,Method> cacheMap = new HashMap<>();
+        for (Method m : methods){
+            cacheMap.put(m.getName(),m);
+        }
+        mysqlMapperMethodCache.put(clazz,cacheMap);
+        return cacheMap;
+    }
+
+    private static Map<String,Integer> cacheAllMysqlParamIndex(Method method){
+        int index = 0;
+        Map<String,Integer> cacheMap = new HashMap<>();
+        Parameter[] parameters = method.getParameters();
+        for(Parameter p : parameters){
+            cacheMap.put(p.getName(),index);
+            index++;
+        }
+        mysqlParamIndexCache.put(method,cacheMap);
         return cacheMap;
     }
 }
