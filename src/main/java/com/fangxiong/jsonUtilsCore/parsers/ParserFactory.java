@@ -1,5 +1,6 @@
 package com.fangxiong.jsonUtilsCore.parsers;
 
+import com.fangxiong.globalUtils.GlobalStringUtils;
 import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
 
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ public class ParserFactory {
             if(o==null || o.equals("null")) {
                 return null;
             } else if (JsonOperationUtil.strIsNotBlank(o.toString())) {
-                return "\""+ParserFactory.convertEscapeCharacterToStr(o.toString())+"\"";
+                return "\""+ convertEscapeCharacterToStr(o.toString())+"\"";
             }else {
                 return "\"\"";
             }
@@ -46,12 +47,14 @@ public class ParserFactory {
         return parserMap.get(clazz);
     }
 
-    public static String convertEscapeCharacterToStr(String str){
+    private static String convertEscapeCharacterToStr(String str){
         StringBuilder sb = new StringBuilder();
         char[] charArray = str.toCharArray();
         for(char c : charArray){
             if(c == '"'){
                 sb.append("\\\"");
+            } else if (c == '\'') {
+                sb.append("\\'");
             } else if (c == '\\') {
                 sb.append("\\\\");
             } else if (c == '\b') {

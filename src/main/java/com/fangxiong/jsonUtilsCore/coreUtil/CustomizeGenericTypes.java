@@ -1,7 +1,8 @@
-package com.fangxiong.globalUtils;
+package com.fangxiong.jsonUtilsCore.coreUtil;
 
+import com.fangxiong.globalUtils.GlobalCustomizeClazzDetector;
 import com.fangxiong.jsonUtilsCore.exceptions.CustomizeGenericError;
-import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ public class CustomizeGenericTypes implements ParameterizedType {
                 leftSignCount++;
             } else if(ca[i]=='<' && !hasMultipleGeneric && !isNestingGenericType){
                 leftSignCount++;
-                tempRawType= CustomizeClazzDetector.getClazzWithStr(sbRaw.toString());
+                tempRawType= GlobalCustomizeClazzDetector.getClazzWithStr(sbRaw.toString());
                 sbRaw.setLength(0);
                 isReadingActualType= true;
             } else if (ca[i]=='<' && isNestingGenericType) {
@@ -50,13 +51,13 @@ public class CustomizeGenericTypes implements ParameterizedType {
             } else if (ca[i]=='>' && isNestingGenericType) {
                 nestedLeftSignCount--;sbActual.append(ca[i]);
             } else if (ca[i]=='>' && hasMultipleGeneric) {
-                identifiedAcTypes.add(CustomizeClazzDetector.getClazzWithStr(sbActual.toString()));
+                identifiedAcTypes.add(GlobalCustomizeClazzDetector.getClazzWithStr(sbActual.toString()));
                 sbActual.setLength(0);
             } else if (ca[i]=='>' && !hasMultipleGeneric && !isNestingGenericType) {
-                identifiedAcTypes.add(CustomizeClazzDetector.getClazzWithStr(sbActual.toString()));
+                identifiedAcTypes.add(GlobalCustomizeClazzDetector.getClazzWithStr(sbActual.toString()));
                 sbActual.setLength(0);
             }else if (!isNestingGenericType && isReadingActualType && ca[i]==',') {
-                identifiedAcTypes.add(CustomizeClazzDetector.getClazzWithStr(sbActual.toString()));
+                identifiedAcTypes.add(GlobalCustomizeClazzDetector.getClazzWithStr(sbActual.toString()));
                 sbActual.setLength(0);
                 hasMultipleGeneric = true;
             } else if (isReadingActualType) {

@@ -1,6 +1,6 @@
 package com.fangxiong.jsonUtilsCore.converters;
 
-import com.fangxiong.globalUtils.CustomizeGenericTypes;
+import com.fangxiong.jsonUtilsCore.coreUtil.CustomizeGenericTypes;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

@@ -1,10 +1,9 @@
 package com.fangxiong.mysqlUtilsCore.converter;
 
-import com.fangxiong.globalUtils.CustomizeClazzDetector;
+import com.fangxiong.globalUtils.GlobalCustomizeClazzDetector;
 import com.fangxiong.globalUtils.GlobalConverterCacheLib;
 import com.fangxiong.mysqlUtilsCore.enums.EnableCamelCaseToUnderscore;
 import com.fangxiong.mysqlUtilsCore.exceptions.MysqlConverterError;
-import com.fangxiong.utils.mysql.MysqlUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -23,7 +22,7 @@ public class MysqlObjectConverter implements MysqlNonGenericConverter {
     @Override
     public Object converter(ResultSet resultSet, Class<?> clazz,String columName) {
         Object convertedObj = null;
-        if(CustomizeClazzDetector.isCustomizeClazz(clazz)){
+        if(GlobalCustomizeClazzDetector.isCustomizeClazz(clazz)){
             int tempCursor = 0;
             Field[] converterFieldCache = GlobalConverterCacheLib.getConverterFieldCache(clazz);
             Map<Field, Method> converterSetMethodCache = GlobalConverterCacheLib.getConverterSetMethodCache(clazz);
@@ -34,7 +33,7 @@ public class MysqlObjectConverter implements MysqlNonGenericConverter {
                 throw new MysqlConverterError("Can't obtain the NoArgsConstructor from class : '"+clazz.getName()+"'.",e);
             }
             try {
-                while (resultSet.next()){
+                if (resultSet.next()){
                     for(Field f : converterFieldCache){
                         Object o = convertFiled(resultSet, clazz, f.getType(), f, converterFiledNameCache.get(f));
                         try {
@@ -47,7 +46,6 @@ public class MysqlObjectConverter implements MysqlNonGenericConverter {
             } catch (SQLException e) {
                 throw new MysqlConverterError("Access database error!",e);
             }
-        }else {
         }
         return convertedObj;
     }

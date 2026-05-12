@@ -1,8 +1,6 @@
-import com.fangxiong.globalUtils.CustomizeClazzDetector;
-import com.fangxiong.globalUtils.CustomizeGenericTypes;
+import com.fangxiong.globalUtils.GlobalCustomizeClazzDetector;
+import com.fangxiong.jsonUtilsCore.coreUtil.CustomizeGenericTypes;
 import com.fangxiong.jsonUtilsCore.enums.DecorateJson;
-import com.fangxiong.jsonUtilsCore.parsers.ParserFactory;
-import com.fangxiong.mysqlUtilsCore.enums.EnableCamelCaseToUnderscore;
 import com.fangxiong.utils.json.JsonUtils;
 import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
 import com.fangxiong.utils.mysql.MysqlUtils;
@@ -15,8 +13,6 @@ import java.lang.reflect.Type;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class FunctionTest {
     //TODO add Parser for Set and more tye;
@@ -36,13 +32,17 @@ public class FunctionTest {
         try {
             // 1. 加载驱动
             Class.forName("com.mysql.cj.jdbc.Driver");
-//            // 2. 获取连接
+            // 2. 获取连接
             Connection conn = DriverManager.getConnection(url, user, pwd);
-            MysqlUtils.useMapper(conn,TestMapper.class).selectOne(2,"FX");
+            long start = System.nanoTime();
+            List<MysqlConvertTestEntity> mysqlConvertTestEntities = MysqlUtils.useMapper(conn, TestMapper.class).selectAllUsers();
+            System.out.println(mysqlConvertTestEntities);
+            long end = System.nanoTime();
+            double ms = (end - start) / 1_000_000.0;
+            System.out.println("FxTools start: " + ms + " ms");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
 
     @Test
@@ -680,16 +680,6 @@ public class FunctionTest {
         System.out.println(JsonUtils.beanToJson(flag));
     }
 
-    @Test
-    public void testEscapedCharactersConvertor(){
-        String testStr = """
-                hello"Java\\Json
-                测试换行
-                \t我是制表符'单引号'
-                \b冷门退格符\u0007""";
-        String s = ParserFactory.convertEscapeCharacterToStr(testStr);
-        System.out.println(s);
-    }
 
     @Test
     public void testListToJSON() {
@@ -847,8 +837,8 @@ public class FunctionTest {
     public void testIsCustomizeClazz(){
         TestEntity testEntity = new TestEntity();
         Integer id = 1;
-        assertEquals(true, CustomizeClazzDetector.isCustomizeClazz(testEntity.getClass()));
-        assertEquals(false,CustomizeClazzDetector.isCustomizeClazz(id.getClass()));
+        assertEquals(true, GlobalCustomizeClazzDetector.isCustomizeClazz(testEntity.getClass()));
+        assertEquals(false, GlobalCustomizeClazzDetector.isCustomizeClazz(id.getClass()));
     }
 
     @Test

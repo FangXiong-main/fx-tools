@@ -9,7 +9,7 @@ import java.time.LocalTime;
 import java.util.*;
 
 
-public class CustomizeClazzDetector {
+public class GlobalCustomizeClazzDetector {
     private static final ArrayList<Class<?>> clazzList = new ArrayList<>();
     private static final ArrayList<Class<?>> genericClazzList = new ArrayList<>();
     private static final Map<String,Class<?>> detClazzWithStr = new HashMap<>();

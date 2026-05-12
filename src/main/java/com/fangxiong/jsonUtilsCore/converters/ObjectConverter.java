@@ -4,8 +4,8 @@ import com.fangxiong.globalUtils.GlobalConverterCacheLib;
 import com.fangxiong.jsonUtilsCore.annotations.IgnoredField;
 import com.fangxiong.jsonUtilsCore.annotations.NotNullClass;
 import com.fangxiong.jsonUtilsCore.annotations.NotNullField;
-import com.fangxiong.globalUtils.CustomizeClazzDetector;
-import com.fangxiong.globalUtils.CustomizeGenericTypes;
+import com.fangxiong.globalUtils.GlobalCustomizeClazzDetector;
+import com.fangxiong.jsonUtilsCore.coreUtil.CustomizeGenericTypes;
 import com.fangxiong.jsonUtilsCore.exceptions.JsonConvertFailureError;
 import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
 
@@ -24,7 +24,7 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
     @Override
     public Object convert(String s, Class<?> clazz) {
         String tempFiledName=null;String tempValue=null;String tempFiledType=null;
-        if(CustomizeClazzDetector.isCustomizeClazz(clazz)){
+        if(GlobalCustomizeClazzDetector.isCustomizeClazz(clazz)){
             try {
                 Field[] df = GlobalConverterCacheLib.getConverterFieldCache(clazz);
                 Map<Field,Method> setMethodCache = GlobalConverterCacheLib.getConverterSetMethodCache(clazz);

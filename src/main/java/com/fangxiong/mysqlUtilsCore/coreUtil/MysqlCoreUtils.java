@@ -1,13 +1,20 @@
 package com.fangxiong.mysqlUtilsCore.coreUtil;
 
-import com.fangxiong.globalUtils.CustomizeClazzDetector;
+import com.fangxiong.globalUtils.GlobalCustomizeClazzDetector;
 import com.fangxiong.globalUtils.GlobalConverterCacheLib;
+import com.fangxiong.globalUtils.GlobalStringUtils;
 import com.fangxiong.mysqlUtilsCore.annotations.*;
+import com.fangxiong.mysqlUtilsCore.converter.MysqlGenericConverterFactory;
+import com.fangxiong.mysqlUtilsCore.converter.MysqlNonGenericConverter;
+import com.fangxiong.mysqlUtilsCore.converter.MysqlNonGenericConverterFactory;
 import com.fangxiong.mysqlUtilsCore.exceptions.MysqlUtilsException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,19 +37,21 @@ public class MysqlCoreUtils {
         }
         Map<String, Method> mysqlMapperMethodCache = GlobalConverterCacheLib.getMysqlMapperMethodCache(mapper);
         InvocationHandler invocationHandler = (proxy, method, args) -> {
+            if (method.getDeclaringClass() == Object.class) {
+                return method.invoke(proxy, args);
+            }
             String originalSql = "";
             Method mapperMethod = mysqlMapperMethodCache.get(method.getName());  //interface's method
+            Type returnType = mapperMethod.getGenericReturnType();
             Map<String, String> fieldValueMap = null;
             if (method.getParameterCount()==1) {
                 Class<?> paramClass = method.getParameters()[0].getType();
-                if (CustomizeClazzDetector.isCustomizeClazz(paramClass)) {
+                if (GlobalCustomizeClazzDetector.isCustomizeClazz(paramClass)) {
                     fieldValueMap = cacheEntityFieldValue(paramClass, args[0]);
                 }
             }else {
                 fieldValueMap = cacheAllArgs(args, mapperMethod.getParameters());
             }
-            Map<String, Integer> mysqlParamIndexCache = GlobalConverterCacheLib.getMysqlParamIndexCache(mapperMethod);
-            Statement statement = mysqlConnection.createStatement();
             Annotation[] declaredAnnotations = mapperMethod.getDeclaredAnnotations();
             if(declaredAnnotations.length != 1){
                 throw new MysqlUtilsException("Expect single annotation,but find 0 or more than one.");
@@ -57,6 +66,9 @@ public class MysqlCoreUtils {
             } else if (annotation instanceof Insert) {
                 originalSql = mapperMethod.getAnnotation(Insert.class).value();
             }
+            if(originalSql.isEmpty()){
+                throw new MysqlUtilsException("No sql sequence detected!");
+            }
             Matcher matcher = sqlValuePattern.matcher(originalSql);
             while(matcher.find()){
                 String tempParamName = matcher.group(1);
@@ -67,8 +79,19 @@ public class MysqlCoreUtils {
                     originalSql = originalSql.replaceFirst(tempRegex,fieldValueMap.get(tempParamName));
                 }
             }
-            System.out.println(originalSql);
-            return null;
+            if(!(annotation instanceof Select)){
+                Statement statement = mysqlConnection.createStatement();
+                statement.close();mysqlConnection.close();
+                return statement.executeUpdate(originalSql);
+            }
+            Statement statement = mysqlConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            ResultSet resultSet = statement.executeQuery(originalSql);
+            statement.close();mysqlConnection.close();
+            if(returnType instanceof ParameterizedType pt){
+                return MysqlGenericConverterFactory.getConverter((Class<?>) pt.getRawType()).converter(resultSet,returnType);
+            }else {
+                return MysqlNonGenericConverterFactory.getConverter((Class<?>) returnType).converter(resultSet,(Class<?>) returnType,null);
+            }
         };
         return (T) Proxy.newProxyInstance(mapper.getClassLoader(), new Class[]{mapper},invocationHandler);
     }
@@ -94,9 +117,47 @@ public class MysqlCoreUtils {
         Map<String,String> cacheMap = new HashMap<>();
         int cursor = 0;
         for(Parameter p : parameters){
-            cacheMap.put(p.getAnnotation(ParamName.class).value(),args[cursor].toString());
+            if(isDigitType(p.getType())){
+                cacheMap.put(p.getAnnotation(ParamName.class).value(),args[cursor].toString());
+            }else{
+                String s = convertEscapeCharacterToStr(args[cursor].toString());
+                cacheMap.put(p.getAnnotation(ParamName.class).value(),"'"+s+"'");
+            }
             cursor++;
         }
         return cacheMap;
+    }
+
+    private static String convertEscapeCharacterToStr(String str){
+        StringBuilder sb = new StringBuilder();
+        char[] charArray = str.toCharArray();
+        for(char c : charArray){
+            if(c == '"'){
+                sb.append("\\\\\"");
+            } else if (c == '\'') {
+                sb.append("\\\\'");
+            } else if (c == '\\') {
+                sb.append("\\\\\\");
+            } else if (c == '\b') {
+                sb.append("\\\\").append("b");
+            } else if (c == '\f') {
+                sb.append("\\\\").append("f");
+            } else if (c == '\n') {
+                sb.append("\\\\").append("n");
+            } else if (c == '\r') {
+                sb.append("\\\\").append("r");
+            } else if (c == '\t') {
+                sb.append("\\\\").append("t");
+            } else if (c <= 31) {
+                sb.append(String.format("\\\\u%04X",(int)c));
+            }else {
+                sb.append(c);
+            }
+        }
+        return  sb.toString();
+    }
+
+    public static Boolean isDigitType(Class<?> clazz){
+        return clazz == Integer.class || clazz == int.class || clazz == Float.class || clazz == float.class || clazz == Double.class || clazz == double.class || clazz == BigInteger.class || clazz == BigDecimal.class;
     }
 }

@@ -13,14 +13,54 @@ public class MysqlNonGenericConverterFactory {
     private static EnableCamelCaseToUnderscore camelCaseToUnderscoreEnum = EnableCamelCaseToUnderscore.DISABLE;
     private static final Map<Class<?>,MysqlNonGenericConverter> mysqlNonGenericConverterMap = new HashMap<>();
     static{
-        mysqlNonGenericConverterMap.put(String.class,(r,c,n)-> r.getString(n));
-        mysqlNonGenericConverterMap.put(int.class,(r,c,n)-> r.getInt(n));
-        mysqlNonGenericConverterMap.put(Integer.class,(r,c,n)-> r.getInt(n));
-        mysqlNonGenericConverterMap.put(BigInteger.class,(r,c,n)-> r.getInt(n));
-        mysqlNonGenericConverterMap.put(Float.class,(r,c,n)-> r.getFloat(n));
-        mysqlNonGenericConverterMap.put(Double.class,(r,c,n)-> r.getDouble(n));
-        mysqlNonGenericConverterMap.put(BigDecimal.class,(r, c, n)-> r.getBigDecimal(n));
-        mysqlNonGenericConverterMap.put(char.class,(r, c, n)-> r.getString(n));
+        mysqlNonGenericConverterMap.put(String.class,(r,c,n)-> {
+            if(n==null){
+                return r.getString(1);
+            }
+            return r.getString(n);
+        });
+        mysqlNonGenericConverterMap.put(int.class,(r,c,n)-> {
+            if(n == null){
+                return r.getInt(1);
+            }
+            return r.getInt(n);
+        });
+        mysqlNonGenericConverterMap.put(Integer.class,(r,c,n)-> {
+            if (n == null) {
+                return r.getInt(1);
+            }
+            return r.getInt(n);
+        });
+        mysqlNonGenericConverterMap.put(BigInteger.class,(r,c,n)-> {
+            if (n == null){
+                return r.getInt(1);
+            }
+            return r.getInt(n);
+        });
+        mysqlNonGenericConverterMap.put(Float.class,(r,c,n)-> {
+            if(n== null){
+                return r.getFloat(1);
+            }
+            return r.getFloat(n);
+        });
+        mysqlNonGenericConverterMap.put(Double.class,(r,c,n)-> {
+            if(n == null){
+                return r.getDouble(1);
+            }
+            return r.getDouble(n);
+        });
+        mysqlNonGenericConverterMap.put(BigDecimal.class,(r, c, n)-> {
+            if(n == null){
+                return r.getBigDecimal(1);
+            }
+            return r.getBigDecimal(n);
+        });
+        mysqlNonGenericConverterMap.put(char.class,(r, c, n)-> {
+            if(n == null){
+                return r.getString(1);
+            }
+            return r.getString(n);
+        });
     }
 
     private static MysqlNonGenericConverter addConverter(Class<?> clazz){
