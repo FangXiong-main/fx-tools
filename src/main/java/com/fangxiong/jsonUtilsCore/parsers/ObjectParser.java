@@ -1,5 +1,6 @@
 package com.fangxiong.jsonUtilsCore.parsers;
 
+import com.fangxiong.globalUtils.GlobalConverterCacheLib;
 import com.fangxiong.jsonUtilsCore.exceptions.JsonParserFailureError;
 
 import java.lang.reflect.Field;
@@ -18,12 +19,12 @@ public class ObjectParser implements JsonParser {
         try {
             Class<?> clazz = o.getClass();
             Field[] df = fieldCache.get(clazz)!=null ? fieldCache.get(clazz) : getFieldCache(clazz);
-            Map<String,Method> methods = methodCache.get(clazz)!=null ? methodCache.get(clazz) : getMethodCache(df,clazz);
+            Map<Field,Method> methods = GlobalConverterCacheLib.getConverterGetMethodCache(clazz);
             int totalCount = df.length;
             int tempCount = 0;
             sb.append("{");
             for(Field fd : df){
-                Method md = methods.get(fd.getName());
+                Method md = methods.get(fd);
                 sb.append("\"").append(fd.getName()).append("\":");
                 String parsed;
                 if(md.invoke(o)!=null){
@@ -49,25 +50,4 @@ public class ObjectParser implements JsonParser {
         return df;
     }
 
-    private static Map<String,Method> getMethodCache(Field[] fields, Class<?> clazz) {
-        Map<String,Method> cacheMap = null;
-        String methodName = null;
-        try {
-            cacheMap = new HashMap<>();
-            for (Field f : fields) {
-                char upperCase = Character.toUpperCase(f.getName().charAt(0));
-                if(f.getName().length()==1){
-                    methodName = GET+ upperCase;
-                    cacheMap.put(f.getName(),clazz.getDeclaredMethod(methodName));
-                }else{
-                    methodName = GET+ upperCase +f.getName().substring(1);
-                    cacheMap.put(f.getName(), clazz.getDeclaredMethod(methodName));
-                }
-            }
-        } catch (Exception e) {
-            throw new JsonParserFailureError("Cannot find method named '"+methodName+"' in class "+clazz.getName(),e);
-        }
-        methodCache.put(clazz,cacheMap);
-        return cacheMap;
-    }
 }

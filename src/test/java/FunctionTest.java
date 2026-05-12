@@ -29,33 +29,50 @@ public class FunctionTest {
     }
 
     @Test
-    public void testMysqlConverter(){
-        // 连接信息
+    public void testMysqlUtils(){
         String url = "jdbc:mysql://localhost:3306/db1?serverTimezone=UTC&useSSL=false";
         String user = "root";
         String pwd = "abc200519P";
-
         try {
             // 1. 加载驱动
             Class.forName("com.mysql.cj.jdbc.Driver");
-            // 2. 获取连接
+//            // 2. 获取连接
             Connection conn = DriverManager.getConnection(url, user, pwd);
-            // 3. 创建Statement
-            Statement stmt = conn.createStatement();
-            // 4. 执行查询，直接拿到 ResultSet
-            String sql = "select id,name,age,score,favorite_subject from student";
-            ResultSet rs = stmt.executeQuery(sql);
-            MysqlConvertTestEntity entityFromResultSet = MysqlUtils.getEntityFromResultSet(rs, MysqlConvertTestEntity.class, EnableCamelCaseToUnderscore.ENABLE);
-            System.out.println(entityFromResultSet);
-            // 关闭资源
-            rs.close();
-            stmt.close();
-            conn.close();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (SQLException e) {
+            MysqlUtils.useMapper(conn,TestMapper.class).selectOne(2,"FX");
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+    }
+
+    @Test
+    public void testMysqlConverter(){
+//        // 连接信息
+//        String url = "jdbc:mysql://localhost:3306/db1?serverTimezone=UTC&useSSL=false";
+//        String user = "root";
+//        String pwd = "abc200519P";
+//
+//        try {
+//            // 1. 加载驱动
+//            Class.forName("com.mysql.cj.jdbc.Driver");
+//            // 2. 获取连接
+//            Connection conn = DriverManager.getConnection(url, user, pwd);
+//            // 3. 创建Statement
+//            Statement stmt = conn.createStatement();
+//            // 4. 执行查询，直接拿到 ResultSet
+//            String sql = "select id,name,age,score,favorite_subject from student";
+//            ResultSet rs = stmt.executeQuery(sql);
+//            MysqlConvertTestEntity entityFromResultSet = MysqlUtils.getEntityFromResultSet(rs, MysqlConvertTestEntity.class, EnableCamelCaseToUnderscore.ENABLE);
+//            System.out.println(entityFromResultSet);
+//            // 关闭资源
+//            rs.close();
+//            stmt.close();
+//            conn.close();
+//        } catch (ClassNotFoundException e) {
+//            throw new RuntimeException(e);
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     @Test

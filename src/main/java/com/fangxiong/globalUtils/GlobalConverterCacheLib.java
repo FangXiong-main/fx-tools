@@ -1,6 +1,7 @@
 package com.fangxiong.globalUtils;
 
 import com.fangxiong.globalExceptions.GlobalConverterCacheLibError;
+import com.fangxiong.jsonUtilsCore.exceptions.JsonParserFailureError;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -10,11 +11,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.fangxiong.constants.SystemConstants.GET;
 import static com.fangxiong.constants.SystemConstants.SET;
 
 public class GlobalConverterCacheLib {
     private static final Map<Class<?>, Field[]> converterFieldCache = new HashMap<>();
     private static final Map<Class<?>,Map<Field, Method>> converterSetMethodCache = new HashMap<>();
+    private static final Map<Class<?>,Map<Field, Method>> converterGetMethodCache = new HashMap<>();
     private static final Map<Class<?>,Map<Field, Type>> converterPartTypeCache = new HashMap<>();
     private static final Map<Class<?>, ArrayList<String>> converterFiledNameCache = new HashMap<>();
     private static final Map<Class<?>, Map<String,Method>> mysqlMapperMethodCache = new HashMap<>();
@@ -22,7 +25,7 @@ public class GlobalConverterCacheLib {
 
     public static Map<String,Integer> getMysqlParamIndexCache(Method method){
         Map<String, Integer> parameterIntegerMap = mysqlParamIndexCache.get(method);
-        if(parameterIntegerMap.isEmpty()){
+        if(parameterIntegerMap==null||parameterIntegerMap.isEmpty()){
             return cacheAllMysqlParamIndex(method);
         }
         return parameterIntegerMap;
@@ -30,7 +33,7 @@ public class GlobalConverterCacheLib {
 
     public static Map<String,Method> getMysqlMapperMethodCache(Class<?> clazz){
         Map<String,Method> cacheMap = mysqlMapperMethodCache.get(clazz);
-        if (cacheMap.isEmpty()){
+        if (cacheMap==null||cacheMap.isEmpty()){
             return cacheAllMysqlMapperMethod(clazz);
         }
         return cacheMap;
@@ -50,6 +53,14 @@ public class GlobalConverterCacheLib {
             return cacheAllSetMethod(clazz);
         }
         return stringMethodMap;
+    }
+
+    public static Map<Field,Method> getConverterGetMethodCache(Class<?> clazz){
+        Map<Field, Method> fieldMethodMap = converterGetMethodCache.get(clazz);
+        if(fieldMethodMap == null){
+            return cacheAllGetMethod(clazz);
+        }
+        return fieldMethodMap;
     }
 
     public static Map<Field, Type> getConverterPartTypeCache(Class<?> clazz){
@@ -120,4 +131,28 @@ public class GlobalConverterCacheLib {
         mysqlParamIndexCache.put(method,cacheMap);
         return cacheMap;
     }
+
+    private static Map<Field,Method> cacheAllGetMethod(Class<?> clazz){
+        Field[] fields = clazz.getDeclaredFields();
+        Map<Field,Method> cacheMap = new HashMap<>();
+        String methodName = null;
+        try {
+            cacheMap = new HashMap<>();
+            for (Field f : fields) {
+                char upperCase = Character.toUpperCase(f.getName().charAt(0));
+                if(f.getName().length()==1){
+                    methodName = GET+ upperCase;
+                    cacheMap.put(f,clazz.getDeclaredMethod(methodName));
+                }else{
+                    methodName = GET+ upperCase +f.getName().substring(1);
+                    cacheMap.put(f, clazz.getDeclaredMethod(methodName));
+                }
+            }
+        } catch (Exception e) {
+            throw new GlobalConverterCacheLibError("Cannot find method named '"+methodName+"' in class "+clazz.getName(),e);
+        }
+        converterGetMethodCache.put(clazz, cacheMap);
+        return cacheMap;
+    }
+
 }
