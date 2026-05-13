@@ -17,8 +17,7 @@ They have no functional dependencies on each other. You can use either one indep
 
 ## FxJSON — JSON Codec Engine
 
-FxJSON is the primary software described in the accompanying academic paper.
-It provides a self-contained, annotation-driven engine for JSON serialization
+FxJSON is a self-contained, annotation-driven engine for JSON serialization
 and deserialization, designed specifically for lightweight deployment
 environments such as microservices and serverless functions.
 
@@ -86,32 +85,6 @@ annotation checks are always enforced.
 | `@NotNullField` | Field | Throw `JsonConvertFailureError` if the value is null after parsing. |
 | `@NotNullClass` | Class | Same as `@NotNullField`, but applies to every field in the class. |
 | `@TimeType` | Field | Specify a custom `LocalDateTime` format pattern. |
-
-### Experimental Evaluation
-
-All performance experiments reported in the paper were conducted against
-Jackson 2.15.2 and Gson 2.14.0 on both Windows and macOS, using Amazon
-Corretto 16. Test payloads covered three sizes (≈0.9 KB, ≈8.0 KB, ≈17.9 KB)
-with multi-level nested Maps and `LocalDateTime` fields. Key findings:
-
-- **Cold-start latency:** 6–7× faster than Jackson and Gson on both platforms.
-- **Hot-path performance:** On par with Jackson and Gson for kilobyte-scale payloads.
-- **Long-run stability:** Lower latency variation than Jackson under sustained load.
-
-The test suite was developed and executed in a separate benchmarking project.
-For details on the experimental setup, see Section 4 of the [paper].
-
-### Paper
-
-For a full description of the engine's design, architecture, and experimental
-evaluation, please refer to the *SoftwareX* submission:
-
-> Fang X, Pan C, Xie M. FxTools: A lightweight JSON codec engine for Java.
-> *SoftwareX*, 2026.
-
-If you use this software in your research, please cite the paper above.
-
----
 
 ## FxRedis — Redis Utilities
 
