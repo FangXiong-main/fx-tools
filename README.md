@@ -173,6 +173,11 @@ public class RedisUtilConfig {
 | v1.0.0 | Apr 2026 | Initial release with FxJSON (JSON codec engine) and FxRedis (Redis utilities). |
 
 ---
+## Citation
+
+The version of FxTools described in the associated research paper is archived at Zenodo:
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20156271.svg)](https://doi.org/10.5281/zenodo.20156271)
 
 ## License
 
