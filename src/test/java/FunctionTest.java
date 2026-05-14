@@ -34,12 +34,20 @@ public class FunctionTest {
             Class.forName("com.mysql.cj.jdbc.Driver");
             // 2. 获取连接
             Connection conn = DriverManager.getConnection(url, user, pwd);
+            long start1 = System.nanoTime();
+            List<Map<String, Object>> maps1 = MysqlUtils.useMapper(conn, TestMapper.class).selectAllUsers();
+            long end1 = System.nanoTime();
+            double ms1 = (end1 - start1) / 1_000_000.0;
+            System.out.println("FxTools first start: " + ms1 + " ms");
+            Connection conn2 = DriverManager.getConnection(url, user, pwd);
             long start = System.nanoTime();
-            List<MysqlConvertTestEntity> mysqlConvertTestEntities = MysqlUtils.useMapper(conn, TestMapper.class).selectAllUsers();
-            System.out.println(mysqlConvertTestEntities);
+            List<Map<String, Object>> maps = MysqlUtils.useMapper(conn2, TestMapper.class).selectAllUsers();
             long end = System.nanoTime();
             double ms = (end - start) / 1_000_000.0;
-            System.out.println("FxTools start: " + ms + " ms");
+            System.out.println("FxTools second start: " + ms + " ms");
+                        for(Map<String,Object> m : maps){
+                System.out.println(m.toString());
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

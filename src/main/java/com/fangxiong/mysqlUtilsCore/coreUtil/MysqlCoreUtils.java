@@ -7,6 +7,7 @@ import com.fangxiong.mysqlUtilsCore.annotations.*;
 import com.fangxiong.mysqlUtilsCore.converter.MysqlGenericConverterFactory;
 import com.fangxiong.mysqlUtilsCore.converter.MysqlNonGenericConverter;
 import com.fangxiong.mysqlUtilsCore.converter.MysqlNonGenericConverterFactory;
+import com.fangxiong.mysqlUtilsCore.enums.EnableCamelCaseToUnderscore;
 import com.fangxiong.mysqlUtilsCore.exceptions.MysqlUtilsException;
 
 import java.lang.annotation.Annotation;
@@ -22,7 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MysqlCoreUtils {
-
     private static final Pattern sqlValuePattern = Pattern.compile("#\\{(\\S+)}");
     private static Connection mysqlConnection = null;
 
@@ -81,14 +81,16 @@ public class MysqlCoreUtils {
             }
             if(!(annotation instanceof Select)){
                 Statement statement = mysqlConnection.createStatement();
+                int i = statement.executeUpdate(originalSql);
                 statement.close();mysqlConnection.close();
-                return statement.executeUpdate(originalSql);
+                return i;
             }
             Statement statement = mysqlConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             ResultSet resultSet = statement.executeQuery(originalSql);
-            statement.close();mysqlConnection.close();
             if(returnType instanceof ParameterizedType pt){
-                return MysqlGenericConverterFactory.getConverter((Class<?>) pt.getRawType()).converter(resultSet,returnType);
+                Object converter = MysqlGenericConverterFactory.getConverter((Class<?>) pt.getRawType()).converter(resultSet, returnType);
+                statement.close();mysqlConnection.close();
+                return converter;
             }else {
                 return MysqlNonGenericConverterFactory.getConverter((Class<?>) returnType).converter(resultSet,(Class<?>) returnType,null);
             }
@@ -160,4 +162,5 @@ public class MysqlCoreUtils {
     public static Boolean isDigitType(Class<?> clazz){
         return clazz == Integer.class || clazz == int.class || clazz == Float.class || clazz == float.class || clazz == Double.class || clazz == double.class || clazz == BigInteger.class || clazz == BigDecimal.class;
     }
+
 }

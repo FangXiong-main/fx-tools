@@ -17,6 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MysqlObjectConverter implements MysqlNonGenericConverter {
+
     public static final Pattern camelToUnderscorePattern = Pattern.compile("(\\S+)([A-Z]\\S*)");
 
     @Override
@@ -42,6 +43,8 @@ public class MysqlObjectConverter implements MysqlNonGenericConverter {
                             throw new MysqlConverterError("Can't convert the value:'"+o+"',with method:"+converterSetMethodCache.get(f).getName()+".",e);
                         }
                     }
+                }else {
+                    return null;
                 }
             } catch (SQLException e) {
                 throw new MysqlConverterError("Access database error!",e);
@@ -58,7 +61,7 @@ public class MysqlObjectConverter implements MysqlNonGenericConverter {
                 return MysqlNonGenericConverterFactory.getConverter((Class<?>) type).converter(resultSet,clazz,columName);
             }
         } catch (SQLException e) {
-            throw new MysqlConverterError("Convert "+field.getName()+"failed,can't find the colum name:'"+columName+"',please check your field name's format or enable camelToUnderscore");
+            throw new MysqlConverterError("Convert "+field.getName()+" failed,can't find the colum name:'"+columName+"',please check your field name's format or enable camelToUnderscore");
         }
     }
 

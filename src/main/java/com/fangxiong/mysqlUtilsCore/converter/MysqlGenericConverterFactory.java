@@ -8,8 +8,8 @@ public class MysqlGenericConverterFactory {
     private static final Map<Class<?>, MysqlGenericConverter> mysqlGenericConverterMap = new HashMap<>();
 
     static{
-        mysqlGenericConverterMap.put(Map.class,null);
-        mysqlGenericConverterMap.put(List.class,null);
+        mysqlGenericConverterMap.put(Map.class,new MysqlMapConverter());
+        mysqlGenericConverterMap.put(List.class,new MysqlListConverter());
     }
 
     public static MysqlGenericConverter getConverter(Class<?> clazz){
