@@ -1,110 +1,194 @@
-# fx-tools 通用工具包
+# FxTools
 
- Json工具库（Java）,Redis工具库。
+**A lightweight, zero-dependency Java toolkit for JSON processing and Redis caching.**
 
-# 核心功能
+## What's in This Repository
 
-## Redis工具库
+This repository contains two independent Java libraries that share the same build environment:
 
-### Redis基础缓存操作
+| Library | Description |
+|:---|:---|
+| **FxJSON** | A lightweight, zero-dependency JSON codec engine optimized for cold-start performance. |
+| **FxRedis** | A collection of production-ready Redis utilities covering common caching scenarios. |
 
-- `setStringValue`：存储字符串数据
-- `getStringValue`：获取字符串数据
+They have no functional dependencies on each other. You can use either one independently.
 
-### Redis高并发缓存解决方案
+---
 
-- 缓存穿透（缓存空值）
-- 缓存击穿（互斥锁）
-- 逻辑过期（异步更新）
+## FxJSON — JSON Codec Engine
 
-### 基于Redis的全局随机ID生成器
+FxJSON is a self-contained, annotation-driven engine for JSON serialization
+and deserialization, designed specifically for lightweight deployment
+environments such as microservices and serverless functions.
 
-## Json工具库
+### Why Another JSON Library?
 
-### 完全自主开发的Json基本解析工具
+Mainstream JSON libraries like Jackson and Gson are built for generality.
+They load full metadata caches at startup and construct complete syntax trees
+during parsing. In environments where cold-start latency matters—serverless
+functions, short-lived containers, microservices that scale from zero—that
+overhead adds up. FxJSON takes a different approach: it extracts only the
+first level of a JSON string using a character-level state machine, defers
+reflection metadata loading until a class is first encountered, and separates
+format validation from the parsing path entirely.
 
-### 提供两个工具：jsonToBean 和 BeanToJson
+### Key Features
 
-### 支持普通对象、集合、嵌套、LocalDateTime、空值、各种边界
+- **Zero dependencies.** Runs with only the JDK (16+). No third-party JARs needed.
+- **Streaming split parser.** Extracts key-value pairs field by field without building a full AST.
+- **Deferred caching.** Reflection metadata (fields, setters, generic types) is cached on first use, not at startup.
+- **Annotation-driven validation.** `@NotNullField`, `@NotNullClass`, `@IgnoredField`, and `@TimeType` give you fine-grained control without writing extra validation code.
+- **Generic type resolution.** `CustomizeGenericTypes` handles generic type parameters without anonymous inner classes.
+- **Configurable safety levels.** Choose between `SKIP`, `FAST`, and `NORMAL` pre-validation depending on your performance and safety needs.
 
-### 支持List，Map,Set等基本类型（支持单双泛型的无限嵌套，其余类型会在后续更新中支持），以及自定义类型的序列化与反序列化
+### Quick Start
 
-### 支持Json反序列化为局部变量（支持单，双泛型），需提供泛型对应的字符串即可，解析器会自动解析出对应的类型，列子：JsonUtils.jsonToBean(json, new CustomizeGenericTypes("Map<String, List<Map<String,Object>>>"))
+```java
+// Define a simple entity
+public class User {
+    private String name;
+    private int age;
+    // getters and setters
+}
 
-## 版本更新日志
-### v1.0.0 完成基于缓存穿透、缓存击穿、逻辑过期等高并发查询的开发。
-### v1.0.1 完成基于Redis自增的全局随机Id生成器的开发
-### v1.1.1 完成JsonUtil的开发，支持List，Map等基本类型（支持单双泛型的无限嵌套，Set会在后续更新中支持），以及自定义类型的序列化与反序列化。
-### v1.1.2 JsonUtil新增对Set的支持
+// Deserialize a JSON string to a Java entity
+String json = "{\"name\":\"Alice\",\"age\":25}";
+User user = JsonUtils.jsonToBean(json, User.class, SafetyCheckLevel.SKIP);
 
-# 快速开始
+// Serialize an entity back to JSON
+String output = JsonUtils.beanToJson(user);  // {"name":"Alice","age":25}
+```
+### Supported Types
 
-## Json工具库
+- Primitive types and their wrappers: `int`, `long`, `double`, `boolean`, `String`, `BigDecimal`
+- Date and time: `LocalDateTime` (with `@TimeType` for custom formats)
+- Collections: `List`, `Map`, `Set` (with recursive generic nesting)
+- Custom user-defined classes (automatic reflection-based mapping)
+- Local variables with generic type parameters (via `CustomizeGenericTypes`)
 
-## Redis工具库
+### Safety Levels
 
-### Maven项目导入Jar包
-在项目主目录下新建lib文件夹,并将jar文件放入
+| Level | What It Checks |
+|:---|:---|
+| `SKIP` | No pre-validation. Fastest path. |
+| `FAST` | Illegal character detection only. |
+| `NORMAL` | Illegal character detection + bracket matching. |
 
-### 引入 Maven 依赖
+Regardless of the level you pick, field-level type matching and non-null
+annotation checks are always enforced.
 
-    <dependency>
-            <groupId>com.fangxiong</groupId>
-            <artifactId>fx-tools</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/jar包文件名称.jar(例:fx-tools-1.0.jar)</systemPath>
-    </dependency>
+### Custom Annotations
 
-### 配置 Redis 连接(如要使用Redis工具必须配置，若只是用Json工具则无需配置)
+| Annotation | Scope | Purpose |
+|:---|:---|:---|
+| `@IgnoredField` | Field | Skip the field during serialization and deserialization. |
+| `@NotNullField` | Field | Throw `JsonConvertFailureError` if the value is null after parsing. |
+| `@NotNullClass` | Class | Same as `@NotNullField`, but applies to every field in the class. |
+| `@TimeType` | Field | Specify a custom `LocalDateTime` format pattern. |
 
-在 `application.yml` 中配置 Redis 信息
+## FxRedis — Redis Utilities
 
-    spring:
-      redis:
-        host: localhost
-        port: 6379
+A set of utility classes built on `StringRedisTemplate` for common caching
+scenarios in Spring Boot applications.
 
-### 注册配置类（必须）
+### Key Features
 
-创建配置类，将 `RedisUtil` 交给 Spring 管理
+- Basic `set` / `get` string operations
+- **Cache penetration** protection (null-value caching)
+- **Cache breakdown** protection (mutex lock)
+- **Logical expiration** (asynchronous cache refresh)
+- **Redis-based unique ID generator** (increment-based)
 
-    @Configuration
-    public class RedisUtilConfig {
-        @Bean
-        public RedisUtil redisUtil(StringRedisTemplate stringRedisTemplate) {
-            return new RedisUtil(stringRedisTemplate);
-        }
-    }
-
-## 使用方式
-
-### 注入 RedisUtil
-
-    @Autowired
-    private RedisUtil redisUtil;
-
-### 常用方法示例
-
-#### 缓存穿透解决方案
-
-    redisUtil.queryWithPassThrough(key, id, User.class, 30L, TimeUnit.MINUTES, userMapper::selectById);
-
-#### 缓存击穿解决方案
-
-    redisUtil.queryWithMutex(key, id, User.class, 30L, TimeUnit.MINUTES, userMapper::selectById);
-
-#### 逻辑过期解决方案
-
-    redisUtil.queryWithLogicalExpire(key, id, User.class, 30L, TimeUnit.MINUTES, executorService, userMapper::selectById);
-
-#### 全局随机ID生成器
-    
-    redisUtil.uniqueIdGenerator(String keyPrefix,LocalDateTime startTime,int timeStampDigits,int machineCodeDigits,int sequenceDigits,long machineCode)
-
-
-## 环境依赖
+### Requirements
 
 - JDK 17+
-- SpringBoot 3.x
-- Redis
+- Spring Boot 3.x
+- A configured `StringRedisTemplate` bean
+
+### Usage
+
+```java
+// Cache penetration
+redisUtil.queryWithPassThrough(key, id, User.class,
+    30L, TimeUnit.MINUTES, userMapper::selectById);
+
+// Cache breakdown
+redisUtil.queryWithMutex(key, id, User.class,
+    30L, TimeUnit.MINUTES, userMapper::selectById);
+
+// Logical expiration
+redisUtil.queryWithLogicalExpire(key, id, User.class,
+    30L, TimeUnit.MINUTES, executorService, userMapper::selectById);
+```
+### Configuration
+
+Add your Redis connection details to `application.yml`:
+
+```yaml
+spring:
+  redis:
+    host: localhost
+    port: 6379
+```
+
+Register `RedisUtil` as a Spring bean:
+
+```java
+@Configuration
+public class RedisUtilConfig {
+    @Bean
+    public RedisUtil redisUtil(StringRedisTemplate stringRedisTemplate) {
+        return new RedisUtil(stringRedisTemplate);
+    }
+}
+```
+
+---
+
+## Installation
+
+1. Download the latest JAR from [GitHub Releases](https://github.com/FangXiong-main/fx-tools/releases).
+2. Place it in your project's `lib/` directory.
+3. Add the Maven dependency:
+
+```xml
+<dependency>
+    <groupId>com.fangxiong</groupId>
+    <artifactId>fx-tools</artifactId>
+    <version>1.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/lib/fx-tools-1.0.jar</systemPath>
+</dependency>
+```
+
+> **Note:** If you only need FxJSON, you can skip the Redis configuration
+> and Spring Boot setup entirely. FxJSON has no external dependencies.
+
+---
+
+## Changelog
+
+| Version | Date | Changes |
+|:---|:---|:---|
+| v1.0.0 | Apr 2026 | Initial release with FxJSON (JSON codec engine) and FxRedis (Redis utilities). |
+
+---
+## Citation
+
+The version of FxTools described in the associated research paper is archived at Zenodo:
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20156271.svg)](https://doi.org/10.5281/zenodo.20156271)
+
+## License
+
+This project is distributed under the [MIT License](LICENSE).
+
+---
+
+## Contact
+
+For questions, bug reports, or feedback, please open an issue on this
+repository or contact the maintainer at `1255404327@qq.com`.
+
+## Note for reviewers 
+The code corresponding to the manuscript is located in the jsonUtilsCore/ directory. Other modules (e.g., MySQL utilities) are under active development and are not described in the paper.
