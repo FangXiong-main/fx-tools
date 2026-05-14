@@ -189,3 +189,6 @@ This project is distributed under the [MIT License](LICENSE).
 
 For questions, bug reports, or feedback, please open an issue on this
 repository or contact the maintainer at `1255404327@qq.com`.
+
+## Note for reviewers 
+The code corresponding to the manuscript is located in the jsonUtilsCore/ directory. Other modules (e.g., MySQL utilities) are under active development and are not described in the paper.
