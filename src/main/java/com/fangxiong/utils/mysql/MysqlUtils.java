@@ -18,9 +18,7 @@ public class MysqlUtils {
     }
 
     public static <T> T useMapper (Connection connection, Class<T> mapper, EnableCamelCaseToUnderscore enableCamelCaseToUnderscore){
-        if(enableCamelCaseToUnderscore == EnableCamelCaseToUnderscore.ENABLE){
-            MysqlNonGenericConverterFactory.setCamelCaseToUnderscoreEnumStatus(EnableCamelCaseToUnderscore.ENABLE);
-        }
+        MysqlNonGenericConverterFactory.setCamelCaseToUnderscoreEnumStatus(enableCamelCaseToUnderscore);
         return useMapper(connection,mapper);
     }
 

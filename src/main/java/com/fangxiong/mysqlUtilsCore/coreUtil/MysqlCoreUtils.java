@@ -20,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MysqlCoreUtils {
-    private static final Pattern sqlValuePattern = Pattern.compile("#\\{(\\S+)}");
+    private static final Pattern sqlValuePattern = Pattern.compile("#\\{(\\S+?)}");
     private static final Pattern underscoreNamePattern = Pattern.compile("(\\S+)_(\\S+)");
     private static Connection mysqlConnection = null;
 
@@ -74,12 +74,15 @@ public class MysqlCoreUtils {
                 if (fieldValueMap==null) {
                     originalSql = originalSql.replaceFirst(tempRegex,args[0].toString());
                 }else {
-                    originalSql = originalSql.replaceFirst(tempRegex,fieldValueMap.get(tempParamName));
+                    String s = fieldValueMap.get(tempParamName);
+                    originalSql = originalSql.replaceFirst(tempRegex,s == null ? "null" : s);
                 }
             }
+            System.out.println("Executed Sql ==> "+originalSql);
             if(!(annotation instanceof Select)){
                 Statement statement = mysqlConnection.createStatement();
                 int i = statement.executeUpdate(originalSql);
+                System.out.println("Affected rows ==> "+i);
                 statement.close();mysqlConnection.close();
                 return i;
             }
@@ -105,10 +108,15 @@ public class MysqlCoreUtils {
             for(Field f : fields){
                 Method method = converterGetMethodCache.get(f);
                 tempMethodName = method.getName();
-                filedValueCache.put(f.getName(), method.invoke(entity).toString());
+                Object o = method.invoke(entity);
+                if(isDigitType(f.getType())){
+                    filedValueCache.put(f.getName(), o == null ? null : o.toString());
+                }else {
+                    filedValueCache.put(f.getName(), o == null ? null : "'"+convertEscapeCharacterToStr(o.toString())+"'");
+                }
             }
         } catch (Exception e) {
-            throw new MysqlUtilsException("Can't find get method '"+tempMethodName+"' in entity '"+clazz.getName()+"'.");
+            throw new MysqlUtilsException(e);
         }
         return filedValueCache;
     }
@@ -117,11 +125,15 @@ public class MysqlCoreUtils {
         Map<String,String> cacheMap = new HashMap<>();
         int cursor = 0;
         for(Parameter p : parameters){
+            ParamName annotation = p.getAnnotation(ParamName.class);
+            if(annotation == null){
+                throw new MysqlUtilsException("Multiple params but without @ParamName annotation.Param ==> Type: '"+p.getType().getName()+"' with value: '"+args[cursor].toString()+"'.");
+            }
             if(isDigitType(p.getType())){
-                cacheMap.put(p.getAnnotation(ParamName.class).value(),args[cursor].toString());
+                cacheMap.put(annotation.value(),args[cursor].toString());
             }else{
                 String s = convertEscapeCharacterToStr(args[cursor].toString());
-                cacheMap.put(p.getAnnotation(ParamName.class).value(),"'"+s+"'");
+                cacheMap.put(annotation.value(),"'"+s+"'");
             }
             cursor++;
         }

@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MysqlNonGenericConverterFactory {
-    private static EnableCamelCaseToUnderscore camelCaseToUnderscoreEnum = EnableCamelCaseToUnderscore.DISABLE;
+    private static EnableCamelCaseToUnderscore camelCaseToUnderscoreEnum = EnableCamelCaseToUnderscore.ENABLE;
     private static final Map<Class<?>,MysqlNonGenericConverter> mysqlNonGenericConverterMap = new HashMap<>();
     static{
         mysqlNonGenericConverterMap.put(String.class,(r,c,n)-> {
