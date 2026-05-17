@@ -19,7 +19,6 @@ public class GlobalConverterCacheLib {
     private static final Map<Class<?>,Map<Field, Method>> converterSetMethodCache = new HashMap<>();
     private static final Map<Class<?>,Map<Field, Method>> converterGetMethodCache = new HashMap<>();
     private static final Map<Class<?>,Map<Field, Type>> converterPartTypeCache = new HashMap<>();
-    private static final Map<Class<?>, ArrayList<String>> converterFiledNameCache = new HashMap<>();
     private static final Map<Class<?>, Map<String,Method>> mysqlMapperMethodCache = new HashMap<>();
     private static final Map<Method,Map<String,Integer>> mysqlParamIndexCache = new HashMap<>();
 

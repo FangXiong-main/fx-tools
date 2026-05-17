@@ -14,8 +14,14 @@ public class MysqlUtils {
         if (!MysqlCoreUtils.setMysqlConnection(connection)) {
             throw new MysqlUtilsException("Set mysql connection failed!");
         }
-        MysqlNonGenericConverterFactory.setCamelCaseToUnderscoreEnumStatus(EnableCamelCaseToUnderscore.ENABLE);
         return MysqlCoreUtils.getMapperEntity(mapper,null);
+    }
+
+    public static <T> T useMapper (Connection connection, Class<T> mapper, EnableCamelCaseToUnderscore enableCamelCaseToUnderscore){
+        if(enableCamelCaseToUnderscore == EnableCamelCaseToUnderscore.ENABLE){
+            MysqlNonGenericConverterFactory.setCamelCaseToUnderscoreEnumStatus(EnableCamelCaseToUnderscore.ENABLE);
+        }
+        return useMapper(connection,mapper);
     }
 
 }

@@ -1,6 +1,8 @@
 package com.fangxiong.mysqlUtilsCore.converter;
 
 import com.fangxiong.mysqlUtilsCore.coreUtil.CurrentColumnTypeDetector;
+import com.fangxiong.mysqlUtilsCore.coreUtil.MysqlCoreUtils;
+import com.fangxiong.mysqlUtilsCore.enums.EnableCamelCaseToUnderscore;
 import com.fangxiong.mysqlUtilsCore.exceptions.MysqlConverterError;
 
 import java.lang.reflect.ParameterizedType;
@@ -35,7 +37,7 @@ public class MysqlMapConverter implements MysqlGenericConverter{
                             for(int i =1 ;i<=columnCount;i++){
                                 Class<?> columnType = currentColumnTypeDetector.getMysqlColumnTypeMap(metaData.getColumnType(i));
                                 String columnName = metaData.getColumnName(i);
-                                convertedMap.put(columnName,MysqlNonGenericConverterFactory.getConverter(columnType).converter(resultSet,null,columnName));
+                                convertedMap.put(MysqlCoreUtils.convertColumnNameToCamelCase(columnName),MysqlNonGenericConverterFactory.getConverter(columnType).converter(resultSet,null,columnName));
                             }
                         }else {
                             throw new MysqlConverterError("Unsupported return type : Map<"+actualTypeArgument1.getTypeName()+","+actualTypeArgument2.getTypeName()+">.");

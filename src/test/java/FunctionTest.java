@@ -1,6 +1,7 @@
 import com.fangxiong.globalUtils.GlobalCustomizeClazzDetector;
 import com.fangxiong.jsonUtilsCore.coreUtil.CustomizeGenericTypes;
 import com.fangxiong.jsonUtilsCore.enums.DecorateJson;
+import com.fangxiong.mysqlUtilsCore.enums.EnableCamelCaseToUnderscore;
 import com.fangxiong.utils.json.JsonUtils;
 import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
 import com.fangxiong.utils.mysql.MysqlUtils;
@@ -41,11 +42,11 @@ public class FunctionTest {
             System.out.println("FxTools first start: " + ms1 + " ms");
             Connection conn2 = DriverManager.getConnection(url, user, pwd);
             long start = System.nanoTime();
-            List<Map<String, Object>> maps = MysqlUtils.useMapper(conn2, TestMapper.class).selectAllUsers();
+            List<Map<String, Object>> maps = MysqlUtils.useMapper(conn2, TestMapper.class,EnableCamelCaseToUnderscore.ENABLE).selectAllUsers();
             long end = System.nanoTime();
             double ms = (end - start) / 1_000_000.0;
             System.out.println("FxTools second start: " + ms + " ms");
-                        for(Map<String,Object> m : maps){
+            for(Map<String,Object> m : maps){
                 System.out.println(m.toString());
             }
         } catch (Exception e) {

@@ -2,12 +2,9 @@ package com.fangxiong.mysqlUtilsCore.coreUtil;
 
 import com.fangxiong.globalUtils.GlobalCustomizeClazzDetector;
 import com.fangxiong.globalUtils.GlobalConverterCacheLib;
-import com.fangxiong.globalUtils.GlobalStringUtils;
 import com.fangxiong.mysqlUtilsCore.annotations.*;
 import com.fangxiong.mysqlUtilsCore.converter.MysqlGenericConverterFactory;
-import com.fangxiong.mysqlUtilsCore.converter.MysqlNonGenericConverter;
 import com.fangxiong.mysqlUtilsCore.converter.MysqlNonGenericConverterFactory;
-import com.fangxiong.mysqlUtilsCore.enums.EnableCamelCaseToUnderscore;
 import com.fangxiong.mysqlUtilsCore.exceptions.MysqlUtilsException;
 
 import java.lang.annotation.Annotation;
@@ -24,6 +21,7 @@ import java.util.regex.Pattern;
 
 public class MysqlCoreUtils {
     private static final Pattern sqlValuePattern = Pattern.compile("#\\{(\\S+)}");
+    private static final Pattern underscoreNamePattern = Pattern.compile("(\\S+)_(\\S+)");
     private static Connection mysqlConnection = null;
 
     public static Boolean setMysqlConnection(Connection connection){
@@ -163,4 +161,11 @@ public class MysqlCoreUtils {
         return clazz == Integer.class || clazz == int.class || clazz == Float.class || clazz == float.class || clazz == Double.class || clazz == double.class || clazz == BigInteger.class || clazz == BigDecimal.class;
     }
 
+    public static String convertColumnNameToCamelCase(String s){
+        Matcher matcher = underscoreNamePattern.matcher(s);
+        if(matcher.matches()){
+            return matcher.group(1)+Character.toUpperCase(matcher.group(2).charAt(0))+matcher.group(2).substring(1);
+        }
+        return s;
+    }
 }

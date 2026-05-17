@@ -1,7 +1,6 @@
 package com.fangxiong.mysqlUtilsCore.converter;
 
 import com.fangxiong.mysqlUtilsCore.enums.EnableCamelCaseToUnderscore;
-import com.fangxiong.mysqlUtilsCore.enums.EnableUnderscoreToCamelCase;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -9,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MysqlNonGenericConverterFactory {
-    private static EnableUnderscoreToCamelCase underscoreToCamelCaseEnum = EnableUnderscoreToCamelCase.DISABLE;
     private static EnableCamelCaseToUnderscore camelCaseToUnderscoreEnum = EnableCamelCaseToUnderscore.DISABLE;
     private static final Map<Class<?>,MysqlNonGenericConverter> mysqlNonGenericConverterMap = new HashMap<>();
     static{
@@ -76,16 +74,8 @@ public class MysqlNonGenericConverterFactory {
         return mysqlNonGenericConverter;
     }
 
-    public static void setUnderscoreToCamelCaseStatus(EnableUnderscoreToCamelCase enableUnderscoreToCamelCase){
-        underscoreToCamelCaseEnum = enableUnderscoreToCamelCase;
-    }
-
     public static void setCamelCaseToUnderscoreEnumStatus(EnableCamelCaseToUnderscore enableCamelCaseToUnderscore){
         camelCaseToUnderscoreEnum = enableCamelCaseToUnderscore;
-    }
-
-    public static EnableUnderscoreToCamelCase getUnderscoreToCamelCaseStatus(){
-        return underscoreToCamelCaseEnum;
     }
 
     public static EnableCamelCaseToUnderscore getCamelCaseToUnderscoreStatus(){
