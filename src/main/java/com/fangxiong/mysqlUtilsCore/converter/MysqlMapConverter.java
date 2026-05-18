@@ -10,6 +10,7 @@ import java.lang.reflect.Type;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -34,10 +35,10 @@ public class MysqlMapConverter implements MysqlGenericConverter{
                         if(actualTypeArgument2 == Object.class){
                             ResultSetMetaData metaData = resultSet.getMetaData();
                             int columnCount = metaData.getColumnCount();
+                            Map<Integer,String> convertedColumnNameCache = getConvertedColumnNameCache(metaData,columnCount);
                             for(int i =1 ;i<=columnCount;i++){
                                 Class<?> columnType = currentColumnTypeDetector.getMysqlColumnTypeMap(metaData.getColumnType(i));
-                                String columnName = metaData.getColumnName(i);
-                                convertedMap.put(MysqlCoreUtils.convertColumnNameToCamelCase(columnName),MysqlNonGenericConverterFactory.getConverter(columnType).converter(resultSet,null,columnName));
+                                convertedMap.put(convertedColumnNameCache.get(i),MysqlNonGenericConverterFactory.getConverter(columnType).converter(resultSet,null,metaData.getColumnName(i)));
                             }
                         }else {
                             throw new MysqlConverterError("Unsupported return type : Map<"+actualTypeArgument1.getTypeName()+","+actualTypeArgument2.getTypeName()+">.");
@@ -52,4 +53,25 @@ public class MysqlMapConverter implements MysqlGenericConverter{
         }
         return convertedMap;
     }
+
+    private static Map<Integer,String> getConvertedColumnNameCache(ResultSetMetaData metaData,int columnCount){
+        Map<Integer,String> cacheMap = new HashMap<>();int tempI=0;
+        try {
+            if (MysqlNonGenericConverterFactory.getCamelCaseToUnderscoreStatus() == EnableCamelCaseToUnderscore.ENABLE){
+                for(int i=1 ;i<=columnCount;i++){
+                    tempI=i;
+                    cacheMap.put(i,MysqlCoreUtils.convertColumnNameToCamelCase(metaData.getColumnName(i)));
+                }
+            }else {
+                for(int i=1 ;i<=columnCount;i++){
+                    tempI=i;
+                    cacheMap.put(i,metaData.getColumnName(i));
+                }
+            }
+        } catch (SQLException e) {
+            throw new MysqlConverterError("Can't get the column name with the column index :"+tempI+".");
+        }
+        return cacheMap;
+    }
+
 }

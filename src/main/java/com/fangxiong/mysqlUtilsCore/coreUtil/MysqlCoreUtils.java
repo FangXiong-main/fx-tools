@@ -78,11 +78,11 @@ public class MysqlCoreUtils {
                     originalSql = originalSql.replaceFirst(tempRegex,s == null ? "null" : s);
                 }
             }
-            System.out.println("Executed Sql ==> "+originalSql);
+            System.out.println("\nExecuted Sql ==> "+originalSql+"\n");
             if(!(annotation instanceof Select)){
                 Statement statement = mysqlConnection.createStatement();
                 int i = statement.executeUpdate(originalSql);
-                System.out.println("Affected rows ==> "+i);
+                System.out.println("\nAffected rows ==> "+i+"\n");
                 statement.close();mysqlConnection.close();
                 return i;
             }
