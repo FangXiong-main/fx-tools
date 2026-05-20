@@ -22,21 +22,21 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
     private static final Pattern isIntegerPattern = Pattern.compile("-?(\\d+)");
     private static final Pattern isDicimalPattern = Pattern.compile("-?(\\d+\\.\\d+)");
     @Override
-    public Object convert(String s, Class<?> clazz) {
+    public Object convert(String s, Class<?> clazz,Field field) {
         String tempFiledName=null;String tempValue=null;String tempFiledType=null;
         if(GlobalCustomizeClazzDetector.isCustomizeClazz(clazz)){
             try {
                 Field[] df = GlobalConverterCacheLib.getConverterFieldCache(clazz);
                 Map<Field,Method> setMethodCache = GlobalConverterCacheLib.getConverterSetMethodCache(clazz);
                 Map<Field,Type> partTypeCache = GlobalConverterCacheLib.getConverterPartTypeCache(clazz);
-                Map<Field, String> allFieldValue = getAllFieldValue(df, s);
+                Map<String, String> allFieldValue = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(s);
                 Object convertedObj = clazz.getDeclaredConstructor().newInstance();
                 for(Field f : df){
-                    tempFiledType=f.getType().getTypeName();tempFiledName = f.getName();tempValue=allFieldValue.get(f);
+                    tempFiledType=f.getType().getTypeName();tempFiledName = f.getName();tempValue=allFieldValue.get(f.getName());
                     if(f.getAnnotation(IgnoredField.class)!=null){
-                        setMethodCache.get(f).invoke(convertedObj,convertFiled(null,partTypeCache.get(f)));
+                        setMethodCache.get(f).invoke(convertedObj,convertFiled(null,partTypeCache.get(f),f));
                     } else if(tempValue!=null&&!tempValue.equals("null")){
-                        setMethodCache.get(f).invoke(convertedObj,convertFiled(allFieldValue.get(f),partTypeCache.get(f)));
+                        setMethodCache.get(f).invoke(convertedObj,convertFiled(tempValue,partTypeCache.get(f),f));
                     } else if (clazz.getAnnotation(NotNullClass.class)!=null&&tempValue==null) {
                         throw new JsonConvertFailureError("Detected class:'"+clazz.getName()+"' with @NotNullClass annotation,current converting field is:'"+tempFiledName+"'"+",but the value ready to convert is null.Caused by Json syntax error.");
                     } else if (clazz.getAnnotation(NotNullClass.class)!=null&& Objects.equals(tempValue, "null")) {
@@ -46,7 +46,7 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
                     } else if (f.getAnnotation(NotNullField.class) != null&&Objects.equals(tempValue, "null")) {
                         throw new JsonConvertFailureError("Detected field '"+tempFiledName+"'"+" with @NotNullFiled annotation,but the value ready to convert is null.Caused by custom restrict error.");
                     } else {
-                        setMethodCache.get(f).invoke(convertedObj,convertFiled(null,partTypeCache.get(f)));
+                        setMethodCache.get(f).invoke(convertedObj,convertFiled(null,partTypeCache.get(f),f));
                     }
                 }
                 return convertedObj;
@@ -58,7 +58,7 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
             if (type instanceof ParameterizedType pt){
                 return GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt.getRawType()).convert(s,pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1]);
             }else {
-                return NonGenericTypeConverterFactory.getConverter((Class<?>) type).convert(s,(Class<?>) type);
+                return NonGenericTypeConverterFactory.getConverter((Class<?>) type).convert(s,(Class<?>) type,null);
             }
         }
     }
@@ -97,20 +97,11 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
         return String.class;
     }
 
-    private static Map<Field,String> getAllFieldValue(Field[] df, String json){
-        Map<Field,String> cacheFiledValueMap = new HashMap<>();
-        Map<String,String> tempFieldValueMap = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(json);
-        for (Field f:df){
-            cacheFiledValueMap.put(f,tempFieldValueMap.get(f.getName()));
-        }
-        return cacheFiledValueMap;
-    }
-
-    private static Object convertFiled(String s,Type type){
+    private static Object convertFiled(String s,Type type,Field field){
         if (type instanceof ParameterizedType pt){
             return GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt.getRawType()).convert(s,pt);
         }else{
-            return NonGenericTypeConverterFactory.getConverter((Class<?>) type).convert(s,(Class<?>) type);
+            return NonGenericTypeConverterFactory.getConverter((Class<?>) type).convert(s,(Class<?>) type,field);
         }
     }
 

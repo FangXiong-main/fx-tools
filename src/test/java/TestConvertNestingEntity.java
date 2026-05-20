@@ -1,5 +1,6 @@
 import com.fangxiong.jsonUtilsCore.annotations.NotNullClass;
 import com.fangxiong.jsonUtilsCore.annotations.NotNullField;
+import com.fangxiong.jsonUtilsCore.annotations.TimeType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ public class TestConvertNestingEntity {
     private String name;
     private Boolean isActive;
     private Double score;
+    @TimeType("yyyy:MM:dd'T'HH:mm:ss.SSS")
     private LocalDateTime createTime;
     private List<Map<String, List<Map<String, Integer>>>> ultimateTest;
 

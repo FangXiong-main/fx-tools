@@ -51,12 +51,12 @@ public class MapConverter implements GenericTypeJsonConverter {
                                 convertedMap.put(key,null);
                             }
                         } else{
-                            convertedMap.put(key,NonGenericTypeConverterFactory.getConverter((Class<?>) tempType).convert(partlyMap.get(key),(Class<?>) tempType));
+                            convertedMap.put(key,NonGenericTypeConverterFactory.getConverter((Class<?>) tempType).convert(partlyMap.get(key),(Class<?>) tempType,null));
                         }
                     }
                 }else {
                     for(String key : partlyMap.keySet()){
-                        convertedMap.put(key,NonGenericTypeConverterFactory.getConverter((Class<?>) type).convert(partlyMap.get(key),(Class<?>) type));
+                        convertedMap.put(key,NonGenericTypeConverterFactory.getConverter((Class<?>) type).convert(partlyMap.get(key),(Class<?>) type,null));
                     }
                 }
             }

@@ -93,7 +93,7 @@ public class FunctionTest {
                 "  \"name\": \"fx\",\n" +
                 "  \"isActive\": true,\n" +
                 "  \"score\": 98.5,\n" +
-                "  \"createTime\": \"2025-01-01T12:00:00\",\n" +
+                "  \"createTime\": \"2025:01:01T12:00:00.123\",\n" +
                 "  \"ultimateTest\": [\n" +
                 "    {\n" +
                 "      \"level1\": [\n" +

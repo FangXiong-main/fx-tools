@@ -13,36 +13,36 @@ public class NonGenericTypeConverterFactory {
 
     static {
         converterMap.put(LocalDateTime.class,new LocalDateTimeConverter());
-        converterMap.put(Integer.class,(s,f)-> {
+        converterMap.put(Integer.class,(s,f,d)-> {
             if (s == null) {
                 return null;
             }
             JsonOperationUtil.jsonValueValidationChecker(s,Integer.class);
             return Integer.parseInt(s);
         });
-        converterMap.put(Long.class,(s,f)->{
+        converterMap.put(Long.class,(s,f,d)->{
             if(s==null){
                 return null;
             }
             JsonOperationUtil.jsonValueValidationChecker(s,Long.class);
             return Long.parseLong(s);
         });
-        converterMap.put(String.class,(s,f)-> s);
-        converterMap.put(int.class, (s,f)->{
+        converterMap.put(String.class,(s,f,d)-> s);
+        converterMap.put(int.class, (s,f,d)->{
             if (s==null){
                 return null;
             }
             JsonOperationUtil.jsonValueValidationChecker(s,int.class);
             return Integer.parseInt(s);
         });
-        converterMap.put(long.class,(s,f)-> {
+        converterMap.put(long.class,(s,f,d)-> {
             if(s==null){
                 return null;
             }
             JsonOperationUtil.jsonValueValidationChecker(s,long.class);
             return Long.parseLong(s);
         });
-        converterMap.put(Boolean.class,(s,f)-> {
+        converterMap.put(Boolean.class,(s,f,d)-> {
             if(s==null){
                 return null;
             }
@@ -54,7 +54,7 @@ public class NonGenericTypeConverterFactory {
             }
             return Boolean.parseBoolean(s);
         });
-        converterMap.put(boolean.class,(s,f)-> {
+        converterMap.put(boolean.class,(s,f,d)-> {
             if(s==null){
                 return null;
             }
@@ -65,35 +65,35 @@ public class NonGenericTypeConverterFactory {
                 return true;
             }
         });
-        converterMap.put(Double.class,(s,f)-> {
+        converterMap.put(Double.class,(s,f,d)-> {
             if (s==null){
                 return null;
             }
             JsonOperationUtil.jsonValueValidationChecker(s,Double.class);
             return Double.parseDouble(s);
         });
-        converterMap.put(Float.class,(s,f)-> {
+        converterMap.put(Float.class,(s,f,d)-> {
             if(s==null){
                 return null;
             }
             JsonOperationUtil.jsonValueValidationChecker(s,Float.class);
             return Float.parseFloat(s);
         });
-        converterMap.put(double.class,(s,f)-> {
+        converterMap.put(double.class,(s,f,d)-> {
             if (s == null) {
                 return null;
             }
             JsonOperationUtil.jsonValueValidationChecker(s,double.class);
             return Double.parseDouble(s);
         });
-        converterMap.put(float.class,(s,f)-> {
+        converterMap.put(float.class,(s,f,d)-> {
             if (s == null) {
                 return null;
             }
             JsonOperationUtil.jsonValueValidationChecker(s,float.class);
             return Float.parseFloat(s);
         });
-        converterMap.put(BigDecimal.class,(s,f)->{
+        converterMap.put(BigDecimal.class,(s,f,d)->{
             if (s == null) {
                 return null;
             }

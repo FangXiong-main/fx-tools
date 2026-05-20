@@ -27,7 +27,7 @@ public class JsonUtils {
         String undecoratedJSONStr = JsonOperationUtil.getUndecoratedJSONStr(jsonString);
         JsonOperationUtil.jsonBracketMatchChecker(undecoratedJSONStr);
         JsonOperationUtil.jsonInvalidCharacterChecker(undecoratedJSONStr);
-        return (T) NonGenericTypeConverterFactory.getConverter(clazz).convert(undecoratedJSONStr, clazz);
+        return (T) NonGenericTypeConverterFactory.getConverter(clazz).convert(undecoratedJSONStr, clazz,null);
     }
 
     public static <T> T jsonToBean(String jsonString, Class<T> clazz, SafetyCheckLevel safetyCheckLevel) {
@@ -38,7 +38,7 @@ public class JsonUtils {
         } else if (safetyCheckLevel == SafetyCheckLevel.FAST) {
             JsonOperationUtil.jsonInvalidCharacterChecker(undecoratedJSONStr);
         }
-        return (T) NonGenericTypeConverterFactory.getConverter(clazz).convert(undecoratedJSONStr, clazz);
+        return (T) NonGenericTypeConverterFactory.getConverter(clazz).convert(undecoratedJSONStr, clazz,null);
     }
 
 

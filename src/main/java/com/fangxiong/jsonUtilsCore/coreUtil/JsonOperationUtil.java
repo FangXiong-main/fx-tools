@@ -17,7 +17,6 @@ public class JsonOperationUtil {
     private static final Pattern jsonIntegerValuePattern = Pattern.compile("-?(\\d+)");
     private static final Pattern jsonDicimalValuePattern = Pattern.compile("-?(\\d+\\.\\d+)");
     private static final Pattern jsonInvalidCharPattern = Pattern.compile(".*([\\\\\\x00-\\x1F@#$%&<>']).*");
-    private static final Map<String,Map<String,String>> keysAndValuesMapCache = new HashMap<>();
 
     public static Boolean strIsNotBlank(String s){
         if (s == null){
@@ -129,10 +128,6 @@ public class JsonOperationUtil {
     }
 
     public static Map<String,String> getKeysAndValuesMapWithJsonStr(String s) {
-        Map<String, String> cache = keysAndValuesMapCache.get(s);
-        if (cache != null){
-            return cache;
-        }
         Map<String,String> mapKeysAndValues = new LinkedHashMap<>();
         StringBuilder sbKeys = new StringBuilder();
         StringBuilder sbValues = new StringBuilder();
@@ -216,7 +211,6 @@ public class JsonOperationUtil {
                 sbValues.append(ca[i]);
             }
         }
-        keysAndValuesMapCache.put(s, mapKeysAndValues);
         return mapKeysAndValues;
     }
 
@@ -325,4 +319,5 @@ public class JsonOperationUtil {
     public static String getUndecoratedJSONStr(String json){
         return json.replaceAll("\\s+","");
     }
+
 }

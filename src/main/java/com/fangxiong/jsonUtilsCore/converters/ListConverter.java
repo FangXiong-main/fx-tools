@@ -49,13 +49,13 @@ public class ListConverter implements GenericTypeJsonConverter {
                                 convertedList.add(null);
                             }
                         }else {
-                            convertedList.add(NonGenericTypeConverterFactory.getConverter((Class<?>) tempType).convert(values,(Class<?>) tempType));
+                            convertedList.add(NonGenericTypeConverterFactory.getConverter((Class<?>) tempType).convert(values,(Class<?>) tempType,null));
                         }
                     }
                 }else{
                     Class<?> tempClazz = (Class<?>) type;
                     for(String value : valueListToArr){
-                        convertedList.add(NonGenericTypeConverterFactory.getConverter(tempClazz).convert(value,tempClazz));
+                        convertedList.add(NonGenericTypeConverterFactory.getConverter(tempClazz).convert(value,tempClazz,null));
                     }
                 }
             }
