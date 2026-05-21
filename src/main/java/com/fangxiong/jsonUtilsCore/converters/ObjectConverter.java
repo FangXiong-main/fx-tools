@@ -21,11 +21,16 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
 
     private static final Pattern isIntegerPattern = Pattern.compile("-?(\\d+)");
     private static final Pattern isDicimalPattern = Pattern.compile("-?(\\d+\\.\\d+)");
+    private static final Map<String,Object> objectConvertorCache = new HashMap<>();
     @Override
     public Object convert(String s, Class<?> clazz,Field field) {
         String tempFiledName=null;String tempValue=null;String tempFiledType=null;
         if(GlobalCustomizeClazzDetector.isCustomizeClazz(clazz)){
             try {
+                Object cache = objectConvertorCache.get(s);
+                if(cache != null){
+                    return cache;
+                }
                 Field[] df = GlobalConverterCacheLib.getConverterFieldCache(clazz);
                 Map<Field,Method> setMethodCache = GlobalConverterCacheLib.getConverterSetMethodCache(clazz);
                 Map<Field,Type> partTypeCache = GlobalConverterCacheLib.getConverterPartTypeCache(clazz);
@@ -49,6 +54,7 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
                         setMethodCache.get(f).invoke(convertedObj,convertFiled(null,partTypeCache.get(f),f));
                     }
                 }
+                objectConvertorCache.put(s,convertedObj);
                 return convertedObj;
             } catch (Exception e) {
                 throw new JsonConvertFailureError("Convert fieldType: '"+tempFiledType+"',fieldName: '"+tempFiledName+"' with"+" value: '"+tempValue+"' failed.",e);

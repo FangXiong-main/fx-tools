@@ -10,6 +10,7 @@ import java.util.Map;
 
 public class NonGenericTypeConverterFactory {
     private static final Map<Class<?>, NonGenericTypeJsonConverter> converterMap = new HashMap<>();
+    private static final Map<String,Object> normalTypesConverterCache = new HashMap<>();
 
     static {
         converterMap.put(LocalDateTime.class,new LocalDateTimeConverter());
