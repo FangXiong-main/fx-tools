@@ -98,7 +98,7 @@ public class NonGenericTypeConverterFactory {
                 return null;
             }
             JsonOperationUtil.jsonValueValidationChecker(s, BigDecimal.class);
-            return BigDecimal.valueOf(Double.parseDouble(s));
+            return new BigDecimal(s);
         });
     }
 

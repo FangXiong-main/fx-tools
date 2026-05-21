@@ -26,6 +26,9 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
         String tempFiledName=null;String tempValue=null;String tempFiledType=null;
         if(GlobalCustomizeClazzDetector.isCustomizeClazz(clazz)){
             try {
+                if(s == null){
+                    return null;
+                }
                 Field[] df = GlobalConverterCacheLib.getConverterFieldCache(clazz);
                 Map<Field,Method> setMethodCache = GlobalConverterCacheLib.getConverterSetMethodCache(clazz);
                 Map<Field,Type> partTypeCache = GlobalConverterCacheLib.getConverterPartTypeCache(clazz);
