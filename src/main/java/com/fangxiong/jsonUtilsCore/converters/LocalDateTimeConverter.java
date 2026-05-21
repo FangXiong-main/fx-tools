@@ -17,14 +17,18 @@ public class LocalDateTimeConverter implements NonGenericTypeJsonConverter {
         }
         if(field.getAnnotation(TimeType.class)!=null){
             TimeType timeType = field.getAnnotation(TimeType.class);
-            return LocalDateTime.parse(s,DateTimeFormatter.ofPattern(timeType.value()));
+            try {
+                return LocalDateTime.parse(s,DateTimeFormatter.ofPattern(timeType.value()));
+            } catch (Exception e) {
+                throw new JsonConvertFailureError("Convert '"+s+"'"+" to LocalDateTime failure,the format can't be identified or parsed with pattern : "+timeType.value(),e);
+            }
         }
         LocalDateTime parse = null;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         try {
             parse = LocalDateTime.parse(s,formatter);
         } catch (Exception e) {
-            throw new JsonConvertFailureError("Convert '"+s+"'"+" to LocalDateTime failure,the format can't be identified or parsed with default patter:yyyy-MM-dd'T'HH:mm:ss",e);
+            throw new JsonConvertFailureError("Convert '"+s+"'"+" to LocalDateTime failure,the format can't be identified or parsed with default pattern :yyyy-MM-dd'T'HH:mm:ss",e);
         }
         return parse;
     }
