@@ -27,6 +27,9 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
         String tempFiledName=null;String tempValue=null;String tempFiledType=null;
         if(GlobalCustomizeClazzDetector.isCustomizeClazz(clazz)){
             try {
+                if (s == null){
+                    return null;
+                }
                 Object cache = objectConvertorCache.get(s);
                 if(cache != null){
                     return cache;
