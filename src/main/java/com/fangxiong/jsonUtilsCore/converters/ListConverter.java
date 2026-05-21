@@ -7,15 +7,10 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 public class ListConverter implements GenericTypeJsonConverter {
-    private static final Map<String,Object> listConverterCache= new HashMap<>();
     @Override
     public Object convert(String json, Type type) {
         if(json==null){
             return null;
-        }
-        Object cache = listConverterCache.get(json);
-        if(cache != null){
-            return cache;
         }
         List<Object> convertedList = new ArrayList<>();
         if (type instanceof ParameterizedType pt){
@@ -65,7 +60,6 @@ public class ListConverter implements GenericTypeJsonConverter {
                 }
             }
         }
-        listConverterCache.put(json,convertedList);
         return convertedList;
     }
 }
