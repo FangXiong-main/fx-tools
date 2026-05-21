@@ -7,11 +7,16 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 public class MapConverter implements GenericTypeJsonConverter {
+    private static final Map<String,Object> mapConverterCache = new HashMap<>();
 
     @Override
     public Object convert(String json, Type type) {
         if(json==null){
             return null;
+        }
+        Object cache = mapConverterCache.get(json);
+        if(cache != null){
+            return cache;
         }
         Map<Object,Object> convertedMap = new HashMap<>();
         if(type instanceof ParameterizedType pt){
@@ -61,6 +66,7 @@ public class MapConverter implements GenericTypeJsonConverter {
                 }
             }
         }
+        mapConverterCache.put(json,convertedMap);
         return convertedMap;
     }
 }
