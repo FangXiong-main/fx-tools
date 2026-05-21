@@ -2,6 +2,7 @@ package com.fangxiong.jsonUtilsCore.parsers;
 
 import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -26,8 +27,12 @@ public class ParserFactory {
         parserMap.put(HashMap.class,new MapParser());
         parserMap.put(Map.class,new MapParser());
         parserMap.put(Boolean.class,(o,f)->o==null ? null : o.toString());
+        parserMap.put(boolean.class,(o,f)->o==null ? null : o.toString());
         parserMap.put(Double.class,(o,f)->o==null ? null : o.toString());
+        parserMap.put(double.class,(o,f)->o==null ? null : o.toString());
         parserMap.put(Float.class,(o,f)->o==null ? null : o.toString());
+        parserMap.put(float.class,(o,f)->o==null ? null : o.toString());
+        parserMap.put(BigDecimal.class,(o, f)->o==null ? null : o.toString());
         parserMap.put(ArrayList.class,new ListParser());
         parserMap.put(List.class,new ListParser());
         parserMap.put(Set.class,new SetParser());
