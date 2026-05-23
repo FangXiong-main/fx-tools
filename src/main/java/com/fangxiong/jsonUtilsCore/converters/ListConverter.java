@@ -20,7 +20,7 @@ public class ListConverter implements GenericTypeJsonConverter {
         List<Object> convertedList = new ArrayList<>();
         if (type instanceof ParameterizedType pt){
             if(pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1] instanceof ParameterizedType pt2){
-                Map<String, String> partlyMap = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(json);
+                Map<String, String> partlyMap = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(json,null);
                 for (String key : partlyMap.keySet()){
                     convertedList.add(GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) pt2.getRawType()).convert(partlyMap.get(key),pt2));
                 }

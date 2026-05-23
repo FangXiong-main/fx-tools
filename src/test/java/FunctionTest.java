@@ -1,6 +1,7 @@
 import com.fangxiong.globalUtils.GlobalCustomizeClazzDetector;
 import com.fangxiong.jsonUtilsCore.coreUtil.CustomizeGenericTypes;
 import com.fangxiong.jsonUtilsCore.enums.DecorateJson;
+import com.fangxiong.jsonUtilsCore.enums.SafetyCheckLevel;
 import com.fangxiong.utils.json.JsonUtils;
 import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
 import com.fangxiong.utils.mysql.MysqlUtils;
@@ -104,7 +105,7 @@ public class FunctionTest {
                 "    }\n" +
                 "  ]\n" +
                 "}";
-        TestConvertNestingEntity testConvertNestingEntity = JsonUtils.jsonToBean(json, TestConvertNestingEntity.class);
+        TestConvertNestingEntity testConvertNestingEntity = JsonUtils.jsonToBean(json, TestConvertNestingEntity.class, SafetyCheckLevel.SKIP);
         System.out.println(JsonUtils.beanToJson(testConvertNestingEntity, DecorateJson.YES));
     }
 
@@ -141,7 +142,7 @@ public class FunctionTest {
         String undecoratedJSONStr = JsonOperationUtil.getUndecoratedJSONStr(json2);
         System.out.println(undecoratedJSONStr);
         Map<String, String> splitMainJsonToPartlyMap = JsonOperationUtil.getSplitMainJsonToPartlyMap(sb, undecoratedJSONStr);
-        Map<String, String> keysAndValuesMapWithJsonStr = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(undecoratedJSONStr);
+        Map<String, String> keysAndValuesMapWithJsonStr = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(undecoratedJSONStr,null);
         System.out.println(keysAndValuesMapWithJsonStr);
         System.out.println(sb.toString());
         System.out.println(splitMainJsonToPartlyMap);
@@ -210,7 +211,7 @@ public class FunctionTest {
                 "    ]\n" +
                 "  }\n" +
                 "]";
-        Map<String, String> keysAndValuesMapWithJsonStr = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(JsonOperationUtil.getUndecoratedJSONStr(json));
+        Map<String, String> keysAndValuesMapWithJsonStr = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(JsonOperationUtil.getUndecoratedJSONStr(json),null);
         System.out.println(keysAndValuesMapWithJsonStr);
         List<Map<String, List<Map<String, Object>>>> localNestedData;
         List<Map<String, List<Map<String, Object>>>> o = (List<Map<String, List<Map<String, Object>>>>)JsonUtils.jsonToBean(json, new CustomizeGenericTypes("List<Map<String, List<Map<String, Object>>>>"));
@@ -325,7 +326,7 @@ public class FunctionTest {
         System.out.println(JsonOperationUtil.getUndecoratedJSONStr(s));
         String json = "[{\"key\":\"数组内Map\"}]";
         String undecoratedJSONStr = JsonOperationUtil.getUndecoratedJSONStr(json);
-        Map<String, String> jsonKeysAndValuesWithPartlyMap = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(undecoratedJSONStr);
+        Map<String, String> jsonKeysAndValuesWithPartlyMap = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(undecoratedJSONStr,null);
         System.out.println(jsonKeysAndValuesWithPartlyMap);
     }
 
@@ -372,7 +373,7 @@ public class FunctionTest {
                 "]";
         String json = JsonOperationUtil.getUndecoratedJSONStr(json1);
         System.out.println(json);
-        Map<String, String> m1 = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(json);
+        Map<String, String> m1 = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(json,null);
         System.out.println(m1);
         StringBuilder sb = new StringBuilder();
         System.out.println(JsonOperationUtil.getSplitMainJsonToPartlyMap(sb, json));
@@ -584,7 +585,7 @@ public class FunctionTest {
         String json2 = "[\"Header\":{\"id\":1,\"name\":\"FX\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"},\"map\":{\"id\":20,\"name\":\"fx\",\"age\":20,\"gender\":\"male\",\"date\":\"2026-04-17T20:51:06\"}]";
         StringBuilder sb = new StringBuilder();
         Map<String, String> splitMainEntityAndFieldEntity = JsonOperationUtil.getSplitMainJsonToPartlyMap(sb,json);
-        System.out.println(JsonOperationUtil.getKeysAndValuesMapWithJsonStr(sb.toString()));
+        System.out.println(JsonOperationUtil.getKeysAndValuesMapWithJsonStr(sb.toString(),null));
         System.out.println(sb);
         System.out.println(splitMainEntityAndFieldEntity);
         System.out.println(splitMainEntityAndFieldEntity.keySet());
@@ -874,7 +875,7 @@ public class FunctionTest {
     @Test
     public void testGetJSONKeysAndValues2() {
         String json = "{\"date\":\"2026-04-14T13:34:31\"}";
-        JsonOperationUtil.getKeysAndValuesMapWithJsonStr(json);
+        JsonOperationUtil.getKeysAndValuesMapWithJsonStr(json,null);
     }
 
 

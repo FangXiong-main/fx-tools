@@ -37,7 +37,7 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
                 Field[] df = GlobalConverterCacheLib.getConverterFieldCache(clazz);
                 Map<Field,Method> setMethodCache = GlobalConverterCacheLib.getConverterSetMethodCache(clazz);
                 Map<Field,Type> partTypeCache = GlobalConverterCacheLib.getConverterPartTypeCache(clazz);
-                Map<String, String> allFieldValue = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(s);
+                Map<String, String> allFieldValue = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(s,clazz);
                 Object convertedObj = clazz.getDeclaredConstructor().newInstance();
                 for(Field f : df){
                     tempFiledType=f.getType().getTypeName();tempFiledName = f.getName();tempValue=allFieldValue.get(f.getName());
@@ -96,7 +96,7 @@ public class ObjectConverter implements NonGenericTypeJsonConverter {
                 return null;
             }
         } else if (objectValueStr.charAt(0)=='{') {
-            Map<String, String> partlyMap = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(objectValueStr);
+            Map<String, String> partlyMap = JsonOperationUtil.getKeysAndValuesMapWithJsonStr(objectValueStr,null);
             if(!partlyMap.isEmpty()){
                 return new CustomizeGenericTypes(Map.class,Object.class);
             }else {

@@ -92,4 +92,12 @@ public class GlobalCustomizeClazzDetector {
         return !clazzList.contains(clazz);
     }
 
+    public static Boolean isDigitType(Class<?> clazz){
+        return clazz == Integer.class || clazz == int.class || clazz == Float.class || clazz == float.class || clazz == Double.class || clazz == double.class || clazz == BigInteger.class || clazz == BigDecimal.class;
+    }
+
+    public static Boolean isIntegerType(Class<?> clazz){
+        return clazz == int.class || clazz == Integer.class || clazz == BigInteger.class;
+    }
+
 }

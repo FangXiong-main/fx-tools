@@ -109,7 +109,7 @@ public class MysqlCoreUtils {
                 Method method = converterGetMethodCache.get(f);
                 tempMethodName = method.getName();
                 Object o = method.invoke(entity);
-                if(isDigitType(f.getType())){
+                if(GlobalCustomizeClazzDetector.isDigitType(f.getType())){
                     filedValueCache.put(f.getName(), o == null ? null : o.toString());
                 }else {
                     filedValueCache.put(f.getName(), o == null ? null : "'"+convertEscapeCharacterToStr(o.toString())+"'");
@@ -129,7 +129,7 @@ public class MysqlCoreUtils {
             if(annotation == null){
                 throw new MysqlUtilsException("Multiple params but without @ParamName annotation.Param ==> Type: '"+p.getType().getName()+"' with value: '"+args[cursor].toString()+"'.");
             }
-            if(isDigitType(p.getType())){
+            if(GlobalCustomizeClazzDetector.isDigitType(p.getType())){
                 cacheMap.put(annotation.value(),args[cursor].toString());
             }else{
                 String s = convertEscapeCharacterToStr(args[cursor].toString());
@@ -167,10 +167,6 @@ public class MysqlCoreUtils {
             }
         }
         return  sb.toString();
-    }
-
-    public static Boolean isDigitType(Class<?> clazz){
-        return clazz == Integer.class || clazz == int.class || clazz == Float.class || clazz == float.class || clazz == Double.class || clazz == double.class || clazz == BigInteger.class || clazz == BigDecimal.class;
     }
 
     public static String convertColumnNameToCamelCase(String s){

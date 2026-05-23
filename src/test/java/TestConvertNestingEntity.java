@@ -14,9 +14,7 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@NotNullClass
 public class TestConvertNestingEntity {
-    @NotNullField
     private Integer id;
     private String name;
     private Boolean isActive;
