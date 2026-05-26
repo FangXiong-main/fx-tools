@@ -23,5 +23,4 @@ public class GenericTypeConverterFactory {
         }
         return genericTypeConverter.get(clazz);
     }
-
 }

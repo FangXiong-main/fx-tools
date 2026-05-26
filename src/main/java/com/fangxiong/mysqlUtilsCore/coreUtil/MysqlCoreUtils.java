@@ -9,8 +9,6 @@ import com.fangxiong.mysqlUtilsCore.exceptions.MysqlUtilsException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -107,7 +105,6 @@ public class MysqlCoreUtils {
         try {
             for(Field f : fields){
                 Method method = converterGetMethodCache.get(f);
-                tempMethodName = method.getName();
                 Object o = method.invoke(entity);
                 if(GlobalCustomizeClazzDetector.isDigitType(f.getType())){
                     filedValueCache.put(f.getName(), o == null ? null : o.toString());
