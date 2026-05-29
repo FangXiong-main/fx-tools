@@ -24,6 +24,10 @@ public class RedisUtils {
         this.stringRedisTemplate = stringRedisTemplate;
     }
 
+    public void remove(String key) {
+        stringRedisTemplate.delete(key);
+    }
+
     /**
      * 存储字符串数据（无过期时间）
      * @param key 键
@@ -44,7 +48,7 @@ public class RedisUtils {
         if(l==0L){
             stringRedisTemplate.opsForValue().set(key,jsonStr);
         }else{
-            stringRedisTemplate.opsForValue().set(key,jsonStr,l);
+            stringRedisTemplate.opsForValue().set(key,jsonStr,l,TimeUnit.MILLISECONDS);
         }
     }
 
