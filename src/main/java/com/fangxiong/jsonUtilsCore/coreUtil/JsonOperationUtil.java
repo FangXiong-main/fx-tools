@@ -131,23 +131,6 @@ public class JsonOperationUtil {
         Map<String,String> mapKeysAndValues = new LinkedHashMap<>();
         StringBuilder sbKeys = new StringBuilder();
         StringBuilder sbValues = new StringBuilder();
-        if(clazz != null){
-            List<EntityStructureCache> entityStructurePattern = EntityStructureCacheManager.getEntityStructurePattern(clazz);
-            for(EntityStructureCache e : entityStructurePattern){
-                Matcher matcher = e.getFieldPattern().matcher(s);
-                sbKeys.append(e.getFieldName());
-                if(matcher.find()){
-                    sbValues.append(matcher.group(1));
-                }
-                String tempValue = null;
-                if (!sbValues.isEmpty()){
-                    tempValue = sbValues.toString();
-                }
-                mapKeysAndValues.put(sbKeys.toString(),tempValue);
-                sbKeys.setLength(0);sbValues.setLength(0);
-            }
-            return mapKeysAndValues;
-        }
         char[] ca = s.toCharArray();
         int quotationMarksCount = 0;
         boolean isReadingKey = false;boolean isReadingValue = false;boolean isEmptyEntity = false;int isEmptyEntityCount=0;int noKeyListInt=1;boolean isListEntity=false;
