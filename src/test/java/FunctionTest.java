@@ -25,6 +25,13 @@ public class FunctionTest {
     }
 
     @Test
+    public void testString(){
+        String json = "\"hello world\"";
+        String o = JsonUtils.jsonToBean(json, String.class);
+        System.out.println(JsonUtils.beanToJson(o));
+    }
+
+    @Test
     public void testMysqlUtils(){
         String url = "jdbc:mysql://localhost:3306/db1?serverTimezone=UTC&useSSL=false";
         String user = "root";

@@ -9,9 +9,21 @@ import com.fangxiong.jsonUtilsCore.enums.DecorateJson;
 import com.fangxiong.jsonUtilsCore.enums.SafetyCheckLevel;
 import com.fangxiong.jsonUtilsCore.parsers.ParserFactory;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class JsonUtils {
 
+    private static final Pattern stringPattern = Pattern.compile("\"(\\S+)\"");
     public static String beanToJson(Object o) {
+        if(o instanceof String){
+            Matcher matcher = stringPattern.matcher(o.toString());
+            if (matcher.find()){
+                return matcher.group(1);
+            }else {
+                return (String) o;
+            }
+        }
         return ParserFactory.getParser(o.getClass()).parse(o, null);
     }
 
