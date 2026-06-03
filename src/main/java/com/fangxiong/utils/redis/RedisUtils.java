@@ -1,5 +1,6 @@
 package com.fangxiong.utils.redis;
 
+import com.fangxiong.jsonUtilsCore.coreUtil.CustomizeGenericTypes;
 import com.fangxiong.utils.json.JsonUtils;
 import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -27,6 +28,21 @@ public class RedisUtils {
     public void remove(String key) {
         stringRedisTemplate.delete(key);
     }
+
+    public boolean checkSMSCodeSendOverTimes(String key,Integer times,Long ttl){
+        String s = stringRedisTemplate.opsForValue().get(key);
+        if(!JsonOperationUtil.strIsNotBlank(s)){
+            stringRedisTemplate.opsForValue().set(key,"0",ttl,TimeUnit.MILLISECONDS);
+            return false;
+        }
+        Integer redisTimes = JsonUtils.jsonToBean(s, Integer.class);
+        return redisTimes >= times;
+    }
+
+    public void increaseSMSCodeSendTimes(String key){
+        stringRedisTemplate.opsForValue().increment(key,1);
+    }
+
 
     /**
      * 存储字符串数据（无过期时间）
@@ -62,6 +78,14 @@ public class RedisUtils {
         String jsonStr = stringRedisTemplate.opsForValue().get(key);
         if(JsonOperationUtil.strIsNotBlank(jsonStr)){
             return JsonUtils.jsonToBean(jsonStr, clazz);
+        }
+        return null;
+    }
+
+    public Object getStringValueWithCustomizeGenericTypes(String key, CustomizeGenericTypes typeParams) {
+        String jsonStr = stringRedisTemplate.opsForValue().get(key);
+        if(JsonOperationUtil.strIsNotBlank(jsonStr)){
+            return JsonUtils.jsonToBean(jsonStr, typeParams);
         }
         return null;
     }
