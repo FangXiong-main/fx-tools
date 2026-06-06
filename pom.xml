@@ -6,7 +6,7 @@
 
     <groupId>com.fangxiong</groupId>
     <artifactId>fx-tools</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.0</version>
 
     <properties>
         <maven.compiler.source>16</maven.compiler.source>

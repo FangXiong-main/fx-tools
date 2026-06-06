@@ -1,0 +1,5 @@
+Class User: 66.499604 ms
+Class Product: 1.297441 ms
+Class Order: 0.606304 ms
+Class Address: 0.832712 ms
+Class LogEntry: 1.11147 ms
