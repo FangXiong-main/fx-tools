@@ -24,7 +24,6 @@ public class MysqlObjectConverter implements MysqlNonGenericConverter {
     public Object converter(ResultSet resultSet, Class<?> clazz,String columName) {
         Object convertedObj = null;
         if(GlobalCustomizeClazzDetector.isCustomizeClazz(clazz)){
-            int tempCursor = 0;
             Field[] converterFieldCache = GlobalConverterCacheLib.getConverterFieldCache(clazz);
             Map<Field, Method> converterSetMethodCache = GlobalConverterCacheLib.getConverterSetMethodCache(clazz);
             Map<Field,String> converterFiledNameCache = convertAllFiledNameToUnderscore(converterFieldCache);
@@ -54,14 +53,17 @@ public class MysqlObjectConverter implements MysqlNonGenericConverter {
     }
 
     private static Object convertFiled(ResultSet resultSet,Class<?> clazz, Type type,Field field ,String columName){
+        String typeName = null;
         try {
             if(type instanceof ParameterizedType pt){
+                typeName = pt.getTypeName();
                 return MysqlGenericConverterFactory.getConverter((Class<?>) pt.getRawType()).converter(resultSet,pt.getActualTypeArguments()[pt.getActualTypeArguments().length-1]);
             }else{
+                typeName = type.getTypeName();
                 return MysqlNonGenericConverterFactory.getConverter((Class<?>) type).converter(resultSet,clazz,columName);
             }
-        } catch (SQLException e) {
-            throw new MysqlConverterError("Convert "+field.getName()+" failed,can't find the colum name:'"+columName+"',please check your field name's format or enable camelToUnderscore");
+        } catch (Exception e) {
+            throw new MysqlConverterError("Convert "+field.getName()+" failed, with type:'"+typeName+"'.Caused by type not supported or column name:'"+columName+"'not found, Suggest to enable camelToUnderscore.",e);
         }
     }
 

@@ -1,6 +1,6 @@
 package com.fangxiong.jsonUtilsCore.converters;
 
-import com.fangxiong.jsonUtilsCore.annotations.TimeType;
+import com.fangxiong.globalAnnotations.TimeType;
 import com.fangxiong.jsonUtilsCore.exceptions.JsonConvertFailureError;
 
 import java.lang.reflect.Field;

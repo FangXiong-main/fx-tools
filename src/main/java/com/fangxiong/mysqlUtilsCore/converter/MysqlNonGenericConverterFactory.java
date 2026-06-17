@@ -4,6 +4,9 @@ import com.fangxiong.mysqlUtilsCore.enums.EnableCamelCaseToUnderscore;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +14,7 @@ public class MysqlNonGenericConverterFactory {
     private static EnableCamelCaseToUnderscore camelCaseToUnderscoreEnum = EnableCamelCaseToUnderscore.ENABLE;
     private static final Map<Class<?>,MysqlNonGenericConverter> mysqlNonGenericConverterMap = new HashMap<>();
     static{
+        //(r,c,n) -> resultSet,clazz,columName
         mysqlNonGenericConverterMap.put(String.class,(r,c,n)-> {
             if(n==null){
                 return r.getString(1);
@@ -29,11 +33,29 @@ public class MysqlNonGenericConverterFactory {
             }
             return r.getInt(n);
         });
+        mysqlNonGenericConverterMap.put(Short.class,(r,c,n)->{
+            if (n == null){
+                return r.getShort(1);
+            }
+            return r.getShort(n);
+        });
         mysqlNonGenericConverterMap.put(BigInteger.class,(r,c,n)-> {
             if (n == null){
-                return r.getInt(1);
+                return r.getLong(1);
             }
-            return r.getInt(n);
+            return r.getLong(n);
+        });
+        mysqlNonGenericConverterMap.put(Long.class,(r,c,n)->{
+            if (n == null){
+                return r.getLong(1);
+            }
+            return r.getLong(n);
+        });
+        mysqlNonGenericConverterMap.put(long.class,(r,c,n)->{
+            if (n == null){
+                return r.getLong(1);
+            }
+            return r.getLong(n);
         });
         mysqlNonGenericConverterMap.put(Float.class,(r,c,n)-> {
             if(n== null){
@@ -58,6 +80,19 @@ public class MysqlNonGenericConverterFactory {
                 return r.getString(1);
             }
             return r.getString(n);
+        });
+        mysqlNonGenericConverterMap.put(LocalDate.class,(r,c,n)->{
+            if (n == null){
+               return  r.getDate(1).toLocalDate();
+            }
+            return  r.getDate(n).toLocalDate();
+        });
+        mysqlNonGenericConverterMap.put(LocalDateTime.class,new MysqlLocalDateTimeConverter());
+        mysqlNonGenericConverterMap.put(Date.class,(r,c,n)->{
+            if (n == null){
+                return r.getDate(1);
+            }
+            return r.getDate(n);
         });
     }
 

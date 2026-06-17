@@ -32,6 +32,7 @@ public class FunctionTest {
         System.out.println(JsonUtils.beanToJson(o));
     }
 
+
     @Test
     public void testMysqlUtils(){
         String url = "jdbc:mysql://localhost:3306/db1?serverTimezone=UTC&useSSL=false";
@@ -42,7 +43,8 @@ public class FunctionTest {
             Class.forName("com.mysql.cj.jdbc.Driver");
             // 2. 获取连接
             Connection conn1 = DriverManager.getConnection(url, user, pwd);
-            MysqlUtils.useMapper(conn1, TestMapper.class).selectOne(18,"Sniper' or '1'='1");
+            MysqlConvertTestEntity selectOne = MysqlUtils.useMapper(conn1, TestMapper.class).selectOne(18, "Sniper");
+            System.out.println(selectOne);
             Connection conn2 = DriverManager.getConnection(url, user, pwd);
             MysqlConvertTestEntity mysqlConvertTestEntity = new MysqlConvertTestEntity(18, "Sniper", 40, 98.0, "射击");
             long start = System.nanoTime();

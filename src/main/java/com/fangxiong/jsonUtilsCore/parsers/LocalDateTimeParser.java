@@ -1,6 +1,6 @@
 package com.fangxiong.jsonUtilsCore.parsers;
 
-import com.fangxiong.jsonUtilsCore.annotations.TimeType;
+import com.fangxiong.globalAnnotations.TimeType;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
