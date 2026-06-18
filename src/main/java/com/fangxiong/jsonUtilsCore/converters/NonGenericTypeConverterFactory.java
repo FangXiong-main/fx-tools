@@ -3,8 +3,10 @@ package com.fangxiong.jsonUtilsCore.converters;
 import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,7 +14,24 @@ public class NonGenericTypeConverterFactory {
     private static final Map<Class<?>, NonGenericTypeJsonConverter> converterMap = new HashMap<>();
 
     static {
+        //(s,f,d) -> (String s, Class<?> clazz, Field field)
         converterMap.put(LocalDateTime.class,new LocalDateTimeConverter());
+        converterMap.put(LocalDate.class,new LocalDateConverter());
+        converterMap.put(Date.class,new DateConverter());
+        converterMap.put(Short.class,(s,f,d)->{
+            if (s == null){
+                return null;
+            }
+            JsonOperationUtil.jsonValueValidationChecker(s, Short.class);
+            return Short.parseShort(s);
+        });
+        converterMap.put(short.class,(s,f,d)->{
+            if (s == null){
+                return null;
+            }
+            JsonOperationUtil.jsonValueValidationChecker(s, short.class);
+            return Short.parseShort(s);
+        });
         converterMap.put(Integer.class,(s,f,d)-> {
             if (s == null) {
                 return null;

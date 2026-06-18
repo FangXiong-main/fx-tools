@@ -99,11 +99,13 @@ public class FunctionTest {
     @Test
     public void testNotNull(){
         String json = "{\n" +
-                "  \"id\": 1001,\n" +
+                "  \"id\": 11,\n" +
                 "  \"name\": \"fx\",\n" +
                 "  \"isActive\": true,\n" +
                 "  \"score\": 98.5,\n" +
                 "  \"createTime\": \"2025:01:01T12:00:00.123\",\n" +
+                "  \"testTime\": \"2025-01-01\",\n" +
+                "  \"testDateTime\": \"2025-01-01T12:00:00\",\n" +
                 "  \"ultimateTest\": [\n" +
                 "    {\n" +
                 "      \"level1\": [\n" +

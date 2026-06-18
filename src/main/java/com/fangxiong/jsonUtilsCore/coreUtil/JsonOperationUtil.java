@@ -63,7 +63,7 @@ public class JsonOperationUtil {
     }
 
     public static void jsonValueValidationChecker(String valueStr,Class<?> valueType){
-        if(valueType==Integer.class||valueType==int.class){
+        if(valueType==Integer.class||valueType==int.class||valueType==Long.class||valueType==long.class||valueType==short.class||valueType== Short.class){
             if(!jsonIntegerValuePattern.matcher(valueStr).matches()){
                 throw new JsonInvalidValueError("Invalid integer value:"+valueStr);
             } else {

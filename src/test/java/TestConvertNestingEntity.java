@@ -4,7 +4,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -12,12 +14,14 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TestConvertNestingEntity {
-    private Integer id;
+    private Long id;
     private String name;
     private Boolean isActive;
     private BigDecimal score;
     @TimeType("yyyy:MM:dd'T'HH:mm:ss.SSS")
     private LocalDateTime createTime;
+    private LocalDate testTime;
+    private Date testDateTime;
     private List<Map<String, List<Map<String, Integer>>>> ultimateTest;
 
 }

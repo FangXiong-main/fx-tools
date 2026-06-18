@@ -136,7 +136,6 @@ public class GlobalConverterCacheLib {
         Map<Field,Method> cacheMap = new HashMap<>();
         String methodName = null;
         try {
-            cacheMap = new HashMap<>();
             for (Field f : fields) {
                 char upperCase = Character.toUpperCase(f.getName().charAt(0));
                 if(f.getName().length()==1){
