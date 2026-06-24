@@ -14,7 +14,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TestConvertNestingEntity {
-    private Long id;
+    private long id;
     private String name;
     private Boolean isActive;
     private BigDecimal score;

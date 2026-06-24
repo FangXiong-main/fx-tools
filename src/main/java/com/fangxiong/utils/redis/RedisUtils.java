@@ -4,10 +4,12 @@ import com.fangxiong.jsonUtilsCore.coreUtil.CustomizeGenericTypes;
 import com.fangxiong.utils.json.JsonUtils;
 import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -15,6 +17,12 @@ import java.util.function.Function;
 import static com.fangxiong.constants.SystemConstants.*;
 
 public class RedisUtils {
+    private static final String UNLOCK_SCRIPT =
+            "if redis.call('get', KEYS[1]) == ARGV[1] then " +
+                    "    return redis.call('del', KEYS[1]) " +
+                    "else " +
+                    "    return 0 " +
+                    "end";
     private final StringRedisTemplate stringRedisTemplate;
 
     /**
@@ -212,7 +220,7 @@ public class RedisUtils {
      * @param sequenceDigits Id中序列号所占的位数
      * @param machineCode 机器码
     */
-    public long uniqueIdGenerator(String keyPrefix,String timeKeyPattern,LocalDateTime startTime,int timeStampDigits,int machineCodeDigits,int sequenceDigits,long machineCode) {
+    public Long uniqueIdGenerator(String keyPrefix,String timeKeyPattern,LocalDateTime startTime,int timeStampDigits,int machineCodeDigits,int sequenceDigits,long machineCode) {
         if(timeStampDigits+machineCodeDigits+sequenceDigits>MAX_DIGITS_OF_ID || timeStampDigits+machineCodeDigits+sequenceDigits<=0){
             throw new RuntimeException("设定的Id位数超出最大63位的限制！且最少为1位，The digits of the Id digits must be less than or equal to 63 and greater than or equal to 1");
         }
@@ -272,12 +280,19 @@ public class RedisUtils {
         stringRedisTemplate.opsForValue().set(fullKey,JsonUtils.beanToJson(redisData));
     }
 
-    public Boolean enableLock(String key) {
-        return stringRedisTemplate.opsForValue().setIfAbsent(key, "1", 20, TimeUnit.SECONDS);
+    public Boolean enableLock(String key,String uuid) {
+        return stringRedisTemplate.opsForValue().setIfAbsent(key, uuid, 30, TimeUnit.SECONDS);
     }
 
-    public Boolean disableLock(String key) {
-        return stringRedisTemplate.delete(key);
+    public void disableLock(String key,String uuid) {
+        Long result = stringRedisTemplate.execute(
+                new DefaultRedisScript<>(UNLOCK_SCRIPT, Long.class),
+                Collections.singletonList(key),
+                uuid
+        );
+        if (result != null && result == 1){
+            stringRedisTemplate.delete(key);
+        }
     }
 
     /**
