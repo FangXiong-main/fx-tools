@@ -192,4 +192,4 @@ repository or contact the maintainer at `fangxiong520@outlook.com`.
 
 ## Related Thesis
 
-https://www.sciencedirect.com/science/article/pii/S2352711026003407
+[![DOI](https://img.shields.io/badge/DOI-10.1016/j.softx.2026.102848-blue)](https://doi.org/10.1016/j.softx.2026.102848)
