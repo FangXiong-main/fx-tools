@@ -32,6 +32,11 @@ public class FunctionTest {
         System.out.println(JsonUtils.beanToJson(o));
     }
 
+    @Test
+    public void testCustomGenericTypesWithCustomClazz(){
+        
+    }
+
 
     @Test
     public void testMysqlUtils(){

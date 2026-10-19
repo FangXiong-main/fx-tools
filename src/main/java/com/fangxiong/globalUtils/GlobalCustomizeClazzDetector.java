@@ -1,4 +1,6 @@
 package com.fangxiong.globalUtils;
+import com.fangxiong.jsonUtilsCore.exceptions.CustomizeGenericError;
+
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -59,7 +61,17 @@ public class GlobalCustomizeClazzDetector {
     }
 
     public static Class<?> getClazzWithStr(String str){
-        return detClazzWithStr.get(str);
+        Class<?> tempClazz = detClazzWithStr.get(str);
+        if (tempClazz == null){
+            try {
+                Class<?> customClazz = Class.forName(str);
+                detClazzWithStr.put(str,customClazz);
+                return customClazz;
+            } catch (ClassNotFoundException e) {
+                throw new CustomizeGenericError("Cannot find the correspond Class file, please try to use full name. Example:'com.example.MyClass'");
+            }
+        }
+        return tempClazz;
     }
 
     public static Boolean isGenericTypeClazz(Class<?> clazz){
@@ -94,6 +106,15 @@ public class GlobalCustomizeClazzDetector {
 
     public static Boolean isDigitType(Class<?> clazz){
         return clazz == Integer.class || clazz == int.class || clazz == Float.class || clazz == float.class || clazz == Double.class || clazz == double.class || clazz == BigInteger.class || clazz == BigDecimal.class;
+    }
+
+    public static void addNewCustomClazzToDetector(Class<?> clazz){
+        try {
+            String clazzName = clazz.getName();
+            detClazzWithStr.put(clazzName,clazz);
+        } catch (Exception e) {
+            throw new CustomizeGenericError("Create new Class cache failed, cannot create the CustomizeGenericTye.");
+        }
     }
 
     public static Boolean isIntegerType(Class<?> clazz){
