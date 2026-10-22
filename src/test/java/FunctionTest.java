@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class FunctionTest {
-    //TODO add Parser for Set and more tye;
+    //TODO validation for custom generic types;
     @Test
     public void testSetType(){
         String json = "[\"java\", \"json\", \"java\", \"tool\", \"tool\", \"set\", \"list\"]";

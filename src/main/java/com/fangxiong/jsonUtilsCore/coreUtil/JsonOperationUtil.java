@@ -1,5 +1,6 @@
 package com.fangxiong.jsonUtilsCore.coreUtil;
 
+import com.fangxiong.jsonUtilsCore.enums.SafetyCheckLevel;
 import com.fangxiong.jsonUtilsCore.exceptions.JsonInvalidValueError;
 import com.fangxiong.jsonUtilsCore.exceptions.JsonSyntaxError;
 
@@ -15,7 +16,7 @@ public class JsonOperationUtil {
     private static final Pattern jsonIsBlankMapPattern = Pattern.compile("\\{\\s*}");
     private static final Pattern jsonIsBlankListPattern = Pattern.compile("\\[\\s*]");
     private static final Pattern jsonIntegerValuePattern = Pattern.compile("-?(\\d+)");
-    private static final Pattern jsonDicimalValuePattern = Pattern.compile("-?(\\d+\\.\\d+)");
+    private static final Pattern jsonDecimalValuePattern = Pattern.compile("-?(\\d+\\.\\d+)");
     private static final Pattern jsonInvalidCharPattern = Pattern.compile(".*([\\\\\\x00-\\x1F@#$%&<>']).*");
 
     public static Boolean strIsNotBlank(String s){
@@ -74,11 +75,11 @@ public class JsonOperationUtil {
                 }
             }
         } else if (valueType== Float.class||valueType==float.class) {
-            if(!jsonDicimalValuePattern.matcher(valueStr).matches()){
+            if(!jsonDecimalValuePattern.matcher(valueStr).matches()){
                 throw new JsonInvalidValueError("Invalid float value:"+valueStr);
             }
         } else if (valueType== Double.class||valueType==double.class) {
-            if(!jsonDicimalValuePattern.matcher(valueStr).matches()){
+            if(!jsonDecimalValuePattern.matcher(valueStr).matches()){
                 throw new JsonInvalidValueError("Invalid double value:"+valueStr);
             }
         } else if (valueType == Boolean.class || valueType == boolean.class) {
@@ -86,7 +87,7 @@ public class JsonOperationUtil {
                 throw new JsonInvalidValueError("Invalid boolean value: '"+valueStr+"'");
             }
         } else if (valueType == BigDecimal.class) {
-            if(!jsonDicimalValuePattern.matcher(valueStr).matches()&&!jsonIntegerValuePattern.matcher(valueStr).matches()){
+            if(!jsonDecimalValuePattern.matcher(valueStr).matches()&&!jsonIntegerValuePattern.matcher(valueStr).matches()){
                 throw new JsonInvalidValueError("Invalid BigDecimal value: '"+valueStr+"'");
             }
         }
