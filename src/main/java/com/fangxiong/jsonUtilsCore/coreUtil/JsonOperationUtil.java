@@ -1,6 +1,7 @@
 package com.fangxiong.jsonUtilsCore.coreUtil;
 
 import com.fangxiong.jsonUtilsCore.enums.SafetyCheckLevel;
+import com.fangxiong.jsonUtilsCore.exceptions.JsonConvertFailureError;
 import com.fangxiong.jsonUtilsCore.exceptions.JsonInvalidValueError;
 import com.fangxiong.jsonUtilsCore.exceptions.JsonSyntaxError;
 
@@ -18,6 +19,8 @@ public class JsonOperationUtil {
     private static final Pattern jsonIntegerValuePattern = Pattern.compile("-?(\\d+)");
     private static final Pattern jsonDecimalValuePattern = Pattern.compile("-?(\\d+\\.\\d+)");
     private static final Pattern jsonInvalidCharPattern = Pattern.compile(".*([\\\\\\x00-\\x1F@#$%&<>']).*");
+    private static final Integer unicodeNormalSignalLow = 0xD800;
+    private static final Integer unicodeNormalSignalHigh = 0xDFFF;
 
     public static Boolean strIsNotBlank(String s){
         if (s == null){
@@ -127,6 +130,66 @@ public class JsonOperationUtil {
             throw new JsonSyntaxError("Parentheses ot bracketDeque not matched!"+convertInfo);
         }
     }
+
+    public static String unicodeDecoder(String json){
+        StringBuilder decodedJson = new StringBuilder();
+        StringBuilder tempUnicode = new StringBuilder();
+        int tempUnicodeInt; int tempHighSurrogateInt; int tempLowSurrogateInt; String tempHighSurrogateStr; String tempLowSurrogateStr;
+        char[] jsonArr = json.toCharArray();
+        for (int i = 0; i < jsonArr.length ; i++ ){
+            if (jsonArr[i] == '\\' && i+1 < jsonArr.length && jsonArr[i+1] == 'u'){
+                if(i + 6 > jsonArr.length){
+                    throw new JsonConvertFailureError("Reach the end of the json content, cannot recognized the unicode :"+json);
+                }
+                tempUnicode.append(jsonArr[i+2]).append(jsonArr[i+3]).append(jsonArr[i+4]).append(jsonArr[i+5]);
+                tempHighSurrogateStr = tempUnicode.toString(); tempLowSurrogateStr = tempUnicode.toString();
+                try {
+                    tempUnicodeInt = Integer.parseInt(tempUnicode.toString(),16);
+                }catch (Exception e){
+                    throw new JsonConvertFailureError("Invalid unicode found : "+decodedJson+"\\u"+tempUnicode);
+                }finally {
+                    tempUnicode.setLength(0);
+                }
+                if (Character.isHighSurrogate((char) tempUnicodeInt)) {
+                    tempHighSurrogateInt = tempUnicodeInt;
+                    if ((i+6 < jsonArr.length && jsonArr[i+6] != '\\') || (i+7 < jsonArr.length && jsonArr[i+7] != 'u')){
+                        throw new JsonConvertFailureError("HighSurrogate found but no matched LowSurrogate!"+decodedJson+"\\u"+tempHighSurrogateStr);
+                    }
+                    if (i + 12 > jsonArr.length){
+                        throw new JsonConvertFailureError("Invalid LowSurrogate (At Json End): "+json);
+                    }
+                    tempUnicode.append(jsonArr[i+8]).append(jsonArr[i+9]).append(jsonArr[i+10]).append(jsonArr[i+11]);
+                    tempLowSurrogateStr = tempUnicode.toString();
+                    try {
+                        tempLowSurrogateInt = Integer.parseInt(tempUnicode.toString(),16);
+                    }catch (Exception e){
+                        throw new JsonConvertFailureError("Invalid unicode found :" +decodedJson+"\\u"+tempHighSurrogateStr+"\\u"+tempUnicode);
+                    }finally {
+                        tempUnicode.setLength(0);
+                    }
+                    if (!Character.isLowSurrogate((char) tempLowSurrogateInt)) {
+                        throw new JsonConvertFailureError("Invalid LowSurrogate: "+decodedJson+"\\u"+tempHighSurrogateStr+"\\u"+tempLowSurrogateStr);
+                    }
+                    try{
+                        char[] decodedChars = Character.toChars(Character.toCodePoint((char) tempHighSurrogateInt, (char) tempLowSurrogateInt));
+                        decodedJson.append(decodedChars);
+                    }catch (Exception e){
+                        throw new JsonConvertFailureError("Illegal surrogate combination: "+"\\u"+tempHighSurrogateStr+"\\u"+tempLowSurrogateStr);
+                    }
+                    i+=11;
+                }else if (Character.isLowSurrogate((char) tempUnicodeInt)){
+                    throw new JsonConvertFailureError("LowSurrogate should after high surrogate! Error ending : "+decodedJson+"\\u"+tempLowSurrogateStr);
+                }else {
+                    decodedJson.append((char)  tempUnicodeInt);
+                    i+=5;
+                }
+            }else {
+                decodedJson.append(jsonArr[i]);
+            }
+        }
+        return decodedJson.toString();
+    }
+
 
     public static Map<String,String> getKeysAndValuesMapWithJsonStr(String s,Class<?> clazz) {
         Map<String,String> mapKeysAndValues = new LinkedHashMap<>();

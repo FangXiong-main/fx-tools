@@ -2,6 +2,7 @@ import com.fangxiong.globalUtils.GlobalCustomizeClazzDetector;
 import com.fangxiong.jsonUtilsCore.coreUtil.CustomizeGenericTypes;
 import com.fangxiong.jsonUtilsCore.enums.DecorateJson;
 import com.fangxiong.jsonUtilsCore.enums.SafetyCheckLevel;
+import com.fangxiong.jsonUtilsCore.parsers.ParserFactory;
 import com.fangxiong.utils.json.JsonUtils;
 import com.fangxiong.jsonUtilsCore.coreUtil.JsonOperationUtil;
 import com.fangxiong.utils.mysql.MysqlUtils;
@@ -17,6 +18,20 @@ import java.util.*;
 
 public class FunctionTest {
     //TODO validation for custom generic types;
+
+    @Test
+    public void unicodeDecoderTest(){
+        String json = "{\n" +
+                "  \"id\": 11,\n" +
+                "  \"melt\": \"\\uD83E\\uDEE0\",\n" +
+                "  \"coder\": \"\\uD83D\\uDC68\\u200D\\uD83D\\uDCBB\",\n" +
+                "  \"guitar\": \"\\uD83C\\uDFB4\",\n" +
+                "  \"normalText\": \"你好\"\n" +
+                "}";
+        String s = JsonOperationUtil.unicodeDecoder(JsonOperationUtil.getUndecoratedJSONStr(json));
+        System.out.println(ParserFactory.decorateJSONStr(s));
+    }
+
     @Test
     public void testSetType(){
         String json = "[\"java\", \"json\", \"java\", \"tool\", \"tool\", \"set\", \"list\"]";
