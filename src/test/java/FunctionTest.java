@@ -1,6 +1,7 @@
 import com.fangxiong.globalUtils.GlobalCustomizeClazzDetector;
 import com.fangxiong.jsonUtilsCore.coreUtil.CustomizeGenericTypes;
 import com.fangxiong.jsonUtilsCore.enums.DecorateJson;
+import com.fangxiong.jsonUtilsCore.enums.EnableUnicodeDecode;
 import com.fangxiong.jsonUtilsCore.enums.SafetyCheckLevel;
 import com.fangxiong.jsonUtilsCore.parsers.ParserFactory;
 import com.fangxiong.utils.json.JsonUtils;
@@ -33,6 +34,11 @@ public class FunctionTest {
     }
 
     @Test
+    public void unicodeDecoderRealTest(){
+
+    }
+
+    @Test
     public void testSetType(){
         String json = "[\"java\", \"json\", \"java\", \"tool\", \"tool\", \"set\", \"list\"]";
         Object o = JsonUtils.jsonToBean(json, new CustomizeGenericTypes("Set<String>"));
@@ -49,7 +55,26 @@ public class FunctionTest {
 
     @Test
     public void testCustomGenericTypesWithCustomClazz(){
-        
+        String json = "{\n" +
+                "  \"id\": 11,\n" +
+                "  \"name\": \"\\uD83D\\uDC68\\u200D\\uD83D\\uDCBB\",\n" +
+                "  \"isActive\": true,\n" +
+                "  \"score\": 98.5,\n" +
+                "  \"createTime\": \"2025:01:01T12:00:00.123\",\n" +
+                "  \"testTime\": \"2025-01-01\",\n" +
+                "  \"testDateTime\": \"2025-01-01T12:00:00\",\n" +
+                "  \"ultimateTest\": [\n" +
+                "    {\n" +
+                "      \"level1\": [\n" +
+                "        {\n" +
+                "          \"level2\": 100\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+        TestConvertNestingEntity testConvertNestingEntity = JsonUtils.jsonToBean(json, TestConvertNestingEntity.class, SafetyCheckLevel.NORMAL, EnableUnicodeDecode.YES);
+        System.out.println(JsonUtils.beanToJson(testConvertNestingEntity, DecorateJson.YES));
     }
 
 
