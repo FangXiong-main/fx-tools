@@ -1,6 +1,5 @@
 package com.fangxiong.jsonUtilsCore.coreUtil;
 
-import com.fangxiong.jsonUtilsCore.enums.SafetyCheckLevel;
 import com.fangxiong.jsonUtilsCore.exceptions.JsonConvertFailureError;
 import com.fangxiong.jsonUtilsCore.exceptions.JsonInvalidValueError;
 import com.fangxiong.jsonUtilsCore.exceptions.JsonSyntaxError;
