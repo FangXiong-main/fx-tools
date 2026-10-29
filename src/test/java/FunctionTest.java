@@ -322,7 +322,7 @@ public class FunctionTest {
                 "    }\n" +
                 "  ]\n" +
                 "}";
-        FinalTestEntity finalTestEntity = JsonUtils.jsonToBean(json, FinalTestEntity.class);
+        FinalTestEntity finalTestEntity = JsonUtils.jsonToBean(json, FinalTestEntity.class, EnableUnicodeDecode.YES);
         System.out.println(finalTestEntity);
         System.out.println(JsonUtils.beanToJson(finalTestEntity,DecorateJson.YES));
     }

@@ -55,14 +55,18 @@ public class JsonUtils {
 
     public static <T> T jsonToBean(String jsonString, Class<T> clazz) {
         String undecoratedJSONStr = JsonOperationUtil.getUndecoratedJSONStr(jsonString);
-        JsonOperationUtil.jsonBracketMatchChecker(undecoratedJSONStr);
-        JsonOperationUtil.jsonInvalidCharacterChecker(undecoratedJSONStr);
         return (T) NonGenericTypeConverterFactory.getConverter(clazz).convert(undecoratedJSONStr, clazz,null);
     }
 
     public static <T> T jsonToBean(String jsonString, Class<T> clazz, SafetyCheckLevel safetyCheckLevel) {
         String undecoratedJSONStr = JsonOperationUtil.getUndecoratedJSONStr(jsonString);
         jsonChecker(undecoratedJSONStr,safetyCheckLevel);
+        return (T) NonGenericTypeConverterFactory.getConverter(clazz).convert(undecoratedJSONStr, clazz,null);
+    }
+
+    public static <T> T jsonToBean(String jsonString, Class<T> clazz, EnableUnicodeDecode enableUnicodeDecode) {
+        String undecoratedJSONStr = JsonOperationUtil.getUndecoratedJSONStr(jsonString);
+        undecoratedJSONStr = jsonUnicodeDecoder(undecoratedJSONStr, enableUnicodeDecode);
         return (T) NonGenericTypeConverterFactory.getConverter(clazz).convert(undecoratedJSONStr, clazz,null);
     }
 
@@ -83,6 +87,12 @@ public class JsonUtils {
     public static Object jsonToBean(String jsonString, CustomizeGenericTypes typeParams, SafetyCheckLevel safetyCheckLevel){
         String undecoratedJSONStr = JsonOperationUtil.getUndecoratedJSONStr(jsonString);
         jsonChecker(undecoratedJSONStr,safetyCheckLevel);
+        return GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) typeParams.getRawType()).convert(undecoratedJSONStr,typeParams);
+    }
+
+    public static Object jsonToBean(String jsonString, CustomizeGenericTypes typeParams, EnableUnicodeDecode enableUnicodeDecode){
+        String undecoratedJSONStr = JsonOperationUtil.getUndecoratedJSONStr(jsonString);
+        undecoratedJSONStr = jsonUnicodeDecoder(undecoratedJSONStr,enableUnicodeDecode);
         return GenericTypeConverterFactory.getGenericTypeJsonConverter((Class<?>) typeParams.getRawType()).convert(undecoratedJSONStr,typeParams);
     }
 
