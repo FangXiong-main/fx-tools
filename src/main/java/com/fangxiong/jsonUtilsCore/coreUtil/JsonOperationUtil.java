@@ -18,8 +18,6 @@ public class JsonOperationUtil {
     private static final Pattern jsonIntegerValuePattern = Pattern.compile("-?(\\d+)");
     private static final Pattern jsonDecimalValuePattern = Pattern.compile("-?(\\d+\\.\\d+)");
     private static final Pattern jsonInvalidCharPattern = Pattern.compile(".*([\\\\\\x00-\\x1F@#$%&<>']).*");
-    private static final Integer unicodeNormalSignalLow = 0xD800;
-    private static final Integer unicodeNormalSignalHigh = 0xDFFF;
 
     public static Boolean strIsNotBlank(String s){
         if (s == null){
